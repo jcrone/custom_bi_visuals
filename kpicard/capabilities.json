@@ -1,0 +1,101 @@
+{
+    "dataRoles": [
+        {
+            "displayName": "Value",
+            "name": "value",
+            "kind": "Measure",
+            "description": "The main KPI number"
+        },
+        {
+            "displayName": "Target",
+            "name": "target",
+            "kind": "Measure",
+            "description": "Target/comparison value"
+        },
+        {
+            "displayName": "Trend",
+            "name": "trend",
+            "kind": "Measure",
+            "description": "Values for the sparkline (e.g. monthly figures)"
+        },
+        {
+            "displayName": "Category",
+            "name": "category",
+            "kind": "Grouping",
+            "description": "Category axis for the sparkline (e.g. months)"
+        }
+    ],
+    "objects": {
+        "card": {
+            "properties": {
+                "title": {
+                    "type": { "text": true }
+                },
+                "showTitle": {
+                    "type": { "bool": true }
+                },
+                "valueColor": {
+                    "type": { "fill": { "solid": { "color": true } } }
+                },
+                "decimalPlaces": {
+                    "type": { "numeric": true }
+                },
+                "displayUnits": {
+                    "type": { "numeric": true }
+                }
+            }
+        },
+        "variance": {
+            "properties": {
+                "showVariance": {
+                    "type": { "bool": true }
+                },
+                "positiveColor": {
+                    "type": { "fill": { "solid": { "color": true } } }
+                },
+                "negativeColor": {
+                    "type": { "fill": { "solid": { "color": true } } }
+                }
+            }
+        },
+        "sparkline": {
+            "properties": {
+                "showSparkline": {
+                    "type": { "bool": true }
+                },
+                "lineColor": {
+                    "type": { "fill": { "solid": { "color": true } } }
+                },
+                "areaColor": {
+                    "type": { "fill": { "solid": { "color": true } } }
+                }
+            }
+        }
+    },
+    "dataViewMappings": [
+        {
+            "conditions": [
+                {
+                    "value": { "max": 1 },
+                    "target": { "max": 1 },
+                    "trend": { "max": 1 },
+                    "category": { "max": 1 }
+                }
+            ],
+            "categorical": {
+                "categories": {
+                    "for": { "in": "category" },
+                    "dataReductionAlgorithm": { "top": { "count": 1000 } }
+                },
+                "values": {
+                    "select": [
+                        { "bind": { "to": "value" } },
+                        { "bind": { "to": "target" } },
+                        { "bind": { "to": "trend" } }
+                    ]
+                }
+            }
+        }
+    ],
+    "privileges": []
+}

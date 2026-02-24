@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KPI Card Visuals — Preview</title>
+<style>
+  :root {
+    --brand-blue: #00539A;
+    --brand-blue2: #004896;
+    --brand-gold: #FDB945;
+    --brand-navy: #11284C;
+    --bg: #F6F8FB;
+    --card-bg: #FFFFFF;
+    --border: #D9E1EA;
+    --text-muted: #6B7F93;
+    --text-secondary: #3E556E;
+    --kpi-positive: #0E7C3A;
+    --kpi-negative: #B42318;
+    --font: "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--brand-navy);
+    padding: 40px;
+  }
+
+  h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--brand-navy);
+    margin-bottom: 6px;
+  }
+
+  .subtitle {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 32px;
+  }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--brand-blue);
+    margin-bottom: 14px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid var(--brand-gold);
+    display: inline-block;
+  }
+
+  /* ── Single KPI Card ── */
+  .single-cards-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 48px;
+  }
+
+  .kpi-card {
+    flex: 1 1 200px;
+    max-width: 260px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 22px 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    transition: box-shadow 0.15s ease;
+  }
+  .kpi-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.10); }
+
+  .kpi-card__title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 6px;
+  }
+
+  .kpi-card__value {
+    font-size: 34px;
+    font-weight: 700;
+    color: var(--brand-navy);
+    line-height: 1.1;
+    margin-bottom: 6px;
+  }
+
+  .kpi-card__variance {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  .kpi-card__variance.pos { color: var(--kpi-positive); }
+  .kpi-card__variance.neg { color: var(--kpi-negative); }
+
+  .kpi-card__variance .target {
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--text-muted);
+    margin-left: 4px;
+  }
+
+  .kpi-card__sparkline {
+    width: 100%;
+    height: 40px;
+    margin-top: auto;
+  }
+
+  /* ── Multi KPI Grid ── */
+  .multi-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+
+  .mini-card {
+    flex: 1 1 130px;
+    min-width: 110px;
+    max-width: 200px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: box-shadow 0.15s ease;
+  }
+  .mini-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+
+  .mini-card__title {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+
+  .mini-card__value {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--brand-navy);
+    line-height: 1.1;
+    margin-bottom: 4px;
+  }
+
+  .mini-card__variance {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .mini-card__variance.pos { color: var(--kpi-positive); }
+  .mini-card__variance.neg { color: var(--kpi-negative); }
+
+  .arrow { font-size: 9px; }
+
+  /* ── Footer ── */
+  .footer {
+    margin-top: 48px;
+    font-size: 11px;
+    color: var(--text-muted);
+    text-align: center;
+  }
+  .swatch-row {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 8px;
+  }
+  .swatch {
+    width: 18px; height: 18px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+
+  /* ── Animations ── */
+
+  /* Cards fade + slide up on load */
+  .kpi-card, .mini-card {
+    opacity: 0;
+    transform: translateY(18px);
+    animation: cardIn 0.5s ease forwards;
+  }
+  .kpi-card:nth-child(1), .mini-card:nth-child(1) { animation-delay: 0.05s; }
+  .kpi-card:nth-child(2), .mini-card:nth-child(2) { animation-delay: 0.15s; }
+  .kpi-card:nth-child(3), .mini-card:nth-child(3) { animation-delay: 0.25s; }
+  .kpi-card:nth-child(4), .mini-card:nth-child(4) { animation-delay: 0.35s; }
+  .mini-card:nth-child(5) { animation-delay: 0.45s; }
+  .mini-card:nth-child(6) { animation-delay: 0.55s; }
+
+  @keyframes cardIn {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Sparkline draws in */
+  .kpi-card__sparkline polyline {
+    stroke-dasharray: 400;
+    stroke-dashoffset: 400;
+    animation: drawLine 1.4s ease forwards;
+  }
+  .kpi-card:nth-child(1) .kpi-card__sparkline polyline { animation-delay: 0.4s; }
+  .kpi-card:nth-child(2) .kpi-card__sparkline polyline { animation-delay: 0.5s; }
+  .kpi-card:nth-child(3) .kpi-card__sparkline polyline { animation-delay: 0.6s; }
+  .kpi-card:nth-child(4) .kpi-card__sparkline polyline { animation-delay: 0.7s; }
+
+  /* Area fill fades in after line draws */
+  .kpi-card__sparkline polygon {
+    opacity: 0;
+    animation: areaFade 0.6s ease forwards;
+  }
+  .kpi-card:nth-child(1) .kpi-card__sparkline polygon { animation-delay: 1.2s; }
+  .kpi-card:nth-child(2) .kpi-card__sparkline polygon { animation-delay: 1.3s; }
+  .kpi-card:nth-child(3) .kpi-card__sparkline polygon { animation-delay: 1.4s; }
+  .kpi-card:nth-child(4) .kpi-card__sparkline polygon { animation-delay: 1.5s; }
+
+  @keyframes drawLine {
+    to { stroke-dashoffset: 0; }
+  }
+
+  @keyframes areaFade {
+    to { opacity: 1; }
+  }
+
+  /* Value count-up uses a pop effect (JS does the number ticking) */
+  .kpi-card__value, .mini-card__value {
+    transition: transform 0.15s ease;
+  }
+  .kpi-card__value.tick, .mini-card__value.tick {
+    transform: scale(1.06);
+  }
+
+  /* Variance arrow bounce */
+  .kpi-card__variance .arrow, .mini-card__variance .arrow {
+    display: inline-block;
+    opacity: 0;
+    animation: arrowBounce 0.4s ease forwards;
+  }
+  .kpi-card:nth-child(1) .arrow { animation-delay: 0.6s; }
+  .kpi-card:nth-child(2) .arrow { animation-delay: 0.7s; }
+  .kpi-card:nth-child(3) .arrow { animation-delay: 0.8s; }
+  .kpi-card:nth-child(4) .arrow { animation-delay: 0.9s; }
+  .mini-card:nth-child(1) .arrow { animation-delay: 0.6s; }
+  .mini-card:nth-child(2) .arrow { animation-delay: 0.7s; }
+  .mini-card:nth-child(3) .arrow { animation-delay: 0.8s; }
+  .mini-card:nth-child(4) .arrow { animation-delay: 0.9s; }
+  .mini-card:nth-child(5) .arrow { animation-delay: 1.0s; }
+  .mini-card:nth-child(6) .arrow { animation-delay: 1.1s; }
+
+  @keyframes arrowBounce {
+    0%   { opacity: 0; transform: translateY(6px) scale(0.6); }
+    60%  { opacity: 1; transform: translateY(-3px) scale(1.15); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+  }
+</style>
+</head>
+<body>
+
+<h1>KPI Card Visuals</h1>
+<p class="subtitle">Power BI custom visuals — preview with sample data</p>
+
+<!-- ── SINGLE CARDS ── -->
+<div class="section-label">Visual 1 — Single KPI Card</div>
+
+<div class="single-cards-row">
+
+  <!-- Revenue -->
+  <div class="kpi-card">
+    <div class="kpi-card__title">Revenue</div>
+    <div class="kpi-card__value">$2.4M</div>
+    <div class="kpi-card__variance pos">
+      <span class="arrow">&#9650;</span>
+      <span>+12.3%</span>
+      <span class="target">vs $2.1M</span>
+    </div>
+    <svg class="kpi-card__sparkline" viewBox="0 0 200 40" preserveAspectRatio="none">
+      <polygon points="2,40 2,32 28,28 56,30 84,22 112,18 140,20 168,12 198,8 198,40"
+               fill="#00539A" opacity="0.08"/>
+      <polyline points="2,32 28,28 56,30 84,22 112,18 140,20 168,12 198,8"
+                fill="none" stroke="#00539A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+
+  <!-- Profit Margin -->
+  <div class="kpi-card">
+    <div class="kpi-card__title">Profit Margin</div>
+    <div class="kpi-card__value">18.7%</div>
+    <div class="kpi-card__variance neg">
+      <span class="arrow">&#9660;</span>
+      <span>-2.1%</span>
+      <span class="target">vs 20.8%</span>
+    </div>
+    <svg class="kpi-card__sparkline" viewBox="0 0 200 40" preserveAspectRatio="none">
+      <polygon points="2,40 2,10 28,14 56,12 84,18 112,22 140,26 168,30 198,32 198,40"
+               fill="#00539A" opacity="0.08"/>
+      <polyline points="2,10 28,14 56,12 84,18 112,22 140,26 168,30 198,32"
+                fill="none" stroke="#00539A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+
+  <!-- Active Users -->
+  <div class="kpi-card">
+    <div class="kpi-card__title">Active Users</div>
+    <div class="kpi-card__value">84.2K</div>
+    <div class="kpi-card__variance pos">
+      <span class="arrow">&#9650;</span>
+      <span>+8.5%</span>
+      <span class="target">vs 77.6K</span>
+    </div>
+    <svg class="kpi-card__sparkline" viewBox="0 0 200 40" preserveAspectRatio="none">
+      <polygon points="2,40 2,34 28,30 56,28 84,26 112,24 140,18 168,14 198,10 198,40"
+               fill="#00539A" opacity="0.08"/>
+      <polyline points="2,34 28,30 56,28 84,26 112,24 140,18 168,14 198,10"
+                fill="none" stroke="#00539A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+
+  <!-- NPS Score -->
+  <div class="kpi-card">
+    <div class="kpi-card__title">NPS Score</div>
+    <div class="kpi-card__value">72</div>
+    <div class="kpi-card__variance pos">
+      <span class="arrow">&#9650;</span>
+      <span>+5.9%</span>
+      <span class="target">vs 68</span>
+    </div>
+    <svg class="kpi-card__sparkline" viewBox="0 0 200 40" preserveAspectRatio="none">
+      <polygon points="2,40 2,28 28,26 56,30 84,24 112,20 140,22 168,16 198,12 198,40"
+               fill="#00539A" opacity="0.08"/>
+      <polyline points="2,28 28,26 56,30 84,24 112,20 140,22 168,16 198,12"
+                fill="none" stroke="#00539A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+
+</div>
+
+<!-- ── MULTI CARD GRID ── -->
+<div class="section-label">Visual 2 — Multi-KPI Card (single visual)</div>
+
+<div class="multi-grid">
+
+  <div class="mini-card">
+    <div class="mini-card__title">Revenue</div>
+    <div class="mini-card__value">$2.4M</div>
+    <div class="mini-card__variance pos">
+      <span class="arrow">&#9650;</span> +12.3%
+    </div>
+  </div>
+
+  <div class="mini-card">
+    <div class="mini-card__title">COGS</div>
+    <div class="mini-card__value">$1.6M</div>
+    <div class="mini-card__variance neg">
+      <span class="arrow">&#9660;</span> -3.4%
+    </div>
+  </div>
+
+  <div class="mini-card">
+    <div class="mini-card__title">Margin</div>
+    <div class="mini-card__value">18.7%</div>
+    <div class="mini-card__variance neg">
+      <span class="arrow">&#9660;</span> -2.1%
+    </div>
+  </div>
+
+  <div class="mini-card">
+    <div class="mini-card__title">Users</div>
+    <div class="mini-card__value">84.2K</div>
+    <div class="mini-card__variance pos">
+      <span class="arrow">&#9650;</span> +8.5%
+    </div>
+  </div>
+
+  <div class="mini-card">
+    <div class="mini-card__title">Churn</div>
+    <div class="mini-card__value">3.2%</div>
+    <div class="mini-card__variance pos">
+      <span class="arrow">&#9650;</span> +0.8%
+    </div>
+  </div>
+
+  <div class="mini-card">
+    <div class="mini-card__title">NPS</div>
+    <div class="mini-card__value">72</div>
+    <div class="mini-card__variance pos">
+      <span class="arrow">&#9650;</span> +5.9%
+    </div>
+  </div>
+
+</div>
+
+<!-- ── Footer ── -->
+<div class="footer">
+  Brand palette
+  <div class="swatch-row">
+    <div class="swatch" style="background:#00539A" title="#00539A Blue"></div>
+    <div class="swatch" style="background:#11284C" title="#11284C Navy"></div>
+    <div class="swatch" style="background:#004896" title="#004896 Blue2"></div>
+    <div class="swatch" style="background:#FDB945" title="#FDB945 Gold"></div>
+    <div class="swatch" style="background:#0E7C3A" title="#0E7C3A Positive"></div>
+    <div class="swatch" style="background:#B42318" title="#B42318 Negative"></div>
+  </div>
+</div>
+
+<script>
+// Count-up animation for all value elements
+document.addEventListener('DOMContentLoaded', () => {
+  const valueEls = document.querySelectorAll('.kpi-card__value, .mini-card__value');
+
+  valueEls.forEach((el, i) => {
+    const raw = el.textContent.trim();
+    const finalText = raw;
+
+    // Parse the number, prefix ($) and suffix (M, K, %)
+    const match = raw.match(/^([^0-9\-]*)(-?[\d.]+)(.*)$/);
+    if (!match) return;
+
+    const prefix = match[1];
+    const targetNum = parseFloat(match[2]);
+    const suffix = match[3];
+    const decimals = match[2].includes('.') ? match[2].split('.')[1].length : 0;
+
+    el.textContent = prefix + '0' + suffix;
+
+    const delay = 300 + i * 120;
+    const duration = 900;
+    const startTime = performance.now() + delay;
+
+    function easeOut(t) {
+      return 1 - Math.pow(1 - t, 3);
+    }
+
+    function step(now) {
+      if (now < startTime) { requestAnimationFrame(step); return; }
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const easedProgress = easeOut(progress);
+      const current = targetNum * easedProgress;
+
+      el.textContent = prefix + current.toFixed(decimals) + suffix;
+
+      // Subtle scale pulse during counting
+      if (progress < 1) {
+        el.classList.add('tick');
+        setTimeout(() => el.classList.remove('tick'), 80);
+        requestAnimationFrame(step);
+      } else {
+        el.textContent = finalText;
+        el.classList.remove('tick');
+      }
+    }
+
+    requestAnimationFrame(step);
+  });
+});
+</script>
+
+</body>
+</html>
