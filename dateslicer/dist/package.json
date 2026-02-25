@@ -1,0 +1,17 @@
+{
+		"version": "1.0.0.0",
+		"author": {"name":"Jamie Crone","email":"jamie@example.com"},
+		"resources": [
+			{
+				"resourceId": "rId0",
+				"sourceType": 5,
+				"file": "resources/dateslicerDBDD84A5A032498BB55DDA8E91CBACB2.pbiviz.json"
+			}
+		],
+		"visual": {"name":"dateslicer","displayName":"Date Slicer","guid":"dateslicerDBDD84A5A032498BB55DDA8E91CBACB2","visualClassName":"Visual","version":"1.0.0.0","description":"A modern date picker slicer with calendar, presets, and range selection","supportUrl":"https://github.com/jamie-crone/powerbi-visuals","gitHubUrl":""},
+		"metadata": {
+			"pbivizjson": {
+				"resourceId": "rId0"
+			}
+		}
+	}

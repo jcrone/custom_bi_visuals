@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KPI Card Visuals — Preview</title>
+<title>Power BI Custom Visuals — Preview</title>
 <style>
   :root {
     --brand-blue: #00539A;
@@ -193,6 +193,124 @@
     border: 1px solid var(--border);
   }
 
+  /* ── Date Slicer ── */
+  .ds-preview-wrapper {
+    display: flex;
+    flex-direction: row;
+    width: 520px;
+    height: 340px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    font-family: var(--font);
+    font-size: 12px;
+    color: var(--brand-navy);
+    opacity: 0;
+    transform: translateY(18px);
+    animation: cardIn 0.5s ease forwards;
+    animation-delay: 0.1s;
+  }
+  .ds-preview-wrapper:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.10); }
+
+  .ds-prev-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    width: 145px;
+    padding: 12px 10px;
+    border-right: 1px solid var(--border);
+    background: var(--bg);
+  }
+  .ds-prev-toggle-row {
+    display: flex; align-items: center; gap: 6px; margin-bottom: 6px;
+  }
+  .ds-prev-toggle-row input[type="checkbox"] {
+    accent-color: var(--brand-blue); width: 15px; height: 15px;
+  }
+  .ds-prev-toggle-row span { font-weight: 600; font-size: 12px; }
+
+  .ds-prev-preset {
+    display: block; width: 100%; padding: 4px 8px;
+    border: none; border-radius: 4px; background: transparent;
+    color: var(--brand-blue); font-family: var(--font);
+    font-size: 12px; font-weight: 600; text-align: left; cursor: pointer;
+    transition: background 0.15s;
+  }
+  .ds-prev-preset:hover { background: rgba(0,83,154,0.10); }
+  .ds-prev-preset.active { background: rgba(253,185,69,0.22); }
+
+  .ds-prev-days-row {
+    display: flex; align-items: center; gap: 5px; margin-top: 3px;
+  }
+  .ds-prev-days-input {
+    width: 32px; padding: 2px 3px; border: 1px solid var(--border);
+    border-radius: 4px; font-size: 11px; text-align: center;
+    color: var(--brand-navy); background: var(--card-bg);
+  }
+  .ds-prev-days-label { font-size: 10px; color: var(--text-muted); }
+
+  .ds-prev-main {
+    flex: 1; display: flex; flex-direction: column;
+    padding: 12px; gap: 6px;
+  }
+
+  .ds-prev-today-btn {
+    align-self: flex-start; padding: 3px 12px;
+    border: 1px solid var(--brand-blue); border-radius: 8px;
+    background: transparent; color: var(--brand-blue);
+    font-family: var(--font); font-size: 12px; font-weight: 600; cursor: pointer;
+  }
+  .ds-prev-today-btn:hover { background: var(--brand-blue); color: #fff; }
+
+  .ds-prev-input-row { display: flex; gap: 8px; }
+  .ds-prev-date-input {
+    flex: 1; padding: 4px 8px; border: 1px solid var(--border);
+    border-radius: 4px; font-family: var(--font); font-size: 12px;
+    color: var(--brand-navy); background: var(--card-bg);
+  }
+
+  .ds-prev-nav { display: flex; align-items: center; gap: 6px; justify-content: center; }
+  .ds-prev-nav button {
+    width: 26px; height: 26px; border: none; border-radius: 4px;
+    background: transparent; color: var(--brand-navy); font-size: 13px; cursor: pointer;
+  }
+  .ds-prev-nav button:hover { background: rgba(0,83,154,0.10); }
+  .ds-prev-nav select {
+    padding: 2px 4px; border: 1px solid var(--border); border-radius: 4px;
+    font-family: var(--font); font-size: 12px; color: var(--brand-navy);
+    background: var(--card-bg); cursor: pointer;
+  }
+
+  .ds-prev-day-headers {
+    display: grid; grid-template-columns: repeat(7, 1fr);
+    text-align: center; font-size: 11px; font-weight: 600; color: var(--text-muted);
+  }
+  .ds-prev-grid {
+    display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px;
+  }
+  .ds-prev-cell {
+    display: flex; align-items: center; justify-content: center;
+    height: 26px; font-size: 12px; border-radius: 4px; cursor: pointer;
+    transition: background 0.12s; user-select: none;
+  }
+  .ds-prev-cell:hover { background: rgba(0,83,154,0.10); }
+  .ds-prev-cell.other { color: var(--text-muted); opacity: 0.45; }
+  .ds-prev-cell.today { font-weight: 700; box-shadow: inset 0 0 0 2px var(--brand-blue); }
+  .ds-prev-cell.in-range { background: rgba(253,185,69,0.22); border-radius: 0; }
+  .ds-prev-cell.range-start {
+    background: var(--brand-blue); color: #fff; border-radius: 4px 0 0 4px; font-weight: 600;
+  }
+  .ds-prev-cell.range-end {
+    background: var(--brand-blue); color: #fff; border-radius: 0 4px 4px 0; font-weight: 600;
+  }
+
+  @keyframes ds-dropdown-anim {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
   /* ── Animations ── */
 
   /* Cards fade + slide up on load */
@@ -275,8 +393,8 @@
 </head>
 <body>
 
-<h1>KPI Card Visuals</h1>
-<p class="subtitle">Power BI custom visuals — preview with sample data</p>
+<h1>Power BI Custom Visuals</h1>
+<p class="subtitle">Custom visuals — preview with sample data</p>
 
 <!-- ── SINGLE CARDS ── -->
 <div class="section-label">Visual 1 — Single KPI Card</div>
@@ -408,6 +526,127 @@
 
 </div>
 
+<!-- ── DATE SLICER ── -->
+<div class="section-label" style="margin-top: 48px;">Visual 3 — Date Slicer / Date Picker</div>
+
+<div class="ds-preview-wrapper">
+  <!-- Sidebar -->
+  <div class="ds-prev-sidebar">
+    <div class="ds-prev-toggle-row">
+      <input type="checkbox" checked>
+      <span>Date Range</span>
+    </div>
+    <button class="ds-prev-preset">Yesterday</button>
+    <button class="ds-prev-preset">Today</button>
+    <button class="ds-prev-preset">Min Date</button>
+    <button class="ds-prev-preset active">This Week</button>
+    <button class="ds-prev-preset">Last Week</button>
+    <button class="ds-prev-preset">This Month</button>
+    <div class="ds-prev-days-row">
+      <input class="ds-prev-days-input" type="number" value="7" min="1">
+      <span class="ds-prev-days-label">days up to today</span>
+    </div>
+    <div class="ds-prev-days-row">
+      <input class="ds-prev-days-input" type="number" value="7" min="1">
+      <span class="ds-prev-days-label">days starting today</span>
+    </div>
+  </div>
+  <!-- Main Panel -->
+  <div class="ds-prev-main">
+    <button class="ds-prev-today-btn">Today</button>
+    <div class="ds-prev-input-row">
+      <input class="ds-prev-date-input" type="text" value="02/23/2026" readonly>
+      <input class="ds-prev-date-input" type="text" value="03/01/2026" readonly>
+    </div>
+    <div class="ds-prev-nav">
+      <button>&#10094;</button>
+      <select><option>February</option></select>
+      <select><option>2026</option></select>
+      <button>&#10095;</button>
+    </div>
+    <div class="ds-prev-day-headers">
+      <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+    </div>
+    <div class="ds-prev-grid" id="ds-cal-grid"></div>
+  </div>
+</div>
+
+<!-- ── DATE SLICER COMPACT ── -->
+<div class="section-label" style="margin-top: 48px;">Visual 3b — Date Slicer (Compact / Dropdown)</div>
+
+<div style="display: flex; flex-direction: column; gap: 16px; max-width: 360px; opacity: 0; transform: translateY(18px); animation: cardIn 0.5s ease forwards; animation-delay: 0.15s;">
+  <!-- Pill collapsed -->
+  <div class="ds-prev-pill" id="ds-compact-pill" style="
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 14px; border-radius: 8px;
+    border: 1px solid var(--border); background: var(--card-bg);
+    cursor: pointer; font-family: var(--font); user-select: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  ">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="flex-shrink: 0; color: var(--brand-blue);">
+      <rect x="1" y="2" width="14" height="13" rx="2" stroke="currentColor" stroke-width="1.5" fill="none"/>
+      <line x1="1" y1="6" x2="15" y2="6" stroke="currentColor" stroke-width="1.5"/>
+      <line x1="5" y1="1" x2="5" y2="3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="11" y1="1" x2="11" y2="3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+    <span style="flex: 1; font-size: 12px; font-weight: 600; color: var(--brand-navy); white-space: nowrap;">02/23/2026 &mdash; 03/01/2026</span>
+    <span id="ds-compact-chevron" style="font-size: 12px; color: var(--text-muted); transition: transform 0.2s ease;">&#9662;</span>
+  </div>
+
+  <!-- Dropdown panel (toggled by clicking pill) -->
+  <div id="ds-compact-dropdown" style="
+    display: none; position: relative;
+    min-width: 480px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    border: 1px solid var(--border); border-radius: 12px;
+    background: var(--card-bg); overflow: hidden;
+    animation: ds-dropdown-anim 0.15s ease;
+  ">
+    <div class="ds-preview-wrapper" style="
+      width: 100%; height: 320px; border: none; border-radius: 0;
+      box-shadow: none; opacity: 1; transform: none; animation: none;
+    ">
+      <div class="ds-prev-sidebar">
+        <div class="ds-prev-toggle-row">
+          <input type="checkbox" checked>
+          <span>Date Range</span>
+        </div>
+        <button class="ds-prev-preset">Yesterday</button>
+        <button class="ds-prev-preset">Today</button>
+        <button class="ds-prev-preset">Min Date</button>
+        <button class="ds-prev-preset active">This Week</button>
+        <button class="ds-prev-preset">Last Week</button>
+        <button class="ds-prev-preset">This Month</button>
+        <div class="ds-prev-days-row">
+          <input class="ds-prev-days-input" type="number" value="7" min="1">
+          <span class="ds-prev-days-label">days up to today</span>
+        </div>
+        <div class="ds-prev-days-row">
+          <input class="ds-prev-days-input" type="number" value="7" min="1">
+          <span class="ds-prev-days-label">days starting today</span>
+        </div>
+      </div>
+      <div class="ds-prev-main">
+        <button class="ds-prev-today-btn">Today</button>
+        <div class="ds-prev-input-row">
+          <input class="ds-prev-date-input" type="text" value="02/23/2026" readonly>
+          <input class="ds-prev-date-input" type="text" value="03/01/2026" readonly>
+        </div>
+        <div class="ds-prev-nav">
+          <button>&#10094;</button>
+          <select><option>February</option></select>
+          <select><option>2026</option></select>
+          <button>&#10095;</button>
+        </div>
+        <div class="ds-prev-day-headers">
+          <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+        </div>
+        <div class="ds-prev-grid" id="ds-cal-grid-compact"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ── Footer ── -->
 <div class="footer">
   Brand palette
@@ -422,6 +661,87 @@
 </div>
 
 <script>
+// Generate Date Slicer calendar grid for February 2026
+(() => {
+  const grid = document.getElementById('ds-cal-grid');
+  if (!grid) return;
+
+  // Feb 2026 starts on Sunday (day 0)
+  // Range: Mon 23 Feb – Sun 1 Mar (This Week with Sun start = Feb 22–28)
+  const rangeStart = 23; // Feb 23 (Mon)
+  const rangeEnd = 28;   // Feb 28 + Mar 1
+  const todayDate = 25;  // Feb 25
+  const daysInFeb = 28;
+
+  // Jan fill (Feb 1 2026 = Sunday, so no leading days needed)
+  // Actually Feb 1 2026 is a Sunday — grid starts on Sunday
+  for (let d = 1; d <= daysInFeb; d++) {
+    const cell = document.createElement('div');
+    cell.className = 'ds-prev-cell';
+    cell.textContent = d;
+    if (d === todayDate) cell.classList.add('today');
+    if (d >= rangeStart && d <= rangeEnd) cell.classList.add('in-range');
+    if (d === rangeStart) cell.classList.add('range-start');
+    if (d === rangeEnd) cell.classList.add('range-end');
+    grid.appendChild(cell);
+  }
+  // March fill days (Mar 1 is range end in this week scenario)
+  for (let d = 1; d <= 7; d++) {
+    const cell = document.createElement('div');
+    cell.className = 'ds-prev-cell other';
+    cell.textContent = d;
+    if (d === 1) { cell.classList.add('in-range'); cell.classList.add('range-end'); cell.classList.remove('other'); }
+    grid.appendChild(cell);
+  }
+})();
+
+// Generate compact mode calendar grid (same as expanded)
+(() => {
+  const grid = document.getElementById('ds-cal-grid-compact');
+  if (!grid) return;
+  const rangeStart = 23, rangeEnd = 28, todayDate = 25, daysInFeb = 28;
+  for (let d = 1; d <= daysInFeb; d++) {
+    const cell = document.createElement('div');
+    cell.className = 'ds-prev-cell';
+    cell.textContent = d;
+    if (d === todayDate) cell.classList.add('today');
+    if (d >= rangeStart && d <= rangeEnd) cell.classList.add('in-range');
+    if (d === rangeStart) cell.classList.add('range-start');
+    if (d === rangeEnd) cell.classList.add('range-end');
+    grid.appendChild(cell);
+  }
+  for (let d = 1; d <= 7; d++) {
+    const cell = document.createElement('div');
+    cell.className = 'ds-prev-cell other';
+    cell.textContent = d;
+    if (d === 1) { cell.classList.add('in-range'); cell.classList.add('range-end'); cell.classList.remove('other'); }
+    grid.appendChild(cell);
+  }
+})();
+
+// Compact pill toggle
+(() => {
+  const pill = document.getElementById('ds-compact-pill');
+  const dropdown = document.getElementById('ds-compact-dropdown');
+  const chevron = document.getElementById('ds-compact-chevron');
+  if (!pill || !dropdown || !chevron) return;
+  let open = false;
+  pill.addEventListener('click', () => {
+    open = !open;
+    dropdown.style.display = open ? 'block' : 'none';
+    chevron.style.transform = open ? 'rotate(180deg)' : '';
+  });
+  document.addEventListener('click', (e) => {
+    if (open && !pill.contains(e.target) && !dropdown.contains(e.target)) {
+      open = false;
+      dropdown.style.display = 'none';
+      chevron.style.transform = '';
+    }
+  });
+  pill.addEventListener('mouseenter', () => { pill.style.borderColor = 'var(--brand-blue)'; pill.style.boxShadow = '0 0 0 1px var(--brand-blue)'; });
+  pill.addEventListener('mouseleave', () => { if (!open) { pill.style.borderColor = ''; pill.style.boxShadow = ''; } });
+})();
+
 // Count-up animation for all value elements
 document.addEventListener('DOMContentLoaded', () => {
   const valueEls = document.querySelectorAll('.kpi-card__value, .mini-card__value');

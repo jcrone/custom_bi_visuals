@@ -1,0 +1,35 @@
+import powerbi from "powerbi-visuals-api";
+import "./../style/visual.less";
+import VisualConstructorOptions = powerbi.extensibility.visual.VisualConstructorOptions;
+import VisualUpdateOptions = powerbi.extensibility.visual.VisualUpdateOptions;
+import IVisual = powerbi.extensibility.visual.IVisual;
+export declare class Visual implements IVisual {
+    private host;
+    private events;
+    private target;
+    private formattingSettings;
+    private formattingSettingsService;
+    private renderer;
+    private onClickOutside;
+    private viewYear;
+    private viewMonth;
+    private rangeStart;
+    private rangeEnd;
+    private isRangeMode;
+    private clickState;
+    private columnTarget;
+    private minDate;
+    private maxDate;
+    private initialized;
+    private filterRestored;
+    constructor(options: VisualConstructorOptions);
+    update(options: VisualUpdateOptions): void;
+    private renderCalendar;
+    private handleDayClick;
+    private handlePreset;
+    private setRange;
+    private applyFilter;
+    private navigateMonth;
+    destroy(): void;
+    getFormattingModel(): powerbi.visuals.FormattingModel;
+}

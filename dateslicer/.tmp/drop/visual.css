@@ -1,0 +1,340 @@
+.ds-wrapper {
+  --ds-accent: #00539A;
+  --ds-bg: #FFFFFF;
+  --ds-text: #11284C;
+  --ds-border: #D9E1EA;
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 100%;
+  font-family: 'Segoe UI', system-ui, -apple-system, Arial, sans-serif;
+  font-size: 12px;
+  color: var(--ds-text);
+  background: var(--ds-bg);
+  box-sizing: border-box;
+  overflow: hidden;
+}
+.ds-wrapper *,
+.ds-wrapper *::before,
+.ds-wrapper *::after {
+  box-sizing: border-box;
+}
+.ds-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 150px;
+  min-width: 130px;
+  padding: 10px;
+  border-right: 1px solid var(--ds-border);
+  background: #F6F8FB;
+  overflow-y: auto;
+}
+.ds-toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+.ds-toggle {
+  accent-color: var(--ds-accent);
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+.ds-toggle-label {
+  font-weight: 600;
+  font-size: 12px;
+}
+.ds-preset-btn {
+  display: block;
+  width: 100%;
+  padding: 5px 8px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--ds-accent);
+  font-family: 'Segoe UI', system-ui, -apple-system, Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.ds-preset-btn:hover {
+  background: rgba(0, 83, 154, 0.1);
+}
+.ds-preset-btn:active {
+  background: rgba(253, 185, 69, 0.22);
+}
+.ds-days-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+.ds-days-input {
+  width: 36px;
+  padding: 3px 4px;
+  border: 1px solid var(--ds-border);
+  border-radius: 4px;
+  font-family: 'Segoe UI', system-ui, -apple-system, Arial, sans-serif;
+  font-size: 11px;
+  text-align: center;
+  color: var(--ds-text);
+  background: var(--ds-bg);
+}
+.ds-days-input:focus {
+  outline: 2px solid #FDB945;
+  outline-offset: -1px;
+}
+.ds-days-label {
+  font-size: 11px;
+  color: #6B7F93;
+}
+.ds-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  gap: 8px;
+  min-width: 0;
+}
+.ds-today-btn {
+  align-self: flex-start;
+  padding: 4px 14px;
+  border: 1px solid var(--ds-accent);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ds-accent);
+  font-family: 'Segoe UI', system-ui, -apple-system, Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.ds-today-btn:hover {
+  background: var(--ds-accent);
+  color: #fff;
+}
+.ds-input-row {
+  display: flex;
+  gap: 8px;
+}
+.ds-date-input {
+  flex: 1;
+  padding: 5px 8px;
+  border: 1px solid var(--ds-border);
+  border-radius: 4px;
+  font-family: 'Segoe UI', system-ui, -apple-system, Arial, sans-serif;
+  font-size: 12px;
+  color: var(--ds-text);
+  background: var(--ds-bg);
+}
+.ds-date-input:focus {
+  outline: 2px solid #FDB945;
+  outline-offset: -1px;
+}
+.ds-nav-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: center;
+}
+.ds-nav-btn {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--ds-text);
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+.ds-nav-btn:hover {
+  background: rgba(0, 83, 154, 0.1);
+}
+.ds-month-select,
+.ds-year-select {
+  padding: 3px 6px;
+  border: 1px solid var(--ds-border);
+  border-radius: 4px;
+  font-family: 'Segoe UI', system-ui, -apple-system, Arial, sans-serif;
+  font-size: 12px;
+  color: var(--ds-text);
+  background: var(--ds-bg);
+  cursor: pointer;
+}
+.ds-month-select:focus,
+.ds-year-select:focus {
+  outline: 2px solid #FDB945;
+  outline-offset: -1px;
+}
+.ds-day-headers {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: #6B7F93;
+  padding: 0 2px;
+}
+.ds-day-header {
+  padding: 4px 0;
+}
+.ds-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+  padding: 0 2px;
+}
+.ds-day-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  font-size: 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.12s;
+  user-select: none;
+}
+.ds-day-cell:hover {
+  background: rgba(0, 83, 154, 0.1);
+}
+.ds-day--other {
+  color: #6B7F93;
+  opacity: 0.5;
+}
+.ds-day--today {
+  font-weight: 700;
+  box-shadow: inset 0 0 0 2px var(--ds-accent);
+  border-radius: 4px;
+}
+.ds-day--in-range {
+  background: rgba(253, 185, 69, 0.22);
+  border-radius: 0;
+}
+.ds-day--range-start {
+  background: var(--ds-accent);
+  color: #fff;
+  border-radius: 4px 0 0 4px;
+  font-weight: 600;
+}
+.ds-day--range-end {
+  background: var(--ds-accent);
+  color: #fff;
+  border-radius: 0 4px 4px 0;
+  font-weight: 600;
+}
+.ds-day--single {
+  border-radius: 4px;
+}
+.ds-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--ds-border);
+  background: var(--ds-bg);
+  cursor: pointer;
+  font-family: 'Segoe UI', system-ui, -apple-system, Arial, sans-serif;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  user-select: none;
+}
+.ds-pill:hover {
+  border-color: var(--ds-accent);
+  box-shadow: 0 0 0 1px var(--ds-accent);
+}
+.ds-pill__icon {
+  width: 16px;
+  height: 16px;
+  color: var(--ds-accent);
+  flex-shrink: 0;
+}
+.ds-pill__text {
+  flex: 1;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ds-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ds-pill__chevron {
+  font-size: 12px;
+  color: #6B7F93;
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+.ds-pill__chevron.ds-pill__chevron--open {
+  transform: rotate(180deg);
+}
+.ds-dropdown--compact {
+  position: relative;
+}
+.ds-dropdown--compact .ds-wrapper {
+  display: none;
+}
+.ds-dropdown--compact.ds-dropdown--open .ds-wrapper {
+  display: flex;
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 10000;
+  min-width: 480px;
+  max-height: 420px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--ds-border);
+  border-radius: 12px;
+  background: var(--ds-bg);
+  overflow: auto;
+  animation: ds-dropdown-in 0.15s ease;
+}
+@keyframes ds-dropdown-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.ds-wrapper--compact .ds-sidebar {
+  display: none !important;
+}
+.ds-wrapper--compact .ds-main {
+  padding: 6px;
+  gap: 4px;
+}
+.ds-wrapper--compact .ds-today-btn {
+  padding: 2px 10px;
+  font-size: 11px;
+}
+.ds-wrapper--compact .ds-date-input {
+  font-size: 11px;
+  padding: 3px 5px;
+}
+.ds-wrapper--compact .ds-day-cell {
+  height: 22px;
+  font-size: 10px;
+}
+.ds-wrapper--compact .ds-day-header {
+  font-size: 10px;
+}
+.ds-wrapper--compact .ds-nav-btn {
+  width: 22px;
+  height: 22px;
+  font-size: 12px;
+}
+.ds-wrapper--compact .ds-month-select,
+.ds-wrapper--compact .ds-year-select {
+  font-size: 11px;
+}
+

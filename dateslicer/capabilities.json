@@ -1,0 +1,89 @@
+{
+    "dataRoles": [
+        {
+            "displayName": "Date",
+            "name": "category",
+            "kind": "Grouping",
+            "displayNameKey": "Role_Date"
+        }
+    ],
+    "objects": {
+        "general": {
+            "properties": {
+                "filter": {
+                    "type": {
+                        "filter": true
+                    },
+                    "filterState": true
+                }
+            }
+        },
+        "calendar": {
+            "properties": {
+                "firstDayOfWeek": {
+                    "type": {
+                        "enumeration": [
+                            { "value": "0", "displayName": "Sunday" },
+                            { "value": "1", "displayName": "Monday" }
+                        ]
+                    }
+                },
+                "showSidebar": {
+                    "type": { "bool": true }
+                },
+                "defaultPreset": {
+                    "type": {
+                        "enumeration": [
+                            { "value": "none", "displayName": "None" },
+                            { "value": "today", "displayName": "Today" },
+                            { "value": "thisWeek", "displayName": "This Week" },
+                            { "value": "thisMonth", "displayName": "This Month" },
+                            { "value": "lastWeek", "displayName": "Last Week" }
+                        ]
+                    }
+                },
+                "displayMode": {
+                    "type": {
+                        "enumeration": [
+                            { "value": "expanded", "displayName": "Expanded" },
+                            { "value": "compact", "displayName": "Compact" }
+                        ]
+                    }
+                }
+            }
+        },
+        "appearance": {
+            "properties": {
+                "accentColor": {
+                    "type": { "fill": { "solid": { "color": true } } }
+                },
+                "backgroundColor": {
+                    "type": { "fill": { "solid": { "color": true } } }
+                },
+                "textColor": {
+                    "type": { "fill": { "solid": { "color": true } } }
+                },
+                "borderColor": {
+                    "type": { "fill": { "solid": { "color": true } } }
+                }
+            }
+        }
+    },
+    "dataViewMappings": [
+        {
+            "conditions": [
+                { "category": { "max": 1 } }
+            ],
+            "categorical": {
+                "categories": {
+                    "for": { "in": "category" },
+                    "dataReductionAlgorithm": {
+                        "top": { "count": 30000 }
+                    }
+                }
+            }
+        }
+    ],
+    "supportsSynchronizingFilterState": true,
+    "privileges": []
+}

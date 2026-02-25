@@ -5,6 +5,11 @@
       "source": "inference-sh-8/skills",
       "sourceType": "github",
       "computedHash": "478e0690b5a6898c35585bc1b32b6376dbe7ca2cf269a65289e13727311f7e09"
+    },
+    "requesting-code-review": {
+      "source": "obra/superpowers",
+      "sourceType": "github",
+      "computedHash": "93a837ba79c3c3f0b3e503fd9d8b54c638337d73d200c1af3bca9607264bf0e0"
     }
   }
 }

@@ -1,0 +1,47 @@
+import { PresetKey } from "./dateUtils";
+export interface CalendarCallbacks {
+    onPreset: (key: PresetKey) => void;
+    onDayClick: (date: Date) => void;
+    onTodayClick: () => void;
+    onPrevMonth: () => void;
+    onNextMonth: () => void;
+    onMonthSelect: (month: number) => void;
+    onYearSelect: (year: number) => void;
+    onDateRangeToggle: (enabled: boolean) => void;
+    onDaysUpToToday: (n: number) => void;
+    onDaysStartingToday: (n: number) => void;
+    onStartDateInput: (val: string) => void;
+    onEndDateInput: (val: string) => void;
+}
+export declare class CalendarRenderer {
+    private root;
+    private callbacks;
+    private pill;
+    private pillText;
+    private pillChevron;
+    private dropdown;
+    private wrapper;
+    private sidebar;
+    private mainPanel;
+    private gridBody;
+    private dayHeaders;
+    private startInput;
+    private endInput;
+    private dateRangeToggle;
+    private daysUpInput;
+    private daysStartInput;
+    private monthDropdown;
+    private yearDropdown;
+    private currentMode;
+    private isDropdownOpen;
+    private cachedMinYear;
+    private cachedMaxYear;
+    constructor(root: HTMLElement, callbacks: CalendarCallbacks);
+    private buildDOM;
+    render(viewYear: number, viewMonth: number, firstDay: number, rangeStart: Date | null, rangeEnd: Date | null, isRangeMode: boolean, showSidebar: boolean, minYear: number, maxYear: number): void;
+    setDisplayMode(mode: "expanded" | "compact"): void;
+    close(): void;
+    private toggleDropdown;
+    setCompact(compact: boolean): void;
+    private el;
+}
