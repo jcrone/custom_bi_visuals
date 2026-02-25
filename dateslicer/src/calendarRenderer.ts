@@ -27,8 +27,7 @@ export class CalendarRenderer {
     private pill: HTMLElement;
     private pillText: HTMLElement;
     private pillChevron: HTMLElement;
-    private popup: HTMLElement;
-    private popupBackdrop: HTMLElement;
+    private dropdown: HTMLElement;
     private wrapper: HTMLElement;
     private sidebar: HTMLElement;
     private mainPanel: HTMLElement;
@@ -43,27 +42,27 @@ export class CalendarRenderer {
     private yearDropdown: HTMLSelectElement;
 
     private currentMode: "expanded" | "compact" = "expanded";
-    private isPopupOpen: boolean = false;
+    private isDropdownOpen: boolean = false;
     private cachedMinYear: number = 0;
     private cachedMaxYear: number = 0;
+    private outsideClickHandler: (e: MouseEvent) => void;
 
     constructor(root: HTMLElement, callbacks: CalendarCallbacks) {
         this.root = root;
         this.callbacks = callbacks;
+        this.outsideClickHandler = (e: MouseEvent) => this.handleOutsideClick(e);
         this.buildDOM();
     }
 
     private buildDOM(): void {
-        this.root.innerHTML = "";
+        while (this.root.firstChild) this.root.removeChild(this.root.firstChild);
+        this.root.style.position = "relative";
+        this.root.style.overflow = "visible";
 
         // === PILL (compact mode trigger) ===
         this.pill = this.el("div", "ds-pill");
-        this.pill.innerHTML = `<svg class="ds-pill__icon" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="1" y="2" width="14" height="13" rx="2" stroke="currentColor" stroke-width="1.5" fill="none"/>
-            <line x1="1" y1="6" x2="15" y2="6" stroke="currentColor" stroke-width="1.5"/>
-            <line x1="5" y1="1" x2="5" y2="3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-            <line x1="11" y1="1" x2="11" y2="3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-        </svg>`;
+        const pillIcon = this.buildPillIcon();
+        this.pill.appendChild(pillIcon);
         this.pillText = this.el("span", "ds-pill__text");
         this.pillText.textContent = "Select date\u2026";
         this.pill.appendChild(this.pillText);
@@ -74,7 +73,11 @@ export class CalendarRenderer {
 
         this.pill.addEventListener("click", (e) => {
             e.stopPropagation();
-            this.openPopup();
+            if (this.isDropdownOpen) {
+                this.closeDropdown();
+            } else {
+                this.openDropdown();
+            }
         });
 
         this.root.appendChild(this.pill);
@@ -242,15 +245,12 @@ export class CalendarRenderer {
         this.wrapper.appendChild(this.mainPanel);
         this.root.appendChild(this.wrapper);
 
-        // === POPUP (created once, appended to document.body) ===
-        this.popupBackdrop = this.el("div", "ds-popup-backdrop");
-        this.popupBackdrop.addEventListener("click", () => this.close());
-
-        this.popup = this.el("div", "ds-popup");
-        // Stop clicks inside popup from closing via backdrop
-        this.popup.addEventListener("click", (e) => e.stopPropagation());
-
-        this.popupBackdrop.appendChild(this.popup);
+        // === DROPDOWN (inline, positioned below pill inside root) ===
+        this.dropdown = this.el("div", "ds-dropdown");
+        this.dropdown.style.display = "none";
+        // Stop clicks inside dropdown from triggering outside-click close
+        this.dropdown.addEventListener("click", (e) => e.stopPropagation());
+        this.root.appendChild(this.dropdown);
     }
 
     public render(
@@ -279,7 +279,7 @@ export class CalendarRenderer {
         if (minYear !== this.cachedMinYear || maxYear !== this.cachedMaxYear) {
             this.cachedMinYear = minYear;
             this.cachedMaxYear = maxYear;
-            this.yearDropdown.innerHTML = "";
+            while (this.yearDropdown.firstChild) this.yearDropdown.removeChild(this.yearDropdown.firstChild);
             for (let y = minYear; y <= maxYear; y++) {
                 const opt = document.createElement("option");
                 opt.value = String(y);
@@ -291,7 +291,7 @@ export class CalendarRenderer {
 
         // Day headers
         const headers = firstDay === 1 ? DAY_HEADERS_MON : DAY_HEADERS_SUN;
-        this.dayHeaders.innerHTML = "";
+        while (this.dayHeaders.firstChild) this.dayHeaders.removeChild(this.dayHeaders.firstChild);
         for (const h of headers) {
             const cell = this.el("div", "ds-day-header");
             cell.textContent = h;
@@ -300,7 +300,7 @@ export class CalendarRenderer {
 
         // Calendar grid
         const weeks = generateMonthGrid(viewYear, viewMonth, firstDay, rangeStart, rangeEnd);
-        this.gridBody.innerHTML = "";
+        while (this.gridBody.firstChild) this.gridBody.removeChild(this.gridBody.firstChild);
 
         for (const week of weeks) {
             for (const day of week) {
@@ -339,45 +339,46 @@ export class CalendarRenderer {
         this.currentMode = mode;
         if (mode === "compact") {
             this.pill.style.display = "";
-            this.wrapper.style.display = "none";
-            // Close button only visible in popup
+            // Hide inline wrapper; content shows in dropdown when opened
+            if (!this.isDropdownOpen) {
+                this.wrapper.style.display = "none";
+            }
             this.wrapper.classList.add("ds-wrapper--popup");
         } else {
             this.pill.style.display = "none";
-            // Move wrapper back into root if it's in the popup
-            if (this.wrapper.parentElement !== this.root) {
+            // Move wrapper back to root if it's in the dropdown
+            if (this.wrapper.parentElement === this.dropdown) {
                 this.root.appendChild(this.wrapper);
             }
             this.wrapper.style.display = "";
             this.wrapper.classList.remove("ds-wrapper--popup");
-            if (this.isPopupOpen) {
-                this.closePopup();
+            this.dropdown.style.display = "none";
+            if (this.isDropdownOpen) {
+                this.closeDropdown();
             }
         }
     }
 
-    private openPopup(): void {
-        if (this.isPopupOpen) return;
-        this.isPopupOpen = true;
+    private openDropdown(): void {
+        if (this.isDropdownOpen) return;
+        this.isDropdownOpen = true;
 
-        // Move wrapper into the popup
-        this.popup.appendChild(this.wrapper);
+        // Move wrapper into the dropdown
+        this.dropdown.appendChild(this.wrapper);
         this.wrapper.style.display = "";
+        this.dropdown.style.display = "";
 
-        // Copy CSS custom properties from root to popup so theming works
-        const styles = getComputedStyle(this.root);
-        const vars = ["--ds-accent", "--ds-bg", "--ds-text", "--ds-border"];
-        for (const v of vars) {
-            this.popup.style.setProperty(v, styles.getPropertyValue(v));
-        }
-
-        document.body.appendChild(this.popupBackdrop);
         this.pillChevron.classList.add("ds-pill__chevron--open");
+
+        // Listen for clicks outside to close
+        setTimeout(() => {
+            document.addEventListener("click", this.outsideClickHandler);
+        }, 0);
     }
 
-    private closePopup(): void {
-        if (!this.isPopupOpen) return;
-        this.isPopupOpen = false;
+    private closeDropdown(): void {
+        if (!this.isDropdownOpen) return;
+        this.isDropdownOpen = false;
 
         // Move wrapper back to root (hidden in compact mode)
         this.root.appendChild(this.wrapper);
@@ -385,23 +386,26 @@ export class CalendarRenderer {
             this.wrapper.style.display = "none";
         }
 
-        if (this.popupBackdrop.parentElement) {
-            this.popupBackdrop.parentElement.removeChild(this.popupBackdrop);
-        }
+        this.dropdown.style.display = "none";
         this.pillChevron.classList.remove("ds-pill__chevron--open");
+        document.removeEventListener("click", this.outsideClickHandler);
+    }
+
+    private handleOutsideClick(e: MouseEvent): void {
+        const target = e.target as Node;
+        if (!this.dropdown.contains(target) && !this.pill.contains(target)) {
+            this.closeDropdown();
+        }
     }
 
     public close(): void {
-        if (this.currentMode === "compact" && this.isPopupOpen) {
-            this.closePopup();
+        if (this.currentMode === "compact" && this.isDropdownOpen) {
+            this.closeDropdown();
         }
     }
 
     public destroy(): void {
-        // Clean up popup from document.body if open
-        if (this.popupBackdrop.parentElement) {
-            this.popupBackdrop.parentElement.removeChild(this.popupBackdrop);
-        }
+        document.removeEventListener("click", this.outsideClickHandler);
     }
 
     public setCompact(compact: boolean): void {
@@ -410,6 +414,52 @@ export class CalendarRenderer {
         } else {
             this.wrapper.classList.remove("ds-wrapper--compact");
         }
+    }
+
+    private buildPillIcon(): SVGElement {
+        const ns = "http://www.w3.org/2000/svg";
+        const svg = document.createElementNS(ns, "svg");
+        svg.setAttribute("class", "ds-pill__icon");
+        svg.setAttribute("width", "16");
+        svg.setAttribute("height", "16");
+        svg.setAttribute("viewBox", "0 0 16 16");
+        svg.setAttribute("fill", "none");
+
+        const rect = document.createElementNS(ns, "rect");
+        rect.setAttribute("x", "1");
+        rect.setAttribute("y", "2");
+        rect.setAttribute("width", "14");
+        rect.setAttribute("height", "13");
+        rect.setAttribute("rx", "2");
+        rect.setAttribute("stroke", "currentColor");
+        rect.setAttribute("stroke-width", "1.5");
+        rect.setAttribute("fill", "none");
+        svg.appendChild(rect);
+
+        const line1 = document.createElementNS(ns, "line");
+        line1.setAttribute("x1", "1"); line1.setAttribute("y1", "6");
+        line1.setAttribute("x2", "15"); line1.setAttribute("y2", "6");
+        line1.setAttribute("stroke", "currentColor");
+        line1.setAttribute("stroke-width", "1.5");
+        svg.appendChild(line1);
+
+        const line2 = document.createElementNS(ns, "line");
+        line2.setAttribute("x1", "5"); line2.setAttribute("y1", "1");
+        line2.setAttribute("x2", "5"); line2.setAttribute("y2", "3.5");
+        line2.setAttribute("stroke", "currentColor");
+        line2.setAttribute("stroke-width", "1.5");
+        line2.setAttribute("stroke-linecap", "round");
+        svg.appendChild(line2);
+
+        const line3 = document.createElementNS(ns, "line");
+        line3.setAttribute("x1", "11"); line3.setAttribute("y1", "1");
+        line3.setAttribute("x2", "11"); line3.setAttribute("y2", "3.5");
+        line3.setAttribute("stroke", "currentColor");
+        line3.setAttribute("stroke-width", "1.5");
+        line3.setAttribute("stroke-linecap", "round");
+        svg.appendChild(line3);
+
+        return svg;
     }
 
     private el(tag: string, cls: string): HTMLElement {

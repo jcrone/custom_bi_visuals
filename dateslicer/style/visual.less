@@ -384,59 +384,46 @@
 }
 
 // ============================================================
-// Popup (compact mode — appended to document.body)
+// Dropdown (compact mode — inline below pill)
 // ============================================================
-.ds-popup-backdrop {
-    position: fixed;
-    top: 0;
+.ds-dropdown {
+    position: absolute;
+    top: 100%;
     left: 0;
-    width: 100%;
-    height: 100%;
+    right: 0;
     z-index: 99999;
-    background: rgba(0, 0, 0, 0.25);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    animation: ds-backdrop-in 0.15s ease;
-}
-
-.ds-popup {
-    width: 540px;
-    max-width: 95vw;
-    max-height: 85vh;
+    margin-top: 4px;
     border-radius: @radius-lg;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+    border: 1px solid var(--ds-border, @surface-border);
     overflow: hidden;
-    animation: ds-popup-in 0.2s ease;
+    animation: ds-dropdown-in 0.15s ease;
 
     .ds-wrapper {
         width: 100%;
-        height: 380px;
+        height: auto;
+        max-height: calc(100vh - 60px);
         border-radius: @radius-lg;
         background: var(--ds-bg, @surface-bg);
+        overflow-y: auto;
     }
 }
 
-// In popup mode, always show the close button
+// In popup/dropdown mode, always show the close button
 .ds-wrapper--popup {
     .ds-close-btn {
         display: flex !important;
     }
 }
 
-@keyframes ds-backdrop-in {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-@keyframes ds-popup-in {
+@keyframes ds-dropdown-in {
     from {
         opacity: 0;
-        transform: scale(0.95) translateY(8px);
+        transform: translateY(-4px);
     }
     to {
         opacity: 1;
-        transform: scale(1) translateY(0);
+        transform: translateY(0);
     }
 }
 

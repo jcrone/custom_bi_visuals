@@ -43,7 +43,7 @@ class CalendarCardSettings extends FormattingSettingsCard {
             { value: "expanded", displayName: "Expanded" },
             { value: "compact", displayName: "Compact" },
         ],
-        value: { value: "expanded", displayName: "Expanded" }
+        value: { value: "compact", displayName: "Compact" }
     });
 
     name: string = "calendar";
