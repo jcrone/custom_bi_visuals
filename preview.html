@@ -574,11 +574,13 @@
 <!-- ── DATE SLICER COMPACT ── -->
 <div class="section-label" style="margin-top: 48px;">Visual 3b — Date Slicer (Compact / Dropdown)</div>
 
-<div style="display: flex; flex-direction: column; gap: 16px; max-width: 360px; opacity: 0; transform: translateY(18px); animation: cardIn 0.5s ease forwards; animation-delay: 0.15s;">
-  <!-- Pill collapsed -->
-  <div class="ds-prev-pill" id="ds-compact-pill" style="
+<!-- Position anchor — pill + absolutely-positioned dropdown -->
+<div id="ds-compact-anchor" style="position: relative; display: inline-block; opacity: 0; transform: translateY(18px); animation: cardIn 0.5s ease forwards; animation-delay: 0.15s;">
+
+  <!-- Pill -->
+  <div id="ds-compact-pill" style="
     display: flex; align-items: center; gap: 8px;
-    padding: 8px 14px; border-radius: 8px;
+    padding: 8px 14px; border-radius: 8px; width: 300px;
     border: 1px solid var(--border); background: var(--card-bg);
     cursor: pointer; font-family: var(--font); user-select: none;
     transition: border-color 0.15s, box-shadow 0.15s;
@@ -593,18 +595,19 @@
     <span id="ds-compact-chevron" style="font-size: 12px; color: var(--text-muted); transition: transform 0.2s ease;">&#9662;</span>
   </div>
 
-  <!-- Dropdown panel (toggled by clicking pill) -->
+  <!-- Dropdown overlay — absolutely positioned below the pill -->
   <div id="ds-compact-dropdown" style="
-    display: none; position: relative;
-    min-width: 480px;
+    display: none;
+    position: absolute; top: calc(100% + 4px); left: 0;
+    z-index: 10000; width: 520px;
     box-shadow: 0 8px 24px rgba(0,0,0,0.15);
     border: 1px solid var(--border); border-radius: 12px;
     background: var(--card-bg); overflow: hidden;
-    animation: ds-dropdown-anim 0.15s ease;
   ">
-    <div class="ds-preview-wrapper" style="
-      width: 100%; height: 320px; border: none; border-radius: 0;
-      box-shadow: none; opacity: 1; transform: none; animation: none;
+    <div style="
+      display: flex; flex-direction: row;
+      width: 100%; height: 320px;
+      font-family: var(--font); font-size: 12px; color: var(--brand-navy);
     ">
       <div class="ds-prev-sidebar">
         <div class="ds-prev-toggle-row">
@@ -645,6 +648,7 @@
       </div>
     </div>
   </div>
+
 </div>
 
 <!-- ── Footer ── -->
@@ -721,25 +725,48 @@
 
 // Compact pill toggle
 (() => {
+  const anchor = document.getElementById('ds-compact-anchor');
   const pill = document.getElementById('ds-compact-pill');
   const dropdown = document.getElementById('ds-compact-dropdown');
   const chevron = document.getElementById('ds-compact-chevron');
-  if (!pill || !dropdown || !chevron) return;
+  if (!anchor || !pill || !dropdown || !chevron) return;
   let open = false;
-  pill.addEventListener('click', () => {
-    open = !open;
-    dropdown.style.display = open ? 'block' : 'none';
-    chevron.style.transform = open ? 'rotate(180deg)' : '';
+
+  function show() {
+    open = true;
+    dropdown.style.display = 'block';
+    dropdown.style.animation = 'ds-dropdown-anim 0.15s ease';
+    chevron.style.transform = 'rotate(180deg)';
+    pill.style.borderColor = 'var(--brand-blue)';
+    pill.style.boxShadow = '0 0 0 1px var(--brand-blue)';
+  }
+
+  function hide() {
+    open = false;
+    dropdown.style.display = 'none';
+    dropdown.style.animation = '';
+    chevron.style.transform = '';
+    pill.style.borderColor = '';
+    pill.style.boxShadow = '';
+  }
+
+  pill.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (open) { hide(); } else { show(); }
   });
+
+  // Click outside closes
   document.addEventListener('click', (e) => {
-    if (open && !pill.contains(e.target) && !dropdown.contains(e.target)) {
-      open = false;
-      dropdown.style.display = 'none';
-      chevron.style.transform = '';
-    }
+    if (open && !anchor.contains(e.target)) { hide(); }
   });
-  pill.addEventListener('mouseenter', () => { pill.style.borderColor = 'var(--brand-blue)'; pill.style.boxShadow = '0 0 0 1px var(--brand-blue)'; });
-  pill.addEventListener('mouseleave', () => { if (!open) { pill.style.borderColor = ''; pill.style.boxShadow = ''; } });
+
+  pill.addEventListener('mouseenter', () => {
+    pill.style.borderColor = 'var(--brand-blue)';
+    pill.style.boxShadow = '0 0 0 1px var(--brand-blue)';
+  });
+  pill.addEventListener('mouseleave', () => {
+    if (!open) { pill.style.borderColor = ''; pill.style.boxShadow = ''; }
+  });
 })();
 
 // Count-up animation for all value elements
