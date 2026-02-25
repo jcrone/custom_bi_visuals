@@ -300,7 +300,7 @@
 }
 .ds-dropdown {
   position: absolute;
-  top: 100%;
+  top: 0;
   left: 0;
   right: 0;
   z-index: 99999;
@@ -314,7 +314,7 @@
 .ds-dropdown .ds-wrapper {
   width: 100%;
   height: auto;
-  max-height: calc(100vh - 60px);
+  max-height: var(--ds-dropdown-max-height, calc(100vh - 60px));
   border-radius: 12px;
   background: var(--ds-bg, #FFFFFF);
   overflow-y: auto;

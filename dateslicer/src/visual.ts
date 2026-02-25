@@ -155,10 +155,16 @@ export class Visual implements IVisual {
                 if (f && f.conditions && f.conditions.length >= 1) {
                     for (const cond of f.conditions) {
                         if (cond.operator === "GreaterThanOrEqual" && cond.value != null) {
-                            this.rangeStart = stripTime(new Date(cond.value));
+                            const d = new Date(cond.value);
+                            if (!isNaN(d.getTime())) {
+                                this.rangeStart = stripTime(d);
+                            }
                         }
                         if (cond.operator === "LessThanOrEqual" && cond.value != null) {
-                            this.rangeEnd = stripTime(new Date(cond.value));
+                            const d = new Date(cond.value);
+                            if (!isNaN(d.getTime())) {
+                                this.rangeEnd = stripTime(d);
+                            }
                         }
                     }
                     if (this.rangeStart) {
@@ -243,7 +249,7 @@ export class Visual implements IVisual {
                 this.renderCalendar();
                 return; // Don't apply filter yet - wait for second click
             } else {
-                if (d < this.rangeStart!) {
+                if (this.rangeStart && d < this.rangeStart) {
                     this.rangeEnd = this.rangeStart;
                     this.rangeStart = d;
                 } else {
@@ -317,6 +323,9 @@ export class Visual implements IVisual {
     }
 
     public getFormattingModel(): powerbi.visuals.FormattingModel {
+        if (!this.formattingSettings) {
+            this.formattingSettings = new VisualFormattingSettingsModel();
+        }
         return this.formattingSettingsService.buildFormattingModel(this.formattingSettings);
     }
 }

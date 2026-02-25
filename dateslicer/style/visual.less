@@ -388,7 +388,7 @@
 // ============================================================
 .ds-dropdown {
     position: absolute;
-    top: 100%;
+    top: 0;
     left: 0;
     right: 0;
     z-index: 99999;
@@ -402,7 +402,7 @@
     .ds-wrapper {
         width: 100%;
         height: auto;
-        max-height: calc(100vh - 60px);
+        max-height: var(--ds-dropdown-max-height, calc(100vh - 60px));
         border-radius: @radius-lg;
         background: var(--ds-bg, @surface-bg);
         overflow-y: auto;

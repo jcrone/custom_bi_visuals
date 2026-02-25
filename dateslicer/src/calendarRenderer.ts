@@ -333,6 +333,10 @@ export class CalendarRenderer {
         } else {
             this.pillText.textContent = "Select date\u2026";
         }
+
+        if (this.currentMode === "compact" && this.isDropdownOpen) {
+            this.positionDropdown();
+        }
     }
 
     public setDisplayMode(mode: "expanded" | "compact"): void {
@@ -346,16 +350,17 @@ export class CalendarRenderer {
             this.wrapper.classList.add("ds-wrapper--popup");
         } else {
             this.pill.style.display = "none";
-            // Move wrapper back to root if it's in the dropdown
-            if (this.wrapper.parentElement === this.dropdown) {
+            // Close dropdown first (moves wrapper back to root and cleans up listener)
+            if (this.isDropdownOpen) {
+                this.closeDropdown();
+            }
+            // Ensure wrapper is parented to root
+            if (this.wrapper.parentElement !== this.root) {
                 this.root.appendChild(this.wrapper);
             }
             this.wrapper.style.display = "";
             this.wrapper.classList.remove("ds-wrapper--popup");
             this.dropdown.style.display = "none";
-            if (this.isDropdownOpen) {
-                this.closeDropdown();
-            }
         }
     }
 
@@ -365,6 +370,7 @@ export class CalendarRenderer {
 
         // Move wrapper into the dropdown
         this.dropdown.appendChild(this.wrapper);
+        this.positionDropdown();
         this.wrapper.style.display = "";
         this.dropdown.style.display = "";
 
@@ -374,6 +380,16 @@ export class CalendarRenderer {
         setTimeout(() => {
             document.addEventListener("click", this.outsideClickHandler);
         }, 0);
+    }
+
+    private positionDropdown(): void {
+        const rootRect = this.root.getBoundingClientRect();
+        const pillRect = this.pill.getBoundingClientRect();
+        const topOffset = Math.max(0, Math.round(pillRect.bottom - rootRect.top + 4));
+        const availableHeight = Math.max(180, Math.round(rootRect.height - topOffset - 4));
+
+        this.dropdown.style.top = `${topOffset}px`;
+        this.dropdown.style.setProperty("--ds-dropdown-max-height", `${availableHeight}px`);
     }
 
     private closeDropdown(): void {

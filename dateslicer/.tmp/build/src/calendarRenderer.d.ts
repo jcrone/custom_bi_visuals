@@ -42,6 +42,7 @@ export declare class CalendarRenderer {
     render(viewYear: number, viewMonth: number, firstDay: number, rangeStart: Date | null, rangeEnd: Date | null, isRangeMode: boolean, showSidebar: boolean, minYear: number, maxYear: number): void;
     setDisplayMode(mode: "expanded" | "compact"): void;
     private openDropdown;
+    private positionDropdown;
     private closeDropdown;
     private handleOutsideClick;
     close(): void;
