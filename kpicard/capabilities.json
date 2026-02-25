@@ -77,7 +77,21 @@
             "conditions": [
                 {
                     "value": { "max": 1 },
-                    "target": { "max": 1 },
+                    "target": { "max": 1 }
+                }
+            ],
+            "categorical": {
+                "values": {
+                    "select": [
+                        { "bind": { "to": "value" } },
+                        { "bind": { "to": "target" } }
+                    ]
+                }
+            }
+        },
+        {
+            "conditions": [
+                {
                     "trend": { "max": 1 },
                     "category": { "max": 1 }
                 }
@@ -89,8 +103,6 @@
                 },
                 "values": {
                     "select": [
-                        { "bind": { "to": "value" } },
-                        { "bind": { "to": "target" } },
                         { "bind": { "to": "trend" } }
                     ]
                 }

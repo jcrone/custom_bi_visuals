@@ -32,38 +32,40 @@ export class Visual implements IVisual {
             options.dataViews?.[0]
         );
 
-        const dataView: DataView | undefined = options.dataViews?.[0];
-        if (!dataView?.categorical?.values) {
+        // dataViews[0] = Value + Target (aggregated totals, no category)
+        // dataViews[1] = Trend + Category (for sparkline)
+        const dv0: DataView | undefined = options.dataViews?.[0];
+        if (!dv0?.categorical?.values) {
             this.renderMessage("No data");
             return;
         }
 
-        const categorical = dataView.categorical;
-        const values = categorical.values;
-
-        // Find roles
         let mainValue: number | null = null;
         let targetValue: number | null = null;
         let trendValues: number[] = [];
         let measureName = "";
         let valueFormat = "";
 
-        for (const col of values) {
+        // Read aggregated value + target from first dataView
+        for (const col of dv0.categorical.values) {
             const role = col.source.roles;
             if (role["value"]) {
-                mainValue = col.values[col.values.length - 1] as number;
+                mainValue = col.values[0] as number;
                 measureName = col.source.displayName;
                 valueFormat = col.source.format || "";
-                // If categories exist, collect all values as trend
-                if (col.values.length > 1) {
-                    trendValues = col.values.map(v => v as number);
-                }
             }
             if (role["target"]) {
-                targetValue = col.values[col.values.length - 1] as number;
+                targetValue = col.values[0] as number;
             }
-            if (role["trend"]) {
-                trendValues = col.values.map(v => v as number);
+        }
+
+        // Read trend from second dataView (broken out by category)
+        const dv1: DataView | undefined = options.dataViews?.[1];
+        if (dv1?.categorical?.values) {
+            for (const col of dv1.categorical.values) {
+                if (col.source.roles["trend"]) {
+                    trendValues = col.values.map(v => v as number);
+                }
             }
         }
 
