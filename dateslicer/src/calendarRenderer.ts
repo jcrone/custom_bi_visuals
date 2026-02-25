@@ -27,6 +27,7 @@ export class CalendarRenderer {
     private pill: HTMLElement;
     private pillText: HTMLElement;
     private pillChevron: HTMLElement;
+    private closeBtn: HTMLElement;
     private dropdown: HTMLElement;
     private wrapper: HTMLElement;
     private sidebar: HTMLElement;
@@ -54,6 +55,7 @@ export class CalendarRenderer {
 
     private buildDOM(): void {
         this.root.innerHTML = "";
+        this.root.style.position = "relative";
 
         // === PILL (compact mode trigger) ===
         this.pill = this.el("div", "ds-pill");
@@ -157,11 +159,22 @@ export class CalendarRenderer {
         // === MAIN PANEL ===
         this.mainPanel = this.el("div", "ds-main");
 
-        // Today button
+        // Top row: Today button + close button (compact mode)
+        const topRow = this.el("div", "ds-top-row");
+
         const todayBtn = this.el("button", "ds-today-btn");
         todayBtn.textContent = "Today";
         todayBtn.addEventListener("click", () => this.callbacks.onTodayClick());
-        this.mainPanel.appendChild(todayBtn);
+        topRow.appendChild(todayBtn);
+
+        this.closeBtn = this.el("button", "ds-close-btn");
+        this.closeBtn.textContent = "\u2715";
+        this.closeBtn.title = "Close";
+        this.closeBtn.style.display = "none";
+        this.closeBtn.addEventListener("click", () => this.close());
+        topRow.appendChild(this.closeBtn);
+
+        this.mainPanel.appendChild(topRow);
 
         // Date inputs row
         const inputRow = this.el("div", "ds-input-row");
@@ -337,6 +350,8 @@ export class CalendarRenderer {
             this.isDropdownOpen = false;
             this.dropdown.classList.remove("ds-dropdown--open");
             this.pillChevron.classList.remove("ds-pill__chevron--open");
+            this.pill.style.display = "";
+            this.closeBtn.style.display = "none";
         }
     }
 
@@ -345,9 +360,13 @@ export class CalendarRenderer {
         if (this.isDropdownOpen) {
             this.dropdown.classList.add("ds-dropdown--open");
             this.pillChevron.classList.add("ds-pill__chevron--open");
+            this.pill.style.display = "none";
+            this.closeBtn.style.display = "";
         } else {
             this.dropdown.classList.remove("ds-dropdown--open");
             this.pillChevron.classList.remove("ds-pill__chevron--open");
+            this.pill.style.display = "";
+            this.closeBtn.style.display = "none";
         }
     }
 

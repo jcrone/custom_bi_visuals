@@ -19,6 +19,7 @@ export declare class CalendarRenderer {
     private pill;
     private pillText;
     private pillChevron;
+    private closeBtn;
     private dropdown;
     private wrapper;
     private sidebar;

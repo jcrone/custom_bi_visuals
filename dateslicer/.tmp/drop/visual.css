@@ -100,6 +100,29 @@
   gap: 8px;
   min-width: 0;
 }
+.ds-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.ds-close-btn {
+  width: 26px;
+  height: 26px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: #6B7F93;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+}
+.ds-close-btn:hover {
+  background: rgba(0, 83, 154, 0.1);
+  color: var(--ds-text);
+}
 .ds-today-btn {
   align-self: flex-start;
   padding: 4px 14px;
@@ -275,36 +298,28 @@
 .ds-pill__chevron.ds-pill__chevron--open {
   transform: rotate(180deg);
 }
-.ds-dropdown--compact {
-  position: relative;
+.ds-dropdown {
+  width: 100%;
+  height: 100%;
 }
 .ds-dropdown--compact .ds-wrapper {
   display: none;
 }
+.ds-dropdown--compact.ds-dropdown--open {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+}
 .ds-dropdown--compact.ds-dropdown--open .ds-wrapper {
   display: flex;
-  position: absolute;
-  top: calc(100% + 4px);
-  left: 0;
-  z-index: 10000;
-  min-width: 480px;
-  max-height: 420px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-  border: 1px solid var(--ds-border);
+  width: 100%;
+  height: 100%;
   border-radius: 12px;
   background: var(--ds-bg);
   overflow: auto;
-  animation: ds-dropdown-in 0.15s ease;
-}
-@keyframes ds-dropdown-in {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 .ds-wrapper--compact .ds-sidebar {
   display: none !important;

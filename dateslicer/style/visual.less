@@ -144,6 +144,32 @@
     min-width: 0;
 }
 
+.ds-top-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.ds-close-btn {
+    width: 26px;
+    height: 26px;
+    border: none;
+    border-radius: @radius-sm;
+    background: transparent;
+    color: @text-muted;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, color 0.15s;
+
+    &:hover {
+        background: @hover-fill;
+        color: var(--ds-text);
+    }
+}
+
 .ds-today-btn {
     align-self: flex-start;
     padding: 4px 14px;
@@ -362,42 +388,32 @@
 // ============================================================
 .ds-dropdown {
     // In expanded mode: no special behavior, wrapper displays normally
+    width: 100%;
+    height: 100%;
 }
 
 .ds-dropdown--compact {
-    position: relative;
-
     .ds-wrapper {
         display: none;
     }
 }
 
 .ds-dropdown--compact.ds-dropdown--open {
+    // Calendar fills the entire visual tile when open
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+
     .ds-wrapper {
         display: flex;
-        position: absolute;
-        top: calc(100% + 4px);
-        left: 0;
-        z-index: 10000;
-        min-width: 480px;
-        max-height: 420px;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-        border: 1px solid var(--ds-border);
+        width: 100%;
+        height: 100%;
         border-radius: @radius-lg;
         background: var(--ds-bg);
         overflow: auto;
-        animation: ds-dropdown-in 0.15s ease;
-    }
-}
-
-@keyframes ds-dropdown-in {
-    from {
-        opacity: 0;
-        transform: translateY(-4px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
     }
 }
 

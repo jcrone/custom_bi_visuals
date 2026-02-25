@@ -219,6 +219,8 @@
     flex-direction: column;
     gap: 3px;
     width: 145px;
+    min-width: 145px;
+    flex-shrink: 0;
     padding: 12px 10px;
     border-right: 1px solid var(--border);
     background: var(--bg);
@@ -575,16 +577,17 @@
 <div class="section-label" style="margin-top: 48px;">Visual 3b — Date Slicer (Compact / Dropdown)</div>
 
 <!-- Position anchor — pill + absolutely-positioned dropdown -->
-<div id="ds-compact-anchor" style="position: relative; display: inline-block; opacity: 0; transform: translateY(18px); animation: cardIn 0.5s ease forwards; animation-delay: 0.15s;">
+<div id="ds-compact-anchor" style="position: relative; display: inline-block;">
 
-  <!-- Pill -->
-  <div id="ds-compact-pill" style="
+  <!-- Pill — click to open/close dropdown -->
+  <div id="ds-compact-pill" onclick="(function(e){e.stopPropagation();var d=document.getElementById('ds-compact-dropdown'),c=document.getElementById('ds-compact-chevron');if(d.style.display==='block'){d.style.display='none';c.style.transform='';}else{d.style.display='block';c.style.transform='rotate(180deg)';}})(event)" style="
     display: flex; align-items: center; gap: 8px;
     padding: 8px 14px; border-radius: 8px; width: 300px;
     border: 1px solid var(--border); background: var(--card-bg);
     cursor: pointer; font-family: var(--font); user-select: none;
     transition: border-color 0.15s, box-shadow 0.15s;
-  ">
+  " onmouseenter="this.style.borderColor='var(--brand-blue)';this.style.boxShadow='0 0 0 1px var(--brand-blue)'"
+     onmouseleave="if(document.getElementById('ds-compact-dropdown').style.display!=='block'){this.style.borderColor='';this.style.boxShadow=''}">
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="flex-shrink: 0; color: var(--brand-blue);">
       <rect x="1" y="2" width="14" height="13" rx="2" stroke="currentColor" stroke-width="1.5" fill="none"/>
       <line x1="1" y1="6" x2="15" y2="6" stroke="currentColor" stroke-width="1.5"/>
@@ -599,14 +602,14 @@
   <div id="ds-compact-dropdown" style="
     display: none;
     position: absolute; top: calc(100% + 4px); left: 0;
-    z-index: 10000; width: 520px;
+    z-index: 10000; width: 540px;
     box-shadow: 0 8px 24px rgba(0,0,0,0.15);
     border: 1px solid var(--border); border-radius: 12px;
     background: var(--card-bg); overflow: hidden;
   ">
     <div style="
       display: flex; flex-direction: row;
-      width: 100%; height: 320px;
+      width: 100%; height: 340px;
       font-family: var(--font); font-size: 12px; color: var(--brand-navy);
     ">
       <div class="ds-prev-sidebar">
@@ -723,51 +726,19 @@
   }
 })();
 
-// Compact pill toggle
-(() => {
-  const anchor = document.getElementById('ds-compact-anchor');
-  const pill = document.getElementById('ds-compact-pill');
-  const dropdown = document.getElementById('ds-compact-dropdown');
-  const chevron = document.getElementById('ds-compact-chevron');
-  if (!anchor || !pill || !dropdown || !chevron) return;
-  let open = false;
-
-  function show() {
-    open = true;
-    dropdown.style.display = 'block';
-    dropdown.style.animation = 'ds-dropdown-anim 0.15s ease';
-    chevron.style.transform = 'rotate(180deg)';
-    pill.style.borderColor = 'var(--brand-blue)';
-    pill.style.boxShadow = '0 0 0 1px var(--brand-blue)';
-  }
-
-  function hide() {
-    open = false;
+// Click outside closes compact dropdown
+document.onclick = function(e) {
+  var anchor = document.getElementById('ds-compact-anchor');
+  var dropdown = document.getElementById('ds-compact-dropdown');
+  var chevron = document.getElementById('ds-compact-chevron');
+  var pill = document.getElementById('ds-compact-pill');
+  if (anchor && dropdown && chevron && pill && dropdown.style.display === 'block' && !anchor.contains(e.target)) {
     dropdown.style.display = 'none';
-    dropdown.style.animation = '';
     chevron.style.transform = '';
     pill.style.borderColor = '';
     pill.style.boxShadow = '';
   }
-
-  pill.addEventListener('click', (e) => {
-    e.stopPropagation();
-    if (open) { hide(); } else { show(); }
-  });
-
-  // Click outside closes
-  document.addEventListener('click', (e) => {
-    if (open && !anchor.contains(e.target)) { hide(); }
-  });
-
-  pill.addEventListener('mouseenter', () => {
-    pill.style.borderColor = 'var(--brand-blue)';
-    pill.style.boxShadow = '0 0 0 1px var(--brand-blue)';
-  });
-  pill.addEventListener('mouseleave', () => {
-    if (!open) { pill.style.borderColor = ''; pill.style.boxShadow = ''; }
-  });
-})();
+};
 
 // Count-up animation for all value elements
 document.addEventListener('DOMContentLoaded', () => {
