@@ -10,7 +10,6 @@ export declare class Visual implements IVisual {
     private formattingSettings;
     private formattingSettingsService;
     private renderer;
-    private onClickOutside;
     private viewYear;
     private viewMonth;
     private rangeStart;

@@ -19,8 +19,8 @@ export declare class CalendarRenderer {
     private pill;
     private pillText;
     private pillChevron;
-    private closeBtn;
-    private dropdown;
+    private popup;
+    private popupBackdrop;
     private wrapper;
     private sidebar;
     private mainPanel;
@@ -34,15 +34,17 @@ export declare class CalendarRenderer {
     private monthDropdown;
     private yearDropdown;
     private currentMode;
-    private isDropdownOpen;
+    private isPopupOpen;
     private cachedMinYear;
     private cachedMaxYear;
     constructor(root: HTMLElement, callbacks: CalendarCallbacks);
     private buildDOM;
     render(viewYear: number, viewMonth: number, firstDay: number, rangeStart: Date | null, rangeEnd: Date | null, isRangeMode: boolean, showSidebar: boolean, minYear: number, maxYear: number): void;
     setDisplayMode(mode: "expanded" | "compact"): void;
+    private openPopup;
+    private closePopup;
     close(): void;
-    private toggleDropdown;
+    destroy(): void;
     setCompact(compact: boolean): void;
     private el;
 }

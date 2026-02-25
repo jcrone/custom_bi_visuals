@@ -27,8 +27,8 @@ export class CalendarRenderer {
     private pill: HTMLElement;
     private pillText: HTMLElement;
     private pillChevron: HTMLElement;
-    private closeBtn: HTMLElement;
-    private dropdown: HTMLElement;
+    private popup: HTMLElement;
+    private popupBackdrop: HTMLElement;
     private wrapper: HTMLElement;
     private sidebar: HTMLElement;
     private mainPanel: HTMLElement;
@@ -43,7 +43,7 @@ export class CalendarRenderer {
     private yearDropdown: HTMLSelectElement;
 
     private currentMode: "expanded" | "compact" = "expanded";
-    private isDropdownOpen: boolean = false;
+    private isPopupOpen: boolean = false;
     private cachedMinYear: number = 0;
     private cachedMaxYear: number = 0;
 
@@ -55,7 +55,6 @@ export class CalendarRenderer {
 
     private buildDOM(): void {
         this.root.innerHTML = "";
-        this.root.style.position = "relative";
 
         // === PILL (compact mode trigger) ===
         this.pill = this.el("div", "ds-pill");
@@ -75,14 +74,13 @@ export class CalendarRenderer {
 
         this.pill.addEventListener("click", (e) => {
             e.stopPropagation();
-            this.toggleDropdown();
+            this.openPopup();
         });
 
         this.root.appendChild(this.pill);
 
-        // === DROPDOWN CONTAINER ===
-        this.dropdown = this.el("div", "ds-dropdown");
-
+        // === INLINE CONTAINER (used in expanded mode) ===
+        // The wrapper lives here normally; in compact mode it moves into the popup
         this.wrapper = this.el("div", "ds-wrapper");
 
         // === SIDEBAR ===
@@ -159,7 +157,7 @@ export class CalendarRenderer {
         // === MAIN PANEL ===
         this.mainPanel = this.el("div", "ds-main");
 
-        // Top row: Today button + close button (compact mode)
+        // Top row: Today button + close button (compact popup)
         const topRow = this.el("div", "ds-top-row");
 
         const todayBtn = this.el("button", "ds-today-btn");
@@ -167,12 +165,11 @@ export class CalendarRenderer {
         todayBtn.addEventListener("click", () => this.callbacks.onTodayClick());
         topRow.appendChild(todayBtn);
 
-        this.closeBtn = this.el("button", "ds-close-btn");
-        this.closeBtn.textContent = "\u2715";
-        this.closeBtn.title = "Close";
-        this.closeBtn.style.display = "none";
-        this.closeBtn.addEventListener("click", () => this.close());
-        topRow.appendChild(this.closeBtn);
+        const closeBtn = this.el("button", "ds-close-btn");
+        closeBtn.textContent = "\u2715";
+        closeBtn.title = "Close";
+        closeBtn.addEventListener("click", () => this.close());
+        topRow.appendChild(closeBtn);
 
         this.mainPanel.appendChild(topRow);
 
@@ -243,8 +240,17 @@ export class CalendarRenderer {
         this.mainPanel.appendChild(this.gridBody);
 
         this.wrapper.appendChild(this.mainPanel);
-        this.dropdown.appendChild(this.wrapper);
-        this.root.appendChild(this.dropdown);
+        this.root.appendChild(this.wrapper);
+
+        // === POPUP (created once, appended to document.body) ===
+        this.popupBackdrop = this.el("div", "ds-popup-backdrop");
+        this.popupBackdrop.addEventListener("click", () => this.close());
+
+        this.popup = this.el("div", "ds-popup");
+        // Stop clicks inside popup from closing via backdrop
+        this.popup.addEventListener("click", (e) => e.stopPropagation());
+
+        this.popupBackdrop.appendChild(this.popup);
     }
 
     public render(
@@ -333,40 +339,68 @@ export class CalendarRenderer {
         this.currentMode = mode;
         if (mode === "compact") {
             this.pill.style.display = "";
-            this.dropdown.classList.add("ds-dropdown--compact");
-            if (!this.isDropdownOpen) {
-                this.dropdown.classList.remove("ds-dropdown--open");
-            }
+            this.wrapper.style.display = "none";
+            // Close button only visible in popup
+            this.wrapper.classList.add("ds-wrapper--popup");
         } else {
             this.pill.style.display = "none";
-            this.dropdown.classList.remove("ds-dropdown--compact");
-            this.dropdown.classList.remove("ds-dropdown--open");
-            this.isDropdownOpen = false;
+            // Move wrapper back into root if it's in the popup
+            if (this.wrapper.parentElement !== this.root) {
+                this.root.appendChild(this.wrapper);
+            }
+            this.wrapper.style.display = "";
+            this.wrapper.classList.remove("ds-wrapper--popup");
+            if (this.isPopupOpen) {
+                this.closePopup();
+            }
         }
+    }
+
+    private openPopup(): void {
+        if (this.isPopupOpen) return;
+        this.isPopupOpen = true;
+
+        // Move wrapper into the popup
+        this.popup.appendChild(this.wrapper);
+        this.wrapper.style.display = "";
+
+        // Copy CSS custom properties from root to popup so theming works
+        const styles = getComputedStyle(this.root);
+        const vars = ["--ds-accent", "--ds-bg", "--ds-text", "--ds-border"];
+        for (const v of vars) {
+            this.popup.style.setProperty(v, styles.getPropertyValue(v));
+        }
+
+        document.body.appendChild(this.popupBackdrop);
+        this.pillChevron.classList.add("ds-pill__chevron--open");
+    }
+
+    private closePopup(): void {
+        if (!this.isPopupOpen) return;
+        this.isPopupOpen = false;
+
+        // Move wrapper back to root (hidden in compact mode)
+        this.root.appendChild(this.wrapper);
+        if (this.currentMode === "compact") {
+            this.wrapper.style.display = "none";
+        }
+
+        if (this.popupBackdrop.parentElement) {
+            this.popupBackdrop.parentElement.removeChild(this.popupBackdrop);
+        }
+        this.pillChevron.classList.remove("ds-pill__chevron--open");
     }
 
     public close(): void {
-        if (this.currentMode === "compact" && this.isDropdownOpen) {
-            this.isDropdownOpen = false;
-            this.dropdown.classList.remove("ds-dropdown--open");
-            this.pillChevron.classList.remove("ds-pill__chevron--open");
-            this.pill.style.display = "";
-            this.closeBtn.style.display = "none";
+        if (this.currentMode === "compact" && this.isPopupOpen) {
+            this.closePopup();
         }
     }
 
-    private toggleDropdown(): void {
-        this.isDropdownOpen = !this.isDropdownOpen;
-        if (this.isDropdownOpen) {
-            this.dropdown.classList.add("ds-dropdown--open");
-            this.pillChevron.classList.add("ds-pill__chevron--open");
-            this.pill.style.display = "none";
-            this.closeBtn.style.display = "";
-        } else {
-            this.dropdown.classList.remove("ds-dropdown--open");
-            this.pillChevron.classList.remove("ds-pill__chevron--open");
-            this.pill.style.display = "";
-            this.closeBtn.style.display = "none";
+    public destroy(): void {
+        // Clean up popup from document.body if open
+        if (this.popupBackdrop.parentElement) {
+            this.popupBackdrop.parentElement.removeChild(this.popupBackdrop);
         }
     }
 

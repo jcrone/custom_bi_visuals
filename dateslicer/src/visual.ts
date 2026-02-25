@@ -32,9 +32,6 @@ export class Visual implements IVisual {
     private formattingSettingsService: FormattingSettingsService;
     private renderer: CalendarRenderer;
 
-    // Bound listeners (for cleanup)
-    private onClickOutside: (e: MouseEvent) => void;
-
     // State
     private viewYear: number;
     private viewMonth: number;
@@ -105,14 +102,6 @@ export class Visual implements IVisual {
         };
 
         this.renderer = new CalendarRenderer(this.target, callbacks);
-
-        // Click-outside listener to close compact dropdown
-        this.onClickOutside = (e: MouseEvent) => {
-            if (!this.target.contains(e.target as Node)) {
-                this.renderer.close();
-            }
-        };
-        document.addEventListener("click", this.onClickOutside);
     }
 
     public update(options: VisualUpdateOptions): void {
@@ -324,7 +313,7 @@ export class Visual implements IVisual {
     }
 
     public destroy(): void {
-        document.removeEventListener("click", this.onClickOutside);
+        this.renderer.destroy();
     }
 
     public getFormattingModel(): powerbi.visuals.FormattingModel {
