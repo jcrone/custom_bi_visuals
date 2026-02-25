@@ -136,13 +136,10 @@ export class Visual implements IVisual {
         const width = options.viewport.width;
         const height = options.viewport.height;
         const scale = Math.min(width / 200, height / 140, 2.5);
-        const valueEl = this.container.querySelector(".kpi-value") as HTMLElement;
-        if (valueEl) {
-            valueEl.style.fontSize = Math.max(16, 32 * scale) + "px";
-        }
-        const titleEl = this.container.querySelector(".kpi-title") as HTMLElement;
-        if (titleEl) {
-            titleEl.style.fontSize = Math.max(10, 13 * scale) + "px";
+        valueEl.style.fontSize = Math.max(16, 32 * scale) + "px";
+        const titleEl2 = this.container.querySelector(".kpi-title") as HTMLElement;
+        if (titleEl2) {
+            titleEl2.style.fontSize = Math.max(10, 13 * scale) + "px";
         }
     }
 

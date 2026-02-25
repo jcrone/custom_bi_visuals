@@ -2,6 +2,8 @@
 
 For branding and colors look at @STYLE.md
 
+Ask user after completing any changes that effects the code if you they want you to run the pbiviz package to generate updated versions of the .pbiviz files. 
+
 ## Project
 Power BI Visuals
 
@@ -25,3 +27,5 @@ Scaffold: pbiviz new <name>
 Run locally: pbiviz start
 
 Package for use: pbiviz package → outputs a .pbiviz you import into Power BI
+
+

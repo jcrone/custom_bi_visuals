@@ -1,6 +1,6 @@
 {
-		"version": "1.0.0.0",
-		"author": {"name":"Custom Visuals","email":"visuals@example.com"},
+		"version": "1.1.0.0",
+		"author": {"name":"Jamie Crone","email":"jamie@example.com"},
 		"resources": [
 			{
 				"resourceId": "rId0",
@@ -8,7 +8,7 @@
 				"file": "resources/kpicardCC33C6CDC44C47478B36A84304E1F7B1.pbiviz.json"
 			}
 		],
-		"visual": {"name":"kpicard","displayName":"KPI Card","guid":"kpicardCC33C6CDC44C47478B36A84304E1F7B1","visualClassName":"Visual","version":"1.0.0.0","description":"A single KPI card with value, target variance, and sparkline","supportUrl":"https://example.com","gitHubUrl":""},
+		"visual": {"name":"kpicard","displayName":"KPI Card","guid":"kpicardCC33C6CDC44C47478B36A84304E1F7B1","visualClassName":"Visual","version":"1.1.0.0","description":"A single KPI card with value, currency support, target variance, and sparkline","supportUrl":"https://github.com/jamie-crone/powerbi-visuals","gitHubUrl":""},
 		"metadata": {
 			"pbivizjson": {
 				"resourceId": "rId0"

@@ -12,7 +12,8 @@ export declare class Visual implements IVisual {
     constructor(options: VisualConstructorOptions);
     update(options: VisualUpdateOptions): void;
     private animateCountUps;
+    private extractCurrencySymbol;
     private formatNumber;
-    private escapeHtml;
+    private renderMessage;
     getFormattingModel(): powerbi.visuals.FormattingModel;
 }
