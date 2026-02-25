@@ -16,6 +16,7 @@ export class Visual implements IVisual {
     private container: HTMLElement;
     private formattingSettings: VisualFormattingSettingsModel;
     private formattingSettingsService: FormattingSettingsService;
+    private animationFrame: number = 0;
 
     constructor(options: VisualConstructorOptions) {
         this.formattingSettingsService = new FormattingSettingsService();
@@ -113,6 +114,9 @@ export class Visual implements IVisual {
 
         this.container.innerHTML = html;
 
+        // Count-up animation
+        this.animateCountUp(mainValue, decimals, displayUnits, cardS.valueColor.value.value);
+
         // Responsive font sizing
         const width = options.viewport.width;
         const height = options.viewport.height;
@@ -171,6 +175,36 @@ export class Visual implements IVisual {
 
         const formatted = (value / divisor).toFixed(decimals);
         return formatted + unit;
+    }
+
+    private animateCountUp(targetNum: number, decimals: number, displayUnits: number, color: string): void {
+        if (this.animationFrame) cancelAnimationFrame(this.animationFrame);
+
+        const valueEl = this.container.querySelector(".kpi-value") as HTMLElement;
+        if (!valueEl) return;
+
+        const finalText = this.formatNumber(targetNum, decimals, displayUnits);
+        const duration = 800;
+        const start = performance.now();
+
+        const step = (now: number) => {
+            const elapsed = now - start;
+            const progress = Math.min(elapsed / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+
+            const current = targetNum * eased;
+            valueEl.textContent = this.formatNumber(current, decimals, displayUnits);
+
+            if (progress < 1) {
+                this.animationFrame = requestAnimationFrame(step);
+            } else {
+                valueEl.textContent = finalText;
+                this.animationFrame = 0;
+            }
+        };
+
+        valueEl.textContent = this.formatNumber(0, decimals, displayUnits);
+        this.animationFrame = requestAnimationFrame(step);
     }
 
     private escapeHtml(str: string): string {

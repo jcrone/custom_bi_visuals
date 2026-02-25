@@ -8,8 +8,10 @@ export declare class Visual implements IVisual {
     private container;
     private formattingSettings;
     private formattingSettingsService;
+    private animationFrames;
     constructor(options: VisualConstructorOptions);
     update(options: VisualUpdateOptions): void;
+    private animateCountUps;
     private formatNumber;
     private escapeHtml;
     getFormattingModel(): powerbi.visuals.FormattingModel;

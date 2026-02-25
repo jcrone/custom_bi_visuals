@@ -22,6 +22,7 @@ export class Visual implements IVisual {
     private container: HTMLElement;
     private formattingSettings: VisualFormattingSettingsModel;
     private formattingSettingsService: FormattingSettingsService;
+    private animationFrames: number[] = [];
 
     constructor(options: VisualConstructorOptions) {
         this.formattingSettingsService = new FormattingSettingsService();
@@ -109,6 +110,46 @@ export class Visual implements IVisual {
         }
 
         this.container.innerHTML = html;
+
+        // Count-up animation for each card
+        this.animateCountUps(dataPoints, decimals, displayUnits);
+    }
+
+    private animateCountUps(dataPoints: KpiDataPoint[], decimals: number, displayUnits: number): void {
+        this.animationFrames.forEach(id => cancelAnimationFrame(id));
+        this.animationFrames = [];
+
+        const valueEls = this.container.querySelectorAll(".kpi-mini-card__value");
+        valueEls.forEach((el: HTMLElement, idx: number) => {
+            const dp = dataPoints[idx];
+            if (!dp) return;
+
+            const targetNum = dp.value;
+            const finalText = this.formatNumber(targetNum, decimals, displayUnits);
+            const duration = 700;
+            const delay = idx * 80;
+            const start = performance.now() + delay;
+
+            el.textContent = this.formatNumber(0, decimals, displayUnits);
+
+            const step = (now: number) => {
+                if (now < start) { this.animationFrames[idx] = requestAnimationFrame(step); return; }
+                const elapsed = now - start;
+                const progress = Math.min(elapsed / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3);
+                const current = targetNum * eased;
+
+                el.textContent = this.formatNumber(current, decimals, displayUnits);
+
+                if (progress < 1) {
+                    this.animationFrames[idx] = requestAnimationFrame(step);
+                } else {
+                    el.textContent = finalText;
+                }
+            };
+
+            this.animationFrames[idx] = requestAnimationFrame(step);
+        });
     }
 
     private formatNumber(value: number, decimals: number, displayUnits: number): string {

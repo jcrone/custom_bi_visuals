@@ -64,5 +64,54 @@
 }
 .kpi-mini-card__arrow {
   font-size: 9px;
+  display: inline-block;
+  animation: arrowPop 0.35s ease 0.5s both;
+}
+/* ── Animations ── */
+.kpi-mini-card {
+  opacity: 0;
+  transform: translateY(14px);
+  animation: cardSlideIn 0.4s ease forwards;
+}
+.kpi-mini-card:nth-child(1) {
+  animation-delay: 0.03s;
+}
+.kpi-mini-card:nth-child(2) {
+  animation-delay: 0.1s;
+}
+.kpi-mini-card:nth-child(3) {
+  animation-delay: 0.17s;
+}
+.kpi-mini-card:nth-child(4) {
+  animation-delay: 0.24s;
+}
+.kpi-mini-card:nth-child(5) {
+  animation-delay: 0.31s;
+}
+.kpi-mini-card:nth-child(6) {
+  animation-delay: 0.38s;
+}
+.kpi-mini-card:nth-child(n+7) {
+  animation-delay: 0.45s;
+}
+@keyframes cardSlideIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes arrowPop {
+  0% {
+    opacity: 0;
+    transform: translateY(5px) scale(0.5);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(-2px) scale(1.15);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
