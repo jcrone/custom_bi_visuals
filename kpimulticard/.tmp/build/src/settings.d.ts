@@ -5,7 +5,7 @@ import FormattingSettingsModel = formattingSettings.Model;
 declare class CardSettings extends FormattingSettingsCard {
     valueColor: formattingSettings.ColorPicker;
     decimalPlaces: formattingSettings.NumUpDown;
-    displayUnits: formattingSettings.NumUpDown;
+    displayUnits: formattingSettings.ItemDropdown;
     columns: formattingSettings.NumUpDown;
     name: string;
     displayName: string;

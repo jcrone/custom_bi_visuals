@@ -1,5 +1,6 @@
 "use strict";
 
+import powerbi from "powerbi-visuals-api";
 import { formattingSettings } from "powerbi-visuals-utils-formattingmodel";
 
 import FormattingSettingsCard = formattingSettings.SimpleCard;
@@ -16,13 +17,23 @@ class CardSettings extends FormattingSettingsCard {
     decimalPlaces = new formattingSettings.NumUpDown({
         name: "decimalPlaces",
         displayName: "Decimal places",
-        value: 1
+        value: 0,
+        options: {
+            minValue: { value: 0, type: powerbi.visuals.ValidatorType.Min },
+            maxValue: { value: 20, type: powerbi.visuals.ValidatorType.Max }
+        }
     });
 
-    displayUnits = new formattingSettings.NumUpDown({
+    displayUnits = new formattingSettings.ItemDropdown({
         name: "displayUnits",
-        displayName: "Display units (0=auto, 1=none, 1000=K, 1000000=M)",
-        value: 0
+        displayName: "Display units",
+        items: [
+            { value: "1", displayName: "None" },
+            { value: "1000", displayName: "Thousands" },
+            { value: "1000000", displayName: "Millions" },
+            { value: "0", displayName: "Auto" }
+        ],
+        value: { value: "1", displayName: "None" }
     });
 
     columns = new formattingSettings.NumUpDown({

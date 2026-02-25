@@ -76,7 +76,7 @@ export class Visual implements IVisual {
         const cardS = this.formattingSettings.cardSettings;
         const varS = this.formattingSettings.varianceSettings;
         const decimals = cardS.decimalPlaces.value;
-        const displayUnits = cardS.displayUnits.value;
+        const displayUnits = Number(cardS.displayUnits.value?.value ?? 1);
         const maxCols = cardS.columns.value;
 
         const fragment = document.createDocumentFragment();
@@ -174,6 +174,7 @@ export class Visual implements IVisual {
     private extractCurrencySymbol(format: string): string {
         if (!format) return "";
         const unescaped = format.replace(/\\(.)/g, "$1");
+        // Handles tokens like "[$€-407]#,0.00"
         const tokenMatch = unescaped.match(/\[\$([^\]-]+)-[^\]]+\]/);
         if (tokenMatch?.[1]) {
             return tokenMatch[1];
@@ -185,28 +186,50 @@ export class Visual implements IVisual {
     private formatNumber(value: number, decimals: number, displayUnits: number, format?: string): string {
         const safeValue = Number.isFinite(value) ? value : 0;
         const safeDecimals = Number.isFinite(decimals) ? Math.min(20, Math.max(0, Math.trunc(decimals))) : 0;
-        const safeDisplayUnits = Number.isFinite(displayUnits) ? Math.trunc(displayUnits) : 0;
+        const safeDisplayUnits = this.normalizeDisplayUnits(displayUnits);
+        const safeFormat = format || "";
+        const isPercent = /%/.test(safeFormat);
 
         let unit = "";
         let divisor = 1;
 
-        if (safeDisplayUnits === 0) {
+        if (!isPercent && safeDisplayUnits === 0) {
+            // Auto
             const abs = Math.abs(safeValue);
             if (abs >= 1e9) { divisor = 1e9; unit = "B"; }
             else if (abs >= 1e6) { divisor = 1e6; unit = "M"; }
             else if (abs >= 1e3) { divisor = 1e3; unit = "K"; }
-        } else if (safeDisplayUnits === 1) {
+        } else if (!isPercent && safeDisplayUnits === 1) {
             // None
-        } else if (safeDisplayUnits >= 1000) {
+        } else if (!isPercent && safeDisplayUnits >= 1000) {
             divisor = safeDisplayUnits;
             if (safeDisplayUnits === 1e3) unit = "K";
             else if (safeDisplayUnits === 1e6) unit = "M";
             else if (safeDisplayUnits === 1e9) unit = "B";
         }
 
-        const prefix = this.extractCurrencySymbol(format || "");
-        const formatted = (safeValue / divisor).toFixed(safeDecimals);
-        return prefix + formatted + unit;
+        const prefix = this.extractCurrencySymbol(safeFormat);
+        const scaled = isPercent ? safeValue * 100 : safeValue;
+        const formatted = new Intl.NumberFormat(undefined, {
+            minimumFractionDigits: safeDecimals,
+            maximumFractionDigits: safeDecimals
+        }).format(scaled / divisor);
+        const suffix = isPercent ? "%" : "";
+        return prefix + formatted + unit + suffix;
+    }
+
+    private normalizeDisplayUnits(displayUnits: number): number {
+        const normalized = Number.isFinite(displayUnits) ? Math.trunc(displayUnits) : 0;
+        switch (normalized) {
+            case 0:
+            case 1:
+            case 1000:
+            case 1000000:
+            case 1000000000:
+                return normalized;
+            default:
+                return 0;
+        }
     }
 
     private renderMessage(message: string): void {

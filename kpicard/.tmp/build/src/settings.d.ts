@@ -7,7 +7,7 @@ declare class CardSettings extends FormattingSettingsCard {
     showTitle: formattingSettings.ToggleSwitch;
     valueColor: formattingSettings.ColorPicker;
     decimalPlaces: formattingSettings.NumUpDown;
-    displayUnits: formattingSettings.NumUpDown;
+    displayUnits: formattingSettings.ItemDropdown;
     name: string;
     displayName: string;
     slices: Array<FormattingSettingsSlice>;
