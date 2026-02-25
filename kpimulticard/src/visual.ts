@@ -15,6 +15,7 @@ interface KpiDataPoint {
     name: string;
     value: number;
     target: number | null;
+    format: string;
 }
 
 export class Visual implements IVisual {
@@ -40,7 +41,7 @@ export class Visual implements IVisual {
 
         const dataView: DataView | undefined = options.dataViews?.[0];
         if (!dataView?.categorical?.categories?.[0]) {
-            this.container.innerHTML = '<div class="kpi-mini-card__title">Add a KPI Name field</div>';
+            this.renderMessage("Add a KPI Name field");
             return;
         }
 
@@ -54,13 +55,15 @@ export class Visual implements IVisual {
             const dp: KpiDataPoint = {
                 name: String(categories[i]),
                 value: 0,
-                target: null
+                target: null,
+                format: ""
             };
 
             for (const col of values) {
                 const role = col.source.roles;
                 if (role["value"]) {
                     dp.value = col.values[i] as number;
+                    dp.format = col.source.format || "";
                 }
                 if (role["target"]) {
                     dp.target = col.values[i] as number;
@@ -76,40 +79,56 @@ export class Visual implements IVisual {
         const displayUnits = cardS.displayUnits.value;
         const maxCols = cardS.columns.value;
 
-        // Build HTML
-        let html = "";
+        const fragment = document.createDocumentFragment();
         for (const dp of dataPoints) {
-            const formattedValue = this.formatNumber(dp.value, decimals, displayUnits);
-
-            let cardStyle = "";
+            const formattedValue = this.formatNumber(dp.value, decimals, displayUnits, dp.format);
+            const cardEl = document.createElement("div");
+            cardEl.className = "kpi-mini-card";
             if (maxCols > 0) {
                 const basisPct = (100 / maxCols) - 2;
-                cardStyle = `style="flex-basis:${basisPct}%; max-width:${basisPct}%"`;
+                const pct = `${basisPct}%`;
+                cardEl.style.flexBasis = pct;
+                cardEl.style.maxWidth = pct;
             }
 
-            html += `<div class="kpi-mini-card" ${cardStyle}>`;
-            html += `<div class="kpi-mini-card__title">${this.escapeHtml(dp.name)}</div>`;
-            html += `<div class="kpi-mini-card__value" style="color:${cardS.valueColor.value.value}">${formattedValue}</div>`;
+            const titleEl = document.createElement("div");
+            titleEl.className = "kpi-mini-card__title";
+            titleEl.textContent = dp.name;
 
+            const valueEl = document.createElement("div");
+            valueEl.className = "kpi-mini-card__value";
+            valueEl.style.color = cardS.valueColor.value.value;
+            valueEl.textContent = formattedValue;
+
+            cardEl.append(titleEl, valueEl);
             if (varS.showVariance.value && dp.target !== null && dp.target !== undefined) {
                 const delta = dp.value - dp.target;
                 const pct = dp.target !== 0 ? (delta / Math.abs(dp.target)) * 100 : 0;
                 const isPositive = delta >= 0;
                 const cls = isPositive ? "kpi-mini-card__variance--positive" : "kpi-mini-card__variance--negative";
                 const color = isPositive ? varS.positiveColor.value.value : varS.negativeColor.value.value;
-                const arrow = isPositive ? "&#9650;" : "&#9660;";
+                const arrow = isPositive ? "\u25B2" : "\u25BC";
                 const sign = isPositive ? "+" : "";
 
-                html += `<div class="kpi-mini-card__variance ${cls}" style="color:${color}">`;
-                html += `<span class="kpi-mini-card__arrow">${arrow}</span>`;
-                html += `<span>${sign}${pct.toFixed(1)}%</span>`;
-                html += `</div>`;
+                const varianceEl = document.createElement("div");
+                varianceEl.className = `kpi-mini-card__variance ${cls}`;
+                varianceEl.style.color = color;
+
+                const arrowEl = document.createElement("span");
+                arrowEl.className = "kpi-mini-card__arrow";
+                arrowEl.textContent = arrow;
+
+                const pctEl = document.createElement("span");
+                pctEl.textContent = `${sign}${pct.toFixed(1)}%`;
+
+                varianceEl.append(arrowEl, pctEl);
+                cardEl.appendChild(varianceEl);
             }
 
-            html += `</div>`;
+            fragment.appendChild(cardEl);
         }
 
-        this.container.innerHTML = html;
+        this.container.replaceChildren(fragment);
 
         // Count-up animation for each card
         this.animateCountUps(dataPoints, decimals, displayUnits);
@@ -125,12 +144,12 @@ export class Visual implements IVisual {
             if (!dp) return;
 
             const targetNum = dp.value;
-            const finalText = this.formatNumber(targetNum, decimals, displayUnits);
+            const finalText = this.formatNumber(targetNum, decimals, displayUnits, dp.format);
             const duration = 700;
             const delay = idx * 80;
             const start = performance.now() + delay;
 
-            el.textContent = this.formatNumber(0, decimals, displayUnits);
+            el.textContent = this.formatNumber(0, decimals, displayUnits, dp.format);
 
             const step = (now: number) => {
                 if (now < start) { this.animationFrames[idx] = requestAnimationFrame(step); return; }
@@ -139,7 +158,7 @@ export class Visual implements IVisual {
                 const eased = 1 - Math.pow(1 - progress, 3);
                 const current = targetNum * eased;
 
-                el.textContent = this.formatNumber(current, decimals, displayUnits);
+                el.textContent = this.formatNumber(current, decimals, displayUnits, dp.format);
 
                 if (progress < 1) {
                     this.animationFrames[idx] = requestAnimationFrame(step);
@@ -152,7 +171,19 @@ export class Visual implements IVisual {
         });
     }
 
-    private formatNumber(value: number, decimals: number, displayUnits: number): string {
+    private extractCurrencySymbol(format: string): string {
+        if (!format) return "";
+        const match = format.match(/^([^#0.,;]+)/);
+        if (match) {
+            const candidate = match[1].replace(/\\/g, "").trim();
+            if (candidate && /[\$\u00A3\u20AC\u00A5\u20B9]/.test(candidate)) {
+                return candidate;
+            }
+        }
+        return "";
+    }
+
+    private formatNumber(value: number, decimals: number, displayUnits: number, format?: string): string {
         let unit = "";
         let divisor = 1;
 
@@ -170,14 +201,16 @@ export class Visual implements IVisual {
             else if (displayUnits === 1e9) unit = "B";
         }
 
+        const prefix = this.extractCurrencySymbol(format || "");
         const formatted = (value / divisor).toFixed(decimals);
-        return formatted + unit;
+        return prefix + formatted + unit;
     }
 
-    private escapeHtml(str: string): string {
-        const div = document.createElement("div");
-        div.textContent = str;
-        return div.innerHTML;
+    private renderMessage(message: string): void {
+        const messageEl = document.createElement("div");
+        messageEl.className = "kpi-mini-card__title";
+        messageEl.textContent = message;
+        this.container.replaceChildren(messageEl);
     }
 
     public getFormattingModel(): powerbi.visuals.FormattingModel {

@@ -34,7 +34,7 @@ export class Visual implements IVisual {
 
         const dataView: DataView | undefined = options.dataViews?.[0];
         if (!dataView?.categorical?.values) {
-            this.container.innerHTML = '<div class="kpi-title">No data</div>';
+            this.renderMessage("No data");
             return;
         }
 
@@ -46,12 +46,14 @@ export class Visual implements IVisual {
         let targetValue: number | null = null;
         let trendValues: number[] = [];
         let measureName = "";
+        let valueFormat = "";
 
         for (const col of values) {
             const role = col.source.roles;
             if (role["value"]) {
                 mainValue = col.values[col.values.length - 1] as number;
                 measureName = col.source.displayName;
+                valueFormat = col.source.format || "";
                 // If categories exist, collect all values as trend
                 if (col.values.length > 1) {
                     trendValues = col.values.map(v => v as number);
@@ -66,7 +68,7 @@ export class Visual implements IVisual {
         }
 
         if (mainValue === null || mainValue === undefined) {
-            this.container.innerHTML = '<div class="kpi-title">Drop a measure</div>';
+            this.renderMessage("Drop a measure");
             return;
         }
 
@@ -78,44 +80,57 @@ export class Visual implements IVisual {
         const decimals = cardS.decimalPlaces.value;
         const displayUnits = cardS.displayUnits.value;
 
-        let html = "";
+        this.container.replaceChildren();
 
-        // Title
         if (cardS.showTitle.value) {
-            html += `<div class="kpi-title">${this.escapeHtml(titleText)}</div>`;
+            const titleEl = document.createElement("div");
+            titleEl.className = "kpi-title";
+            titleEl.textContent = titleText;
+            this.container.appendChild(titleEl);
         }
 
-        // Value
-        const formattedValue = this.formatNumber(mainValue, decimals, displayUnits);
-        html += `<div class="kpi-value" style="color:${cardS.valueColor.value.value}">${formattedValue}</div>`;
+        const formattedValue = this.formatNumber(mainValue, decimals, displayUnits, valueFormat);
+        const valueEl = document.createElement("div");
+        valueEl.className = "kpi-value";
+        valueEl.style.color = cardS.valueColor.value.value;
+        valueEl.textContent = formattedValue;
+        this.container.appendChild(valueEl);
 
-        // Variance
         if (varS.showVariance.value && targetValue !== null && targetValue !== undefined) {
             const delta = mainValue - targetValue;
             const pct = targetValue !== 0 ? (delta / Math.abs(targetValue)) * 100 : 0;
             const isPositive = delta >= 0;
             const cls = isPositive ? "kpi-variance--positive" : "kpi-variance--negative";
             const color = isPositive ? varS.positiveColor.value.value : varS.negativeColor.value.value;
-            const arrow = isPositive ? "&#9650;" : "&#9660;";
+            const arrow = isPositive ? "\u25B2" : "\u25BC";
             const sign = isPositive ? "+" : "";
 
-            html += `<div class="kpi-variance ${cls}" style="color:${color}">`;
-            html += `<span class="kpi-variance__arrow">${arrow}</span>`;
-            html += `<span>${sign}${pct.toFixed(1)}%</span>`;
-            html += `<span class="kpi-variance__target">vs ${this.formatNumber(targetValue, decimals, displayUnits)}</span>`;
-            html += `</div>`;
+            const varianceEl = document.createElement("div");
+            varianceEl.className = `kpi-variance ${cls}`;
+            varianceEl.style.color = color;
+
+            const arrowEl = document.createElement("span");
+            arrowEl.className = "kpi-variance__arrow";
+            arrowEl.textContent = arrow;
+
+            const pctEl = document.createElement("span");
+            pctEl.textContent = `${sign}${pct.toFixed(1)}%`;
+
+            const targetEl = document.createElement("span");
+            targetEl.className = "kpi-variance__target";
+            targetEl.textContent = `vs ${this.formatNumber(targetValue, decimals, displayUnits, valueFormat)}`;
+
+            varianceEl.append(arrowEl, pctEl, targetEl);
+            this.container.appendChild(varianceEl);
         }
 
-        // Sparkline
         const validTrend = trendValues.filter(v => v !== null && !isNaN(v));
         if (sparkS.showSparkline.value && validTrend.length > 1) {
-            html += this.renderSparkline(validTrend, sparkS.lineColor.value.value, sparkS.areaColor.value.value);
+            this.container.appendChild(this.renderSparkline(validTrend, sparkS.lineColor.value.value, sparkS.areaColor.value.value));
         }
 
-        this.container.innerHTML = html;
-
         // Count-up animation
-        this.animateCountUp(mainValue, decimals, displayUnits, cardS.valueColor.value.value);
+        this.animateCountUp(mainValue, decimals, displayUnits, cardS.valueColor.value.value, valueFormat);
 
         // Responsive font sizing
         const width = options.viewport.width;
@@ -131,7 +146,7 @@ export class Visual implements IVisual {
         }
     }
 
-    private renderSparkline(data: number[], lineColor: string, areaColor: string): string {
+    private renderSparkline(data: number[], lineColor: string, areaColor: string): SVGSVGElement {
         const w = 200;
         const h = 40;
         const min = Math.min(...data);
@@ -148,13 +163,41 @@ export class Visual implements IVisual {
         const polyline = points.join(" ");
         const areaPoints = `${pad},${h} ${polyline} ${w - pad},${h}`;
 
-        return `<svg class="kpi-sparkline" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
-            <polygon points="${areaPoints}" fill="${areaColor}" opacity="0.1"/>
-            <polyline class="kpi-sparkline__line" points="${polyline}" style="stroke:${lineColor}"/>
-        </svg>`;
+        const ns = "http://www.w3.org/2000/svg";
+        const svg = document.createElementNS(ns, "svg");
+        svg.setAttribute("class", "kpi-sparkline");
+        svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+        svg.setAttribute("preserveAspectRatio", "none");
+
+        const polygon = document.createElementNS(ns, "polygon");
+        polygon.setAttribute("points", areaPoints);
+        polygon.setAttribute("fill", areaColor);
+        polygon.setAttribute("opacity", "0.1");
+
+        const line = document.createElementNS(ns, "polyline");
+        line.setAttribute("class", "kpi-sparkline__line");
+        line.setAttribute("points", polyline);
+        line.setAttribute("stroke", lineColor);
+
+        svg.append(polygon, line);
+        return svg;
     }
 
-    private formatNumber(value: number, decimals: number, displayUnits: number): string {
+    private extractCurrencySymbol(format: string): string {
+        if (!format) return "";
+        // Match common currency symbols at the start of the format string
+        const match = format.match(/^([^#0.,;]+)/);
+        if (match) {
+            const candidate = match[1].replace(/\\/g, "").trim();
+            // Only return if it looks like a currency symbol (not just whitespace/parens)
+            if (candidate && /[\$\u00A3\u20AC\u00A5\u20B9]/.test(candidate)) {
+                return candidate;
+            }
+        }
+        return "";
+    }
+
+    private formatNumber(value: number, decimals: number, displayUnits: number, format?: string): string {
         let unit = "";
         let divisor = 1;
 
@@ -173,17 +216,18 @@ export class Visual implements IVisual {
             else if (displayUnits === 1e9) unit = "B";
         }
 
+        const prefix = this.extractCurrencySymbol(format || "");
         const formatted = (value / divisor).toFixed(decimals);
-        return formatted + unit;
+        return prefix + formatted + unit;
     }
 
-    private animateCountUp(targetNum: number, decimals: number, displayUnits: number, color: string): void {
+    private animateCountUp(targetNum: number, decimals: number, displayUnits: number, color: string, format?: string): void {
         if (this.animationFrame) cancelAnimationFrame(this.animationFrame);
 
         const valueEl = this.container.querySelector(".kpi-value") as HTMLElement;
         if (!valueEl) return;
 
-        const finalText = this.formatNumber(targetNum, decimals, displayUnits);
+        const finalText = this.formatNumber(targetNum, decimals, displayUnits, format);
         const duration = 800;
         const start = performance.now();
 
@@ -193,7 +237,7 @@ export class Visual implements IVisual {
             const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
 
             const current = targetNum * eased;
-            valueEl.textContent = this.formatNumber(current, decimals, displayUnits);
+            valueEl.textContent = this.formatNumber(current, decimals, displayUnits, format);
 
             if (progress < 1) {
                 this.animationFrame = requestAnimationFrame(step);
@@ -203,14 +247,15 @@ export class Visual implements IVisual {
             }
         };
 
-        valueEl.textContent = this.formatNumber(0, decimals, displayUnits);
+        valueEl.textContent = this.formatNumber(0, decimals, displayUnits, format);
         this.animationFrame = requestAnimationFrame(step);
     }
 
-    private escapeHtml(str: string): string {
-        const div = document.createElement("div");
-        div.textContent = str;
-        return div.innerHTML;
+    private renderMessage(message: string): void {
+        const messageEl = document.createElement("div");
+        messageEl.className = "kpi-title";
+        messageEl.textContent = message;
+        this.container.replaceChildren(messageEl);
     }
 
     public getFormattingModel(): powerbi.visuals.FormattingModel {
