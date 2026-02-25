@@ -32,40 +32,47 @@ export class Visual implements IVisual {
             options.dataViews?.[0]
         );
 
-        // dataViews[0] = Value + Target (aggregated totals, no category)
-        // dataViews[1] = Trend + Category (for sparkline)
-        const dv0: DataView | undefined = options.dataViews?.[0];
-        if (!dv0?.categorical?.values) {
+        const dataView: DataView | undefined = options.dataViews?.[0];
+        if (!dataView?.categorical?.values) {
             this.renderMessage("No data");
             return;
         }
+
+        const categorical = dataView.categorical;
+        const values = categorical.values;
+        const hasCategories = categorical.categories && categorical.categories.length > 0;
 
         let mainValue: number | null = null;
         let targetValue: number | null = null;
         let trendValues: number[] = [];
         let measureName = "";
         let valueFormat = "";
+        let targetFormat = "";
 
-        // Read aggregated value + target from first dataView
-        for (const col of dv0.categorical.values) {
+        for (const col of values) {
             const role = col.source.roles;
             if (role["value"]) {
-                mainValue = col.values[0] as number;
                 measureName = col.source.displayName;
                 valueFormat = col.source.format || "";
+                if (hasCategories) {
+                    // Sum across all categories to get the total
+                    mainValue = (col.values as number[]).reduce((sum, v) => sum + (v || 0), 0);
+                    // Use individual values for sparkline trend
+                    trendValues = col.values.map(v => v as number);
+                } else {
+                    mainValue = col.values[0] as number;
+                }
             }
             if (role["target"]) {
-                targetValue = col.values[0] as number;
-            }
-        }
-
-        // Read trend from second dataView (broken out by category)
-        const dv1: DataView | undefined = options.dataViews?.[1];
-        if (dv1?.categorical?.values) {
-            for (const col of dv1.categorical.values) {
-                if (col.source.roles["trend"]) {
-                    trendValues = col.values.map(v => v as number);
+                targetFormat = col.source.format || "";
+                if (hasCategories) {
+                    targetValue = (col.values as number[]).reduce((sum, v) => sum + (v || 0), 0);
+                } else {
+                    targetValue = col.values[0] as number;
                 }
+            }
+            if (role["trend"]) {
+                trendValues = col.values.map(v => v as number);
             }
         }
 
@@ -120,7 +127,7 @@ export class Visual implements IVisual {
 
             const targetEl = document.createElement("span");
             targetEl.className = "kpi-variance__target";
-            targetEl.textContent = `vs ${this.formatNumber(targetValue, decimals, displayUnits, valueFormat)}`;
+            targetEl.textContent = `vs ${this.formatNumber(targetValue, decimals, displayUnits, targetFormat || valueFormat)}`;
 
             varianceEl.append(arrowEl, pctEl, targetEl);
             this.container.appendChild(varianceEl);
@@ -184,39 +191,41 @@ export class Visual implements IVisual {
 
     private extractCurrencySymbol(format: string): string {
         if (!format) return "";
-        // Match common currency symbols at the start of the format string
-        const match = format.match(/^([^#0.,;]+)/);
-        if (match) {
-            const candidate = match[1].replace(/\\/g, "").trim();
-            // Only return if it looks like a currency symbol (not just whitespace/parens)
-            if (candidate && /[\$\u00A3\u20AC\u00A5\u20B9]/.test(candidate)) {
-                return candidate;
-            }
+        const unescaped = format.replace(/\\(.)/g, "$1");
+        // Handles tokens like "[$€-407]#,0.00"
+        const tokenMatch = unescaped.match(/\[\$([^\]-]+)-[^\]]+\]/);
+        if (tokenMatch?.[1]) {
+            return tokenMatch[1];
         }
-        return "";
+        const symbolMatch = unescaped.match(/[\$\u00A3\u20AC\u00A5\u20B9]/);
+        return symbolMatch ? symbolMatch[0] : "";
     }
 
     private formatNumber(value: number, decimals: number, displayUnits: number, format?: string): string {
+        const safeValue = Number.isFinite(value) ? value : 0;
+        const safeDecimals = Number.isFinite(decimals) ? Math.min(20, Math.max(0, Math.trunc(decimals))) : 0;
+        const safeDisplayUnits = Number.isFinite(displayUnits) ? Math.trunc(displayUnits) : 0;
+
         let unit = "";
         let divisor = 1;
 
-        if (displayUnits === 0) {
+        if (safeDisplayUnits === 0) {
             // Auto
-            const abs = Math.abs(value);
+            const abs = Math.abs(safeValue);
             if (abs >= 1e9) { divisor = 1e9; unit = "B"; }
             else if (abs >= 1e6) { divisor = 1e6; unit = "M"; }
             else if (abs >= 1e3) { divisor = 1e3; unit = "K"; }
-        } else if (displayUnits === 1) {
+        } else if (safeDisplayUnits === 1) {
             // None
-        } else if (displayUnits >= 1000) {
-            divisor = displayUnits;
-            if (displayUnits === 1e3) unit = "K";
-            else if (displayUnits === 1e6) unit = "M";
-            else if (displayUnits === 1e9) unit = "B";
+        } else if (safeDisplayUnits >= 1000) {
+            divisor = safeDisplayUnits;
+            if (safeDisplayUnits === 1e3) unit = "K";
+            else if (safeDisplayUnits === 1e6) unit = "M";
+            else if (safeDisplayUnits === 1e9) unit = "B";
         }
 
         const prefix = this.extractCurrencySymbol(format || "");
-        const formatted = (value / divisor).toFixed(decimals);
+        const formatted = (safeValue / divisor).toFixed(safeDecimals);
         return prefix + formatted + unit;
     }
 

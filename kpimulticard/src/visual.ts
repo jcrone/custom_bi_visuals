@@ -173,36 +173,39 @@ export class Visual implements IVisual {
 
     private extractCurrencySymbol(format: string): string {
         if (!format) return "";
-        const match = format.match(/^([^#0.,;]+)/);
-        if (match) {
-            const candidate = match[1].replace(/\\/g, "").trim();
-            if (candidate && /[\$\u00A3\u20AC\u00A5\u20B9]/.test(candidate)) {
-                return candidate;
-            }
+        const unescaped = format.replace(/\\(.)/g, "$1");
+        const tokenMatch = unescaped.match(/\[\$([^\]-]+)-[^\]]+\]/);
+        if (tokenMatch?.[1]) {
+            return tokenMatch[1];
         }
-        return "";
+        const symbolMatch = unescaped.match(/[\$\u00A3\u20AC\u00A5\u20B9]/);
+        return symbolMatch ? symbolMatch[0] : "";
     }
 
     private formatNumber(value: number, decimals: number, displayUnits: number, format?: string): string {
+        const safeValue = Number.isFinite(value) ? value : 0;
+        const safeDecimals = Number.isFinite(decimals) ? Math.min(20, Math.max(0, Math.trunc(decimals))) : 0;
+        const safeDisplayUnits = Number.isFinite(displayUnits) ? Math.trunc(displayUnits) : 0;
+
         let unit = "";
         let divisor = 1;
 
-        if (displayUnits === 0) {
-            const abs = Math.abs(value);
+        if (safeDisplayUnits === 0) {
+            const abs = Math.abs(safeValue);
             if (abs >= 1e9) { divisor = 1e9; unit = "B"; }
             else if (abs >= 1e6) { divisor = 1e6; unit = "M"; }
             else if (abs >= 1e3) { divisor = 1e3; unit = "K"; }
-        } else if (displayUnits === 1) {
+        } else if (safeDisplayUnits === 1) {
             // None
-        } else if (displayUnits >= 1000) {
-            divisor = displayUnits;
-            if (displayUnits === 1e3) unit = "K";
-            else if (displayUnits === 1e6) unit = "M";
-            else if (displayUnits === 1e9) unit = "B";
+        } else if (safeDisplayUnits >= 1000) {
+            divisor = safeDisplayUnits;
+            if (safeDisplayUnits === 1e3) unit = "K";
+            else if (safeDisplayUnits === 1e6) unit = "M";
+            else if (safeDisplayUnits === 1e9) unit = "B";
         }
 
         const prefix = this.extractCurrencySymbol(format || "");
-        const formatted = (value / divisor).toFixed(decimals);
+        const formatted = (safeValue / divisor).toFixed(safeDecimals);
         return prefix + formatted + unit;
     }
 
