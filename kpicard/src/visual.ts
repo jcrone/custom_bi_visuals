@@ -52,8 +52,9 @@ export class Visual implements IVisual {
             if (role["value"]) {
                 measureName = col.source.displayName;
                 valueFormat = col.source.format || "";
-                // Keep KPI value independent from sparkline category granularity.
-                mainValue = col.values[col.values.length - 1] as number;
+                // Sum all category-level values so the KPI shows the aggregate total,
+                // not just the last category's value.
+                mainValue = (col.values as number[]).reduce((sum, v) => sum + (Number(v) || 0), 0);
                 // Use value series for sparkline when no dedicated trend measure is provided.
                 if (col.values.length > 1) {
                     trendValues = col.values.map(v => v as number);
@@ -61,7 +62,7 @@ export class Visual implements IVisual {
             }
             if (role["target"]) {
                 targetFormat = col.source.format || "";
-                targetValue = col.values[col.values.length - 1] as number;
+                targetValue = (col.values as number[]).reduce((sum, v) => sum + (Number(v) || 0), 0);
             }
             if (role["trend"]) {
                 trendValues = col.values.map(v => v as number);
@@ -131,7 +132,7 @@ export class Visual implements IVisual {
         }
 
         // Count-up animation
-        this.animateCountUp(mainValue, decimals, displayUnits, cardS.valueColor.value.value, valueFormat);
+        this.animateCountUp(mainValue, decimals, displayUnits, valueFormat);
 
         // Responsive font sizing
         const width = options.viewport.width;
@@ -242,7 +243,7 @@ export class Visual implements IVisual {
         }
     }
 
-    private animateCountUp(targetNum: number, decimals: number, displayUnits: number, color: string, format?: string): void {
+    private animateCountUp(targetNum: number, decimals: number, displayUnits: number, format?: string): void {
         if (this.animationFrame) cancelAnimationFrame(this.animationFrame);
 
         const valueEl = this.container.querySelector(".kpi-value") as HTMLElement;
