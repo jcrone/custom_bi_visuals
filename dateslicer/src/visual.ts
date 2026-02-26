@@ -18,6 +18,13 @@ import {
     getPresetRange, getDaysUpToToday, getDaysStartingToday,
     PresetKey, DateRange
 } from "./dateUtils";
+import { CalendarDialogInitialState, CalendarDialogResult } from "./dialogTypes";
+
+// Import triggers self-registration into globalThis.dialogRegistry
+import "./CalendarDialog";
+
+import DialogAction = powerbi.DialogAction;
+import ModalDialogResult = powerbi.extensibility.visual.ModalDialogResult;
 
 interface ColumnTarget {
     table: string;
@@ -99,6 +106,7 @@ export class Visual implements IVisual {
                     this.applyFilter();
                 }
             },
+            onCompactOpen: () => this.openCalendarDialog(),
         };
 
         this.renderer = new CalendarRenderer(this.target, callbacks);
@@ -304,6 +312,68 @@ export class Visual implements IVisual {
         };
 
         this.host.applyJsonFilter(filter, "general", "filter", FilterAction.merge);
+    }
+
+    private openCalendarDialog(): void {
+        // Build initial state from current visual state
+        const firstDay = this.formattingSettings
+            ? parseInt(String(this.formattingSettings.calendarCard.firstDayOfWeek.value.value), 10)
+            : 0;
+        const showSidebar = this.formattingSettings
+            ? this.formattingSettings.calendarCard.showSidebar.value
+            : true;
+        const minYear = this.minDate ? this.minDate.getFullYear() : this.viewYear - 10;
+        const maxYear = this.maxDate ? this.maxDate.getFullYear() : this.viewYear + 10;
+
+        const accent = this.formattingSettings ? this.formattingSettings.appearanceCard.accentColor.value.value : "#00539A";
+        const bg = this.formattingSettings ? this.formattingSettings.appearanceCard.backgroundColor.value.value : "#FFFFFF";
+        const text = this.formattingSettings ? this.formattingSettings.appearanceCard.textColor.value.value : "#11284C";
+        const border = this.formattingSettings ? this.formattingSettings.appearanceCard.borderColor.value.value : "#D9E1EA";
+
+        const initialState: CalendarDialogInitialState = {
+            viewYear: this.viewYear,
+            viewMonth: this.viewMonth,
+            rangeStartISO: this.rangeStart ? this.rangeStart.toISOString() : null,
+            rangeEndISO: this.rangeEnd ? this.rangeEnd.toISOString() : null,
+            isRangeMode: this.isRangeMode,
+            firstDayOfWeek: firstDay,
+            showSidebar,
+            minYear,
+            maxYear,
+            minDateISO: this.minDate ? this.minDate.toISOString() : null,
+            accentColor: accent,
+            bgColor: bg,
+            textColor: text,
+            borderColor: border,
+        };
+
+        const dialogOptions = {
+            title: "Select Date Range",
+            size: { width: 560, height: 420 },
+            position: { type: 0 as powerbi.VisualDialogPositionType }, // Center
+            actionButtons: [
+                1 as DialogAction, // OK
+                2 as DialogAction, // Cancel
+            ],
+        };
+
+        this.host.openModalDialog("CalendarDialog", dialogOptions, initialState)
+            .then((result: ModalDialogResult) => {
+                if (result.actionId === 1 as DialogAction) { // OK
+                    const r = result.resultState as CalendarDialogResult;
+                    if (r) {
+                        this.isRangeMode = r.isRangeMode;
+                        this.viewYear = r.viewYear;
+                        this.viewMonth = r.viewMonth;
+                        this.rangeStart = r.rangeStartISO ? stripTime(new Date(r.rangeStartISO)) : null;
+                        this.rangeEnd = r.rangeEndISO ? stripTime(new Date(r.rangeEndISO)) : null;
+                        this.clickState = "first";
+                        this.renderCalendar();
+                        this.applyFilter();
+                    }
+                }
+                // Cancel/Close: do nothing
+            });
     }
 
     private navigateMonth(delta: number): void {

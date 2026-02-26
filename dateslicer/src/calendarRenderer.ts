@@ -17,6 +17,7 @@ export interface CalendarCallbacks {
     onDaysStartingToday: (n: number) => void;
     onStartDateInput: (val: string) => void;
     onEndDateInput: (val: string) => void;
+    onCompactOpen?: () => void;
 }
 
 export class CalendarRenderer {
@@ -73,7 +74,9 @@ export class CalendarRenderer {
 
         this.pill.addEventListener("click", (e) => {
             e.stopPropagation();
-            if (this.isDropdownOpen) {
+            if (this.callbacks.onCompactOpen) {
+                this.callbacks.onCompactOpen();
+            } else if (this.isDropdownOpen) {
                 this.closeDropdown();
             } else {
                 this.openDropdown();

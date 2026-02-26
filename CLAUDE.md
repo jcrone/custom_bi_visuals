@@ -31,3 +31,7 @@ Run locally: pbiviz start
 Package for use: pbiviz package → outputs a .pbiviz you import into Power BI
 
 
+This great documentation if you need to research devolopment https://learn.microsoft.com/en-us/power-bi/developer/
+
+
+

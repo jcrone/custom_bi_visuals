@@ -3,6 +3,7 @@ import "./../style/visual.less";
 import VisualConstructorOptions = powerbi.extensibility.visual.VisualConstructorOptions;
 import VisualUpdateOptions = powerbi.extensibility.visual.VisualUpdateOptions;
 import IVisual = powerbi.extensibility.visual.IVisual;
+import "./CalendarDialog";
 export declare class Visual implements IVisual {
     private host;
     private events;
@@ -28,6 +29,7 @@ export declare class Visual implements IVisual {
     private handlePreset;
     private setRange;
     private applyFilter;
+    private openCalendarDialog;
     private navigateMonth;
     destroy(): void;
     getFormattingModel(): powerbi.visuals.FormattingModel;

@@ -12,6 +12,7 @@ export interface CalendarCallbacks {
     onDaysStartingToday: (n: number) => void;
     onStartDateInput: (val: string) => void;
     onEndDateInput: (val: string) => void;
+    onCompactOpen?: () => void;
 }
 export declare class CalendarRenderer {
     private root;
