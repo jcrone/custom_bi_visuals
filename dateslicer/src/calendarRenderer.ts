@@ -245,12 +245,12 @@ export class CalendarRenderer {
         this.wrapper.appendChild(this.mainPanel);
         this.root.appendChild(this.wrapper);
 
-        // === DROPDOWN (inline, positioned below pill inside root) ===
+        // === DROPDOWN (appended to body so it escapes PBI overflow clipping) ===
         this.dropdown = this.el("div", "ds-dropdown");
         this.dropdown.style.display = "none";
         // Stop clicks inside dropdown from triggering outside-click close
         this.dropdown.addEventListener("click", (e) => e.stopPropagation());
-        this.root.appendChild(this.dropdown);
+        document.body.appendChild(this.dropdown);
     }
 
     public render(
@@ -354,7 +354,7 @@ export class CalendarRenderer {
             if (this.isDropdownOpen) {
                 this.closeDropdown();
             }
-            // Ensure wrapper is parented to root
+            // Ensure wrapper is back in root
             if (this.wrapper.parentElement !== this.root) {
                 this.root.appendChild(this.wrapper);
             }
@@ -383,13 +383,12 @@ export class CalendarRenderer {
     }
 
     private positionDropdown(): void {
-        const rootRect = this.root.getBoundingClientRect();
         const pillRect = this.pill.getBoundingClientRect();
-        const topOffset = Math.max(0, Math.round(pillRect.bottom - rootRect.top + 4));
-        const availableHeight = Math.max(180, Math.round(rootRect.height - topOffset - 4));
 
-        this.dropdown.style.top = `${topOffset}px`;
-        this.dropdown.style.setProperty("--ds-dropdown-max-height", `${availableHeight}px`);
+        this.dropdown.style.position = "fixed";
+        this.dropdown.style.left = `${pillRect.left}px`;
+        this.dropdown.style.top = `${pillRect.bottom + 4}px`;
+        this.dropdown.style.width = `${Math.max(pillRect.width, 320)}px`;
     }
 
     private closeDropdown(): void {
@@ -422,6 +421,9 @@ export class CalendarRenderer {
 
     public destroy(): void {
         document.removeEventListener("click", this.outsideClickHandler);
+        if (this.dropdown.parentElement) {
+            this.dropdown.parentElement.removeChild(this.dropdown);
+        }
     }
 
     public setCompact(compact: boolean): void {

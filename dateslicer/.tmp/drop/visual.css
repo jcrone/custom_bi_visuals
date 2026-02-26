@@ -299,22 +299,18 @@
   transform: rotate(180deg);
 }
 .ds-dropdown {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
+  position: fixed;
   z-index: 99999;
-  margin-top: 4px;
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
   border: 1px solid var(--ds-border, #D9E1EA);
-  overflow: hidden;
+  overflow: visible;
   animation: ds-dropdown-in 0.15s ease;
 }
 .ds-dropdown .ds-wrapper {
   width: 100%;
   height: auto;
-  max-height: var(--ds-dropdown-max-height, calc(100vh - 60px));
+  max-height: calc(100vh - 60px);
   border-radius: 12px;
   background: var(--ds-bg, #FFFFFF);
   overflow-y: auto;

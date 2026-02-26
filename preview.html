@@ -576,13 +576,21 @@
 <!-- ── DATE SLICER COMPACT ── -->
 <div class="section-label" style="margin-top: 48px;">Visual 3b — Date Slicer (Compact / Dropdown)</div>
 
-<!-- Position anchor — pill + absolutely-positioned dropdown -->
-<div id="ds-compact-anchor" style="position: relative; display: inline-block;">
+<!-- Simulates a small PBI visual container with overflow:hidden -->
+<div id="ds-compact-container" style="
+  position: relative; display: inline-block;
+  width: 300px; height: 44px;
+  border: 2px dashed var(--text-muted); border-radius: 8px;
+  overflow: hidden;
+">
+  <span style="position: absolute; top: -20px; left: 0; font-size: 10px; color: var(--text-muted);">
+    Visual boundary (overflow: hidden)
+  </span>
 
-  <!-- Pill — click to open/close dropdown -->
-  <div id="ds-compact-pill" onclick="(function(e){e.stopPropagation();var d=document.getElementById('ds-compact-dropdown'),c=document.getElementById('ds-compact-chevron');if(d.style.display==='block'){d.style.display='none';c.style.transform='';}else{d.style.display='block';c.style.transform='rotate(180deg)';}})(event)" style="
+  <!-- Pill — lives inside the small visual container -->
+  <div id="ds-compact-pill" style="
     display: flex; align-items: center; gap: 8px;
-    padding: 8px 14px; border-radius: 8px; width: 300px;
+    padding: 8px 14px; border-radius: 8px; width: 100%; height: 100%;
     border: 1px solid var(--border); background: var(--card-bg);
     cursor: pointer; font-family: var(--font); user-select: none;
     transition: border-color 0.15s, box-shadow 0.15s;
@@ -597,61 +605,69 @@
     <span style="flex: 1; font-size: 12px; font-weight: 600; color: var(--brand-navy); white-space: nowrap;">02/23/2026 &mdash; 03/01/2026</span>
     <span id="ds-compact-chevron" style="font-size: 12px; color: var(--text-muted); transition: transform 0.2s ease;">&#9662;</span>
   </div>
+</div>
 
-  <!-- Dropdown overlay — absolutely positioned below the pill -->
-  <div id="ds-compact-dropdown" style="
-    display: none;
-    position: absolute; top: calc(100% + 4px); left: 0;
-    z-index: 10000; width: 540px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-    border: 1px solid var(--border); border-radius: 12px;
-    background: var(--card-bg); overflow: hidden;
+<!-- Dropdown — appended to body with position:fixed (escapes PBI overflow clipping) -->
+<div id="ds-compact-dropdown" style="
+  display: none;
+  position: fixed;
+  z-index: 99999; width: 540px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+  border: 1px solid var(--border); border-radius: 12px;
+  background: var(--card-bg); overflow: hidden;
+  animation: ds-dropdown-anim 0.15s ease;
+">
+  <div style="
+    display: flex; flex-direction: row;
+    width: 100%; max-height: calc(100vh - 60px);
+    font-family: var(--font); font-size: 12px; color: var(--brand-navy);
+    overflow-y: auto;
   ">
-    <div style="
-      display: flex; flex-direction: row;
-      width: 100%; height: 340px;
-      font-family: var(--font); font-size: 12px; color: var(--brand-navy);
-    ">
-      <div class="ds-prev-sidebar">
-        <div class="ds-prev-toggle-row">
-          <input type="checkbox" checked>
-          <span>Date Range</span>
-        </div>
-        <button class="ds-prev-preset">Yesterday</button>
-        <button class="ds-prev-preset">Today</button>
-        <button class="ds-prev-preset">Min Date</button>
-        <button class="ds-prev-preset active">This Week</button>
-        <button class="ds-prev-preset">Last Week</button>
-        <button class="ds-prev-preset">This Month</button>
-        <div class="ds-prev-days-row">
-          <input class="ds-prev-days-input" type="number" value="7" min="1">
-          <span class="ds-prev-days-label">days up to today</span>
-        </div>
-        <div class="ds-prev-days-row">
-          <input class="ds-prev-days-input" type="number" value="7" min="1">
-          <span class="ds-prev-days-label">days starting today</span>
-        </div>
+    <div class="ds-prev-sidebar">
+      <div class="ds-prev-toggle-row">
+        <input type="checkbox" checked>
+        <span>Date Range</span>
       </div>
-      <div class="ds-prev-main">
-        <button class="ds-prev-today-btn">Today</button>
-        <div class="ds-prev-input-row">
-          <input class="ds-prev-date-input" type="text" value="02/23/2026" readonly>
-          <input class="ds-prev-date-input" type="text" value="03/01/2026" readonly>
-        </div>
-        <div class="ds-prev-nav">
-          <button>&#10094;</button>
-          <select><option>February</option></select>
-          <select><option>2026</option></select>
-          <button>&#10095;</button>
-        </div>
-        <div class="ds-prev-day-headers">
-          <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
-        </div>
-        <div class="ds-prev-grid" id="ds-cal-grid-compact"></div>
+      <button class="ds-prev-preset">Yesterday</button>
+      <button class="ds-prev-preset">Today</button>
+      <button class="ds-prev-preset">Min Date</button>
+      <button class="ds-prev-preset active">This Week</button>
+      <button class="ds-prev-preset">Last Week</button>
+      <button class="ds-prev-preset">This Month</button>
+      <div class="ds-prev-days-row">
+        <input class="ds-prev-days-input" type="number" value="7" min="1">
+        <span class="ds-prev-days-label">days up to today</span>
+      </div>
+      <div class="ds-prev-days-row">
+        <input class="ds-prev-days-input" type="number" value="7" min="1">
+        <span class="ds-prev-days-label">days starting today</span>
       </div>
     </div>
+    <div class="ds-prev-main">
+      <div style="display: flex; align-items: center; justify-content: space-between;">
+        <button class="ds-prev-today-btn">Today</button>
+        <button id="ds-compact-close" style="
+          width: 26px; height: 26px; border: none; border-radius: 4px;
+          background: transparent; color: var(--text-muted); font-size: 14px;
+          cursor: pointer; display: flex; align-items: center; justify-content: center;
+        " title="Close">&#10005;</button>
+      </div>
+      <div class="ds-prev-input-row">
+        <input class="ds-prev-date-input" type="text" value="02/23/2026" readonly>
+        <input class="ds-prev-date-input" type="text" value="03/01/2026" readonly>
+      </div>
+      <div class="ds-prev-nav">
+        <button>&#10094;</button>
+        <select><option>February</option></select>
+        <select><option>2026</option></select>
+        <button>&#10095;</button>
+      </div>
+      <div class="ds-prev-day-headers">
+        <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+      </div>
+      <div class="ds-prev-grid" id="ds-cal-grid-compact"></div>
+    </div>
   </div>
-
 </div>
 
 <!-- ── Footer ── -->
@@ -726,19 +742,54 @@
   }
 })();
 
-// Click outside closes compact dropdown
-document.onclick = function(e) {
-  var anchor = document.getElementById('ds-compact-anchor');
+// Compact dropdown — position: fixed below pill (escapes overflow:hidden)
+(function() {
+  var pill = document.getElementById('ds-compact-pill');
   var dropdown = document.getElementById('ds-compact-dropdown');
   var chevron = document.getElementById('ds-compact-chevron');
-  var pill = document.getElementById('ds-compact-pill');
-  if (anchor && dropdown && chevron && pill && dropdown.style.display === 'block' && !anchor.contains(e.target)) {
+  var closeBtn = document.getElementById('ds-compact-close');
+  if (!pill || !dropdown || !chevron) return;
+
+  function openDropdown() {
+    var rect = pill.getBoundingClientRect();
+    dropdown.style.left = rect.left + 'px';
+    dropdown.style.top = (rect.bottom + 4) + 'px';
+    dropdown.style.width = Math.max(rect.width, 540) + 'px';
+    dropdown.style.display = 'block';
+    chevron.style.transform = 'rotate(180deg)';
+  }
+
+  function closeDropdown() {
     dropdown.style.display = 'none';
     chevron.style.transform = '';
     pill.style.borderColor = '';
     pill.style.boxShadow = '';
   }
-};
+
+  pill.addEventListener('click', function(e) {
+    e.stopPropagation();
+    if (dropdown.style.display === 'block') {
+      closeDropdown();
+    } else {
+      openDropdown();
+    }
+  });
+
+  if (closeBtn) {
+    closeBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      closeDropdown();
+    });
+  }
+
+  dropdown.addEventListener('click', function(e) { e.stopPropagation(); });
+
+  document.addEventListener('click', function(e) {
+    if (dropdown.style.display === 'block' && !dropdown.contains(e.target) && !pill.contains(e.target)) {
+      closeDropdown();
+    }
+  });
+})();
 
 // Count-up animation for all value elements
 document.addEventListener('DOMContentLoaded', () => {
