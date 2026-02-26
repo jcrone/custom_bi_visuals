@@ -33,6 +33,10 @@ export declare class CalendarRenderer {
     private daysStartInput;
     private monthDropdown;
     private yearDropdown;
+    private presetButtons;
+    private daysUpRow;
+    private daysStartRow;
+    private activePresetKey;
     private currentMode;
     private isDropdownOpen;
     private cachedMinYear;
@@ -41,6 +45,7 @@ export declare class CalendarRenderer {
     constructor(root: HTMLElement, callbacks: CalendarCallbacks);
     private buildDOM;
     render(viewYear: number, viewMonth: number, firstDay: number, rangeStart: Date | null, rangeEnd: Date | null, isRangeMode: boolean, showSidebar: boolean, minYear: number, maxYear: number): void;
+    setActivePreset(key: string | null): void;
     setDisplayMode(mode: "expanded" | "compact"): void;
     private openDropdown;
     private positionDropdown;

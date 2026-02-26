@@ -22,6 +22,7 @@ export declare class Visual implements IVisual {
     private maxDate;
     private initialized;
     private filterRestored;
+    private activePreset;
     constructor(options: VisualConstructorOptions);
     update(options: VisualUpdateOptions): void;
     private renderCalendar;

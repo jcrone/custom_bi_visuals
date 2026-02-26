@@ -42,6 +42,11 @@ export class CalendarRenderer {
     private monthDropdown: HTMLSelectElement;
     private yearDropdown: HTMLSelectElement;
 
+    private presetButtons: Map<string, HTMLElement> = new Map();
+    private daysUpRow: HTMLElement;
+    private daysStartRow: HTMLElement;
+    private activePresetKey: string | null = null;
+
     private currentMode: "expanded" | "compact" = "expanded";
     private isDropdownOpen: boolean = false;
     private cachedMinYear: number = 0;
@@ -121,11 +126,13 @@ export class CalendarRenderer {
             const btn = this.el("button", "ds-preset-btn");
             btn.textContent = p.label;
             btn.addEventListener("click", () => this.callbacks.onPreset(p.key));
+            this.presetButtons.set(p.key, btn);
             this.sidebar.appendChild(btn);
         }
 
         // Days up to today
-        const daysUpRow = this.el("div", "ds-days-row");
+        this.daysUpRow = this.el("div", "ds-days-row");
+        const daysUpRow = this.daysUpRow;
         this.daysUpInput = document.createElement("input");
         this.daysUpInput.type = "number";
         this.daysUpInput.className = "ds-days-input";
@@ -142,7 +149,8 @@ export class CalendarRenderer {
         this.sidebar.appendChild(daysUpRow);
 
         // Days starting today
-        const daysStartRow = this.el("div", "ds-days-row");
+        this.daysStartRow = this.el("div", "ds-days-row");
+        const daysStartRow = this.daysStartRow;
         this.daysStartInput = document.createElement("input");
         this.daysStartInput.type = "number";
         this.daysStartInput.className = "ds-days-input";
@@ -337,9 +345,34 @@ export class CalendarRenderer {
             this.pillText.textContent = "Select date\u2026";
         }
 
+        // Highlight active preset button
+        for (const [key, btn] of this.presetButtons) {
+            if (key === this.activePresetKey) {
+                btn.classList.add("ds-preset-btn--active");
+            } else {
+                btn.classList.remove("ds-preset-btn--active");
+            }
+        }
+
+        // Highlight active days row
+        if (this.activePresetKey === "daysUpToToday") {
+            this.daysUpRow.classList.add("ds-days-row--active");
+        } else {
+            this.daysUpRow.classList.remove("ds-days-row--active");
+        }
+        if (this.activePresetKey === "daysStartingToday") {
+            this.daysStartRow.classList.add("ds-days-row--active");
+        } else {
+            this.daysStartRow.classList.remove("ds-days-row--active");
+        }
+
         if (this.currentMode === "compact" && this.isDropdownOpen) {
             this.positionDropdown();
         }
+    }
+
+    public setActivePreset(key: string | null): void {
+        this.activePresetKey = key;
     }
 
     public setDisplayMode(mode: "expanded" | "compact"): void {

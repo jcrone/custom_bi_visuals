@@ -71,11 +71,25 @@ body {
 .ds-preset-btn:active {
   background: rgba(253, 185, 69, 0.22);
 }
+.ds-preset-btn--active {
+  background: var(--ds-accent);
+  color: #fff;
+}
+.ds-preset-btn--active:hover {
+  background: var(--ds-accent);
+  opacity: 0.9;
+}
 .ds-days-row {
   display: flex;
   align-items: center;
   gap: 6px;
   margin-top: 2px;
+  padding: 4px 6px;
+  border-radius: 4px;
+  transition: background 0.15s;
+}
+.ds-days-row--active {
+  background: rgba(253, 185, 69, 0.22);
 }
 .ds-days-input {
   width: 36px;

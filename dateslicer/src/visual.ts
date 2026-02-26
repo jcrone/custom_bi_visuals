@@ -51,6 +51,7 @@ export class Visual implements IVisual {
     private maxDate: Date | null = null;
     private initialized: boolean = false;
     private filterRestored: boolean = false;
+    private activePreset: string | null = null;
 
     constructor(options: VisualConstructorOptions) {
         this.host = options.host;
@@ -79,16 +80,19 @@ export class Visual implements IVisual {
                 this.applyFilter();
             },
             onDaysUpToToday: (n: number) => {
+                this.activePreset = "daysUpToToday";
                 const range = getDaysUpToToday(n);
                 this.setRange(range);
             },
             onDaysStartingToday: (n: number) => {
+                this.activePreset = "daysStartingToday";
                 const range = getDaysStartingToday(n);
                 this.setRange(range);
             },
             onStartDateInput: (val: string) => {
                 const d = parseDate(val);
                 if (d) {
+                    this.activePreset = null;
                     this.rangeStart = d;
                     if (!this.rangeEnd || d > this.rangeEnd) this.rangeEnd = d;
                     this.viewYear = d.getFullYear();
@@ -100,6 +104,7 @@ export class Visual implements IVisual {
             onEndDateInput: (val: string) => {
                 const d = parseDate(val);
                 if (d) {
+                    this.activePreset = null;
                     this.rangeEnd = d;
                     if (!this.rangeStart || d < this.rangeStart) this.rangeStart = d;
                     this.renderCalendar();
@@ -186,6 +191,7 @@ export class Visual implements IVisual {
                 if (preset && preset !== "none") {
                     const firstDay = parseInt(String(this.formattingSettings.calendarCard.firstDayOfWeek.value.value), 10);
                     const range = getPresetRange(preset as PresetKey, firstDay, this.minDate || undefined);
+                    this.activePreset = preset;
                     this.rangeStart = range.start;
                     this.rangeEnd = range.end;
                     this.viewYear = range.start.getFullYear();
@@ -230,6 +236,7 @@ export class Visual implements IVisual {
         const minYear = this.minDate ? this.minDate.getFullYear() : this.viewYear - 10;
         const maxYear = this.maxDate ? this.maxDate.getFullYear() : this.viewYear + 10;
 
+        this.renderer.setActivePreset(this.activePreset);
         this.renderer.render(
             this.viewYear,
             this.viewMonth,
@@ -245,6 +252,7 @@ export class Visual implements IVisual {
 
     private handleDayClick(date: Date): void {
         const d = stripTime(date);
+        this.activePreset = null;
 
         if (!this.isRangeMode) {
             this.rangeStart = d;
@@ -276,6 +284,7 @@ export class Visual implements IVisual {
             ? parseInt(String(this.formattingSettings.calendarCard.firstDayOfWeek.value.value), 10)
             : 0;
         const range = getPresetRange(key, firstDay, this.minDate || undefined);
+        this.activePreset = key;
         this.setRange(range);
     }
 

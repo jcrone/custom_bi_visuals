@@ -107,6 +107,15 @@ body {
     &:active {
         background: @selected-fill;
     }
+    &--active {
+        background: var(--ds-accent);
+        color: #fff;
+
+        &:hover {
+            background: var(--ds-accent);
+            opacity: 0.9;
+        }
+    }
 }
 
 .ds-days-row {
@@ -114,6 +123,13 @@ body {
     align-items: center;
     gap: 6px;
     margin-top: 2px;
+    padding: 4px 6px;
+    border-radius: @radius-sm;
+    transition: background 0.15s;
+
+    &--active {
+        background: @selected-fill;
+    }
 }
 
 .ds-days-input {

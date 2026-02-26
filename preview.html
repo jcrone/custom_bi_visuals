@@ -241,7 +241,14 @@
     transition: background 0.15s;
   }
   .ds-prev-preset:hover { background: rgba(0,83,154,0.10); }
-  .ds-prev-preset.active { background: rgba(253,185,69,0.22); }
+  .ds-prev-preset.active {
+    background: var(--brand-blue);
+    color: #fff;
+  }
+  .ds-prev-preset.active:hover {
+    background: var(--brand-blue);
+    opacity: 0.9;
+  }
 
   .ds-prev-days-row {
     display: flex; align-items: center; gap: 5px; margin-top: 3px;
