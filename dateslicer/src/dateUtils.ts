@@ -78,7 +78,7 @@ export function endOfMonth(d: Date): Date {
     return new Date(d.getFullYear(), d.getMonth() + 1, 0);
 }
 
-export type PresetKey = "yesterday" | "today" | "minDate" | "thisWeek" | "lastWeek" | "thisMonth";
+export type PresetKey = "yesterday" | "today" | "minDate" | "thisWeek" | "lastWeek" | "thisMonth" | "lastMonth" | "thisYear" | "lastYear";
 
 export function getPresetRange(key: PresetKey, firstDay: number, minDate?: Date): DateRange {
     const t = today();
@@ -101,6 +101,16 @@ export function getPresetRange(key: PresetKey, firstDay: number, minDate?: Date)
         }
         case "thisMonth":
             return { start: startOfMonth(t), end: endOfMonth(t) };
+        case "lastMonth": {
+            const prev = new Date(t.getFullYear(), t.getMonth() - 1, 1);
+            return { start: startOfMonth(prev), end: endOfMonth(prev) };
+        }
+        case "thisYear":
+            return { start: new Date(t.getFullYear(), 0, 1), end: new Date(t.getFullYear(), 11, 31) };
+        case "lastYear": {
+            const y = t.getFullYear() - 1;
+            return { start: new Date(y, 0, 1), end: new Date(y, 11, 31) };
+        }
         default:
             return { start: t, end: t };
     }

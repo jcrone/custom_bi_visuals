@@ -22,7 +22,7 @@ export declare function startOfWeek(d: Date, firstDay: number): Date;
 export declare function endOfWeek(d: Date, firstDay: number): Date;
 export declare function startOfMonth(d: Date): Date;
 export declare function endOfMonth(d: Date): Date;
-export type PresetKey = "yesterday" | "today" | "minDate" | "thisWeek" | "lastWeek" | "thisMonth";
+export type PresetKey = "yesterday" | "today" | "minDate" | "thisWeek" | "lastWeek" | "thisMonth" | "lastMonth" | "thisYear" | "lastYear";
 export declare function getPresetRange(key: PresetKey, firstDay: number, minDate?: Date): DateRange;
 export declare function getDaysUpToToday(n: number): DateRange;
 export declare function getDaysStartingToday(n: number): DateRange;

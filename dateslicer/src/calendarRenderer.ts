@@ -120,6 +120,9 @@ export class CalendarRenderer {
             { key: "thisWeek", label: "This Week" },
             { key: "lastWeek", label: "Last Week" },
             { key: "thisMonth", label: "This Month" },
+            { key: "lastMonth", label: "Last Month" },
+            { key: "thisYear", label: "This Year" },
+            { key: "lastYear", label: "Last Year" },
         ];
 
         for (const p of presets) {

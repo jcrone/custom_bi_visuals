@@ -4,7 +4,12 @@ For branding and colors look at @STYLE.md
 
 Ask user after completing any changes that effects the code if you they want you to run the pbiviz package to generate updated versions of the .pbiviz files. 
 
+Ask me if I want to pump the version after updates are complete 
+
+
 After visual change ask user if they would like the preview file updated. 
+
+
 
 ## Project
 Power BI Visuals

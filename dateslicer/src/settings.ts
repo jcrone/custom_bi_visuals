@@ -32,6 +32,9 @@ class CalendarCardSettings extends FormattingSettingsCard {
             { value: "thisWeek", displayName: "This Week" },
             { value: "thisMonth", displayName: "This Month" },
             { value: "lastWeek", displayName: "Last Week" },
+            { value: "lastMonth", displayName: "Last Month" },
+            { value: "thisYear", displayName: "This Year" },
+            { value: "lastYear", displayName: "Last Year" },
         ],
         value: { value: "none", displayName: "None" }
     });
