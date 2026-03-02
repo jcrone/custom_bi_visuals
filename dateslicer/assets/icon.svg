@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20">
+  <!-- Calendar body -->
+  <rect x="2" y="4" width="16" height="14" rx="2" fill="#00539A"/>
+  <!-- Header bar -->
+  <rect x="2" y="4" width="16" height="4" rx="2" fill="#11284C"/>
+  <rect x="2" y="6" width="16" height="2" fill="#11284C"/>
+  <!-- Calendar hangers -->
+  <rect x="6" y="2" width="1.5" height="4" rx="0.75" fill="#00539A"/>
+  <rect x="12.5" y="2" width="1.5" height="4" rx="0.75" fill="#00539A"/>
+  <!-- Day dots -->
+  <rect x="4.5" y="10" width="2" height="2" rx="0.5" fill="rgba(255,255,255,0.5)"/>
+  <rect x="9" y="10" width="2" height="2" rx="0.5" fill="rgba(255,255,255,0.5)"/>
+  <rect x="13.5" y="10" width="2" height="2" rx="0.5" fill="rgba(255,255,255,0.5)"/>
+  <rect x="4.5" y="14" width="2" height="2" rx="0.5" fill="rgba(255,255,255,0.5)"/>
+  <!-- Selected day (gold) -->
+  <rect x="9" y="14" width="2" height="2" rx="0.5" fill="#FDB945"/>
+  <rect x="13.5" y="14" width="2" height="2" rx="0.5" fill="rgba(255,255,255,0.5)"/>
+</svg>
