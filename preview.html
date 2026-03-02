@@ -193,6 +193,99 @@
     border: 1px solid var(--border);
   }
 
+  /* ── Section icon beside label ── */
+  .section-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-icon {
+    width: 20px; height: 20px;
+    flex-shrink: 0;
+    border-radius: 3px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.10);
+  }
+
+  /* ── Info panels ── */
+  .info-panel {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 22px;
+    margin: 12px 0 20px;
+    max-width: 720px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .info-panel__desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.55;
+    margin-bottom: 14px;
+  }
+  .info-panel__heading {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--brand-blue);
+    margin: 14px 0 8px;
+  }
+  .info-panel__heading:first-child { margin-top: 0; }
+  .field-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+  .field-table th {
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 10px;
+    padding: 6px 10px;
+    border-bottom: 2px solid var(--border);
+  }
+  .field-table td {
+    padding: 5px 10px;
+    border-bottom: 1px solid var(--border);
+    color: var(--brand-navy);
+  }
+  .field-table tr:last-child td { border-bottom: none; }
+  .field-table .field-name {
+    font-weight: 600;
+    color: var(--brand-blue);
+    white-space: nowrap;
+  }
+  .field-table .field-type {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-style: italic;
+  }
+  .example-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    font-family: "Consolas", "Cascadia Code", monospace;
+  }
+  .example-table th {
+    text-align: left;
+    font-weight: 600;
+    color: var(--card-bg);
+    background: var(--brand-navy);
+    font-size: 11px;
+    padding: 5px 10px;
+  }
+  .example-table th:first-child { border-radius: 4px 0 0 0; }
+  .example-table th:last-child { border-radius: 0 4px 0 0; }
+  .example-table td {
+    padding: 4px 10px;
+    border-bottom: 1px solid var(--border);
+    color: var(--brand-navy);
+  }
+  .example-table tr:nth-child(even) td { background: var(--bg); }
+  .example-table tr:last-child td { border-bottom: none; }
+
   /* ── Date Slicer ── */
   .ds-preview-wrapper {
     display: flex;
@@ -415,7 +508,35 @@
 <p class="subtitle">Custom visuals — preview with sample data</p>
 
 <!-- ── SINGLE CARDS ── -->
-<div class="section-label">Visual 1 — Single KPI Card</div>
+<div class="section-label">
+  <svg class="section-icon" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="3" width="16" height="14" rx="2" fill="#00539A"/><rect x="5" y="6" width="8" height="2.5" rx="0.5" fill="#FFF"/><polyline points="5,14 8,11 11,12.5 14,9 17,10" fill="none" stroke="#FDB945" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  Visual 1 — Single KPI Card
+</div>
+
+<div class="info-panel">
+  <p class="info-panel__desc">
+    Displays a single KPI metric with a large value, percentage variance against a target, and an optional sparkline trend line.
+    Ideal for highlighting one key metric per card — drop multiple cards side-by-side to build a KPI row.
+  </p>
+  <div class="info-panel__heading">Data Fields</div>
+  <table class="field-table">
+    <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+    <tr><td class="field-name">Value</td><td class="field-type">Measure</td><td>The main KPI number (e.g. Sum of Revenue)</td></tr>
+    <tr><td class="field-name">Target</td><td class="field-type">Measure</td><td>Comparison value — variance is calculated as (Value - Target) / Target</td></tr>
+    <tr><td class="field-name">Trend</td><td class="field-type">Measure</td><td>Values plotted on the sparkline (e.g. Revenue by month)</td></tr>
+    <tr><td class="field-name">Category</td><td class="field-type">Grouping</td><td>Axis for the sparkline (e.g. Month, Week)</td></tr>
+  </table>
+  <div class="info-panel__heading">Example Data</div>
+  <table class="example-table">
+    <tr><th>Month</th><th>Revenue</th><th>Target</th></tr>
+    <tr><td>Jan 2026</td><td>$1,800,000</td><td>$1,700,000</td></tr>
+    <tr><td>Feb 2026</td><td>$2,100,000</td><td>$2,000,000</td></tr>
+    <tr><td>Mar 2026</td><td>$2,400,000</td><td>$2,100,000</td></tr>
+  </table>
+  <p style="font-size:11px; color:var(--text-muted); margin-top:8px;">
+    Category = <strong>Month</strong> &nbsp;|&nbsp; Value = <strong>SUM(Revenue)</strong> &nbsp;|&nbsp; Target = <strong>SUM(Target)</strong> &nbsp;|&nbsp; Trend = <strong>SUM(Revenue)</strong>
+  </p>
+</div>
 
 <div class="single-cards-row">
 
@@ -490,7 +611,37 @@
 </div>
 
 <!-- ── MULTI CARD GRID ── -->
-<div class="section-label">Visual 2 — Multi-KPI Card (single visual)</div>
+<div class="section-label">
+  <svg class="section-icon" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="7" height="7" rx="1.5" fill="#00539A"/><rect x="3.5" y="4" width="4" height="1.5" rx="0.5" fill="#FFF"/><rect x="11" y="2" width="7" height="7" rx="1.5" fill="#00539A"/><rect x="12.5" y="4" width="4" height="1.5" rx="0.5" fill="#FFF"/><rect x="2" y="11" width="7" height="7" rx="1.5" fill="#00539A"/><rect x="3.5" y="13" width="4" height="1.5" rx="0.5" fill="#FFF"/><rect x="11" y="11" width="7" height="7" rx="1.5" fill="#FDB945"/><rect x="12.5" y="13" width="4" height="1.5" rx="0.5" fill="#FFF"/></svg>
+  Visual 2 — Multi-KPI Card (single visual)
+</div>
+
+<div class="info-panel">
+  <p class="info-panel__desc">
+    Shows multiple KPIs in a single responsive grid visual. Each row in your data becomes its own mini-card with a value and
+    variance against target. Great for dashboards where you want several metrics in one compact visual instead of separate cards.
+  </p>
+  <div class="info-panel__heading">Data Fields</div>
+  <table class="field-table">
+    <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+    <tr><td class="field-name">KPI Name</td><td class="field-type">Grouping</td><td>Label for each KPI — each unique value creates a card</td></tr>
+    <tr><td class="field-name">Value</td><td class="field-type">Measure</td><td>The KPI number for each row</td></tr>
+    <tr><td class="field-name">Target</td><td class="field-type">Measure</td><td>Target/comparison value per KPI — drives variance arrows</td></tr>
+  </table>
+  <div class="info-panel__heading">Example Data</div>
+  <table class="example-table">
+    <tr><th>KPI Name</th><th>Value</th><th>Target</th></tr>
+    <tr><td>Revenue</td><td>$2,400,000</td><td>$2,100,000</td></tr>
+    <tr><td>COGS</td><td>$1,600,000</td><td>$1,650,000</td></tr>
+    <tr><td>Margin</td><td>18.7%</td><td>20.8%</td></tr>
+    <tr><td>Users</td><td>84,200</td><td>77,600</td></tr>
+    <tr><td>Churn</td><td>3.2%</td><td>2.4%</td></tr>
+    <tr><td>NPS</td><td>72</td><td>68</td></tr>
+  </table>
+  <p style="font-size:11px; color:var(--text-muted); margin-top:8px;">
+    KPI Name = <strong>KPI[Name]</strong> &nbsp;|&nbsp; Value = <strong>SUM(KPI[Value])</strong> &nbsp;|&nbsp; Target = <strong>SUM(KPI[Target])</strong>
+  </p>
+</div>
 
 <div class="multi-grid">
 
@@ -545,7 +696,44 @@
 </div>
 
 <!-- ── DATE SLICER ── -->
-<div class="section-label" style="margin-top: 48px;">Visual 3 — Date Slicer / Date Picker</div>
+<div class="section-label" style="margin-top: 48px;">
+  <svg class="section-icon" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="4" width="16" height="14" rx="2" fill="#00539A"/><rect x="2" y="4" width="16" height="4" rx="2" fill="#11284C"/><rect x="2" y="6" width="16" height="2" fill="#11284C"/><rect x="6" y="2" width="1.5" height="4" rx="0.75" fill="#00539A"/><rect x="12.5" y="2" width="1.5" height="4" rx="0.75" fill="#00539A"/><rect x="4.5" y="10" width="2" height="2" rx="0.5" fill="rgba(255,255,255,0.5)"/><rect x="9" y="10" width="2" height="2" rx="0.5" fill="rgba(255,255,255,0.5)"/><rect x="13.5" y="10" width="2" height="2" rx="0.5" fill="rgba(255,255,255,0.5)"/><rect x="4.5" y="14" width="2" height="2" rx="0.5" fill="rgba(255,255,255,0.5)"/><rect x="9" y="14" width="2" height="2" rx="0.5" fill="#FDB945"/><rect x="13.5" y="14" width="2" height="2" rx="0.5" fill="rgba(255,255,255,0.5)"/></svg>
+  Visual 3 — Date Slicer / Date Picker
+</div>
+
+<div class="info-panel">
+  <p class="info-panel__desc">
+    A full-featured date slicer with a calendar picker, preset quick-filters (Yesterday, This Week, Last Month, This Year, etc.),
+    custom "N days" inputs, and single-date or date-range modes. Supports two display modes:
+    <strong>Expanded</strong> (inline calendar) and <strong>Compact</strong> (pill that opens a modal dialog).
+    Filters all other visuals on the report page.
+  </p>
+  <div class="info-panel__heading">Data Fields</div>
+  <table class="field-table">
+    <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+    <tr><td class="field-name">Date</td><td class="field-type">Grouping (Date)</td><td>A date column from your model — the slicer filters this field across the report</td></tr>
+  </table>
+  <div class="info-panel__heading">Example Data</div>
+  <table class="example-table">
+    <tr><th>Date</th></tr>
+    <tr><td>01/01/2024</td></tr>
+    <tr><td>01/02/2024</td></tr>
+    <tr><td>01/03/2024</td></tr>
+    <tr><td style="color:var(--text-muted)">... continuous date range ...</td></tr>
+    <tr><td>03/02/2026</td></tr>
+  </table>
+  <p style="font-size:11px; color:var(--text-muted); margin-top:8px;">
+    Date = <strong>Calendar[Date]</strong> &nbsp;|&nbsp; Typically a Date table or a date column from your fact table
+  </p>
+  <div class="info-panel__heading">Formatting Options</div>
+  <table class="field-table">
+    <tr><th>Setting</th><th>Options</th><th>Description</th></tr>
+    <tr><td class="field-name">Display Mode</td><td>Expanded / Compact</td><td>Expanded shows inline calendar; Compact shows a pill that opens a modal dialog</td></tr>
+    <tr><td class="field-name">First Day of Week</td><td>Sunday / Monday</td><td>Sets which day starts the calendar week</td></tr>
+    <tr><td class="field-name">Show Sidebar</td><td>On / Off</td><td>Toggle the preset quick-filter sidebar</td></tr>
+    <tr><td class="field-name">Default Preset</td><td>None, Today, This Week, etc.</td><td>Auto-apply a preset when the report loads</td></tr>
+  </table>
+</div>
 
 <div class="ds-preview-wrapper">
   <!-- Sidebar -->
@@ -593,11 +781,15 @@
 </div>
 
 <!-- ── DATE SLICER COMPACT (MODAL DIALOG) ── -->
-<div class="section-label" style="margin-top: 48px;">Visual 3b — Date Slicer (Compact &rarr; Modal Dialog)</div>
+<div class="section-label" style="margin-top: 48px;">
+  <svg class="section-icon" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="4" width="16" height="14" rx="2" fill="#00539A"/><rect x="2" y="4" width="16" height="4" rx="2" fill="#11284C"/><rect x="2" y="6" width="16" height="2" fill="#11284C"/><rect x="6" y="2" width="1.5" height="4" rx="0.75" fill="#00539A"/><rect x="12.5" y="2" width="1.5" height="4" rx="0.75" fill="#00539A"/><rect x="4.5" y="10" width="2" height="2" rx="0.5" fill="rgba(255,255,255,0.5)"/><rect x="9" y="10" width="2" height="2" rx="0.5" fill="rgba(255,255,255,0.5)"/><rect x="13.5" y="10" width="2" height="2" rx="0.5" fill="rgba(255,255,255,0.5)"/><rect x="4.5" y="14" width="2" height="2" rx="0.5" fill="rgba(255,255,255,0.5)"/><rect x="9" y="14" width="2" height="2" rx="0.5" fill="#FDB945"/><rect x="13.5" y="14" width="2" height="2" rx="0.5" fill="rgba(255,255,255,0.5)"/></svg>
+  Visual 3b — Date Slicer (Compact &rarr; Modal Dialog)
+</div>
 
 <!-- Simulates a small PBI visual container with overflow:hidden -->
 <div id="ds-compact-container" style="
-  position: relative; display: inline-block;
+  position: relative; display: block;
+  margin-top: 14px;
   width: 300px; height: 44px;
   border: 2px dashed var(--text-muted); border-radius: 8px;
   overflow: hidden;
