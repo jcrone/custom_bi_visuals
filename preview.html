@@ -174,6 +174,123 @@
 
   .arrow { font-size: 9px; }
 
+  /* ── Radial Gauge ── */
+  .gauge-preview-row {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 48px;
+  }
+
+  .gauge-card {
+    flex: 1 1 200px;
+    max-width: 260px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    transition: box-shadow 0.15s ease;
+    opacity: 0;
+    transform: translateY(18px);
+    animation: cardIn 0.5s ease forwards;
+  }
+  .gauge-card:nth-child(1) { animation-delay: 0.05s; }
+  .gauge-card:nth-child(2) { animation-delay: 0.15s; }
+  .gauge-card:nth-child(3) { animation-delay: 0.25s; }
+  .gauge-card:nth-child(4) { animation-delay: 0.35s; }
+  .gauge-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.10); }
+
+  .gauge-card__title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 4px;
+  }
+
+  .gauge-card__svg {
+    display: block;
+    margin: 0 auto;
+  }
+
+  .gauge-card__value-text {
+    font-family: var(--font);
+    font-size: 26px;
+    font-weight: 700;
+    fill: var(--brand-navy);
+    text-anchor: middle;
+    dominant-baseline: central;
+  }
+
+  .gauge-card__pct-text {
+    font-family: var(--font);
+    font-size: 12px;
+    font-weight: 600;
+    fill: var(--text-muted);
+    text-anchor: middle;
+    dominant-baseline: central;
+  }
+
+  .gauge-card__label-text {
+    font-family: var(--font);
+    font-size: 10px;
+    font-weight: 400;
+    fill: var(--text-muted);
+    text-anchor: middle;
+    dominant-baseline: central;
+  }
+
+  .gauge-card__variance {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 4px;
+  }
+  .gauge-card__variance.pos { color: var(--kpi-positive); }
+  .gauge-card__variance.neg { color: var(--kpi-negative); }
+  .gauge-card__variance .target {
+    font-size: 10px;
+    font-weight: 400;
+    color: var(--text-muted);
+    margin-left: 4px;
+  }
+
+  /* Arc fill animation */
+  .gauge-arc-fill {
+    stroke-dasharray: var(--arc-len);
+    stroke-dashoffset: var(--arc-len);
+    animation: gaugeArcDraw 1s ease-out forwards;
+  }
+  .gauge-card:nth-child(1) .gauge-arc-fill { animation-delay: 0.3s; }
+  .gauge-card:nth-child(2) .gauge-arc-fill { animation-delay: 0.4s; }
+  .gauge-card:nth-child(3) .gauge-arc-fill { animation-delay: 0.5s; }
+  .gauge-card:nth-child(4) .gauge-arc-fill { animation-delay: 0.6s; }
+
+  @keyframes gaugeArcDraw {
+    to { stroke-dashoffset: 0; }
+  }
+
+  /* Needle fade-in */
+  .gauge-needle {
+    opacity: 0;
+    animation: needleIn 0.3s ease forwards;
+  }
+  .gauge-card:nth-child(1) .gauge-needle { animation-delay: 1.1s; }
+  .gauge-card:nth-child(2) .gauge-needle { animation-delay: 1.2s; }
+  .gauge-card:nth-child(3) .gauge-needle { animation-delay: 1.3s; }
+  .gauge-card:nth-child(4) .gauge-needle { animation-delay: 1.4s; }
+
+  @keyframes needleIn {
+    to { opacity: 1; }
+  }
+
   /* ── Footer ── */
   .footer {
     margin-top: 48px;
@@ -906,6 +1023,53 @@
   </div>
 </div>
 
+<!-- ── RADIAL GAUGE ── -->
+<div class="section-label" style="margin-top: 48px;">
+  <svg class="section-icon" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+    <path d="M10 3a7 7 0 0 0-6.06 3.5" fill="none" stroke="#E8EEF5" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M3.94 6.5A7 7 0 0 0 3 10a7 7 0 0 0 7 7 7 7 0 0 0 7-7 7 7 0 0 0-1-3.5" fill="none" stroke="#E8EEF5" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M10 3a7 7 0 0 0-6.06 3.5A7 7 0 0 0 3 10a7 7 0 0 0 7 7 7 7 0 0 0 5.5-2.67" fill="none" stroke="#00539A" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="10" y1="10" x2="14" y2="6" stroke="#11284C" stroke-width="1.5" stroke-linecap="round"/>
+    <circle cx="10" cy="10" r="1.2" fill="#11284C"/>
+  </svg>
+  Visual 4 — Radial Gauge
+</div>
+
+<div class="info-panel">
+  <p class="info-panel__desc">
+    A modern radial/arc gauge showing progress toward a goal with animated fill, configurable threshold bands
+    (danger/warning/good), a target needle marker, and variance display. Ideal for quota attainment, budget
+    utilization, SLA compliance, or any metric with a defined min/max range.
+  </p>
+  <div class="info-panel__heading">Data Fields</div>
+  <table class="field-table">
+    <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+    <tr><td class="field-name">Value</td><td class="field-type">Measure</td><td>The current value displayed on the gauge</td></tr>
+    <tr><td class="field-name">Target</td><td class="field-type">Measure</td><td>Target/goal — shows a needle marker and variance</td></tr>
+    <tr><td class="field-name">Max Value</td><td class="field-type">Measure</td><td>Maximum scale value (defaults to 100)</td></tr>
+    <tr><td class="field-name">Min Value</td><td class="field-type">Measure</td><td>Minimum scale value (defaults to 0)</td></tr>
+  </table>
+  <div class="info-panel__heading">Formatting Options</div>
+  <table class="field-table">
+    <tr><th>Setting</th><th>Options</th><th>Description</th></tr>
+    <tr><td class="field-name">Arc Color</td><td>Color picker</td><td>Fill color of the progress arc</td></tr>
+    <tr><td class="field-name">Arc Thickness</td><td>8 – 60</td><td>Width of the arc stroke</td></tr>
+    <tr><td class="field-name">Start / End Angle</td><td>0° – 720°</td><td>Geometry of the arc sweep (default 135°–405° for ¾ gauge)</td></tr>
+    <tr><td class="field-name">Thresholds</td><td>On / Off</td><td>Show danger/warning/good color bands behind the arc</td></tr>
+    <tr><td class="field-name">Display Units</td><td>None / K / M / Auto</td><td>Abbreviate large numbers</td></tr>
+  </table>
+  <div class="info-panel__heading">Example Data</div>
+  <table class="example-table">
+    <tr><th>KPI</th><th>Value</th><th>Target</th><th>Max</th></tr>
+    <tr><td>Quota Attainment</td><td>$1,850,000</td><td>$2,000,000</td><td>$2,500,000</td></tr>
+    <tr><td>SLA Compliance</td><td>96.3%</td><td>99%</td><td>100%</td></tr>
+    <tr><td>Budget Used</td><td>$420,000</td><td>$500,000</td><td>$600,000</td></tr>
+    <tr><td>CPU Utilization</td><td>23%</td><td>70%</td><td>100%</td></tr>
+  </table>
+</div>
+
+<div class="gauge-preview-row" id="gauge-preview-row"></div>
+
 <!-- ── Footer ── -->
 <div class="footer">
   Brand palette
@@ -1006,6 +1170,197 @@
 
   overlay.addEventListener('click', function(e) {
     if (e.target === overlay) closeModal();
+  });
+})();
+
+// ── Radial Gauge preview generation ──
+(() => {
+  const gauges = [
+    { title: 'Quota Attainment', value: 1850000, target: 2000000, max: 2500000, min: 0, prefix: '$', suffix: 'M', divisor: 1e6, decimals: 1 },
+    { title: 'SLA Compliance',   value: 96.3,    target: 99,      max: 100,     min: 0, prefix: '',  suffix: '%', divisor: 1,   decimals: 1 },
+    { title: 'Budget Used',      value: 420000,   target: 500000,  max: 600000,  min: 0, prefix: '$', suffix: 'K', divisor: 1e3, decimals: 0 },
+    { title: 'CPU Utilization',  value: 23,       target: 70,      max: 100,     min: 0, prefix: '',  suffix: '%', divisor: 1,   decimals: 0 }
+  ];
+
+  const row = document.getElementById('gauge-preview-row');
+  if (!row) return;
+
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const size = 180;
+  const cx = size / 2, cy = size / 2;
+  const thickness = 18;
+  const radius = (size - thickness - 4) / 2;
+  const startDeg = 135, endDeg = 405;
+  const startRad = startDeg * Math.PI / 180;
+  const endRad = endDeg * Math.PI / 180;
+  const totalAngle = endRad - startRad;
+
+  // threshold settings (in percentage)
+  const dangerBelow = 30, warningBelow = 60;
+  const colors = {
+    arc: '#00539A', danger: '#B42318', warning: '#FDB945',
+    track: '#E8EEF5', navy: '#11284C',
+    positive: '#0E7C3A', negative: '#B42318'
+  };
+
+  function describeArc(r, sRad, eRad) {
+    const x1 = cx + r * Math.cos(sRad);
+    const y1 = cy + r * Math.sin(sRad);
+    const x2 = cx + r * Math.cos(eRad);
+    const y2 = cy + r * Math.sin(eRad);
+    const large = (eRad - sRad) > Math.PI ? 1 : 0;
+    return `M ${x1.toFixed(2)} ${y1.toFixed(2)} A ${r.toFixed(2)} ${r.toFixed(2)} 0 ${large} 1 ${x2.toFixed(2)} ${y2.toFixed(2)}`;
+  }
+
+  function arcLength(r, sRad, eRad) {
+    return r * Math.abs(eRad - sRad);
+  }
+
+  gauges.forEach((g) => {
+    const card = document.createElement('div');
+    card.className = 'gauge-card';
+
+    // Title
+    const title = document.createElement('div');
+    title.className = 'gauge-card__title';
+    title.textContent = g.title;
+    card.appendChild(title);
+
+    // SVG
+    const svg = document.createElementNS(svgNS, 'svg');
+    svg.setAttribute('class', 'gauge-card__svg');
+    svg.setAttribute('width', String(size));
+    svg.setAttribute('height', String(size));
+    svg.setAttribute('viewBox', `0 0 ${size} ${size}`);
+
+    const pct = Math.max(0, Math.min(1, (g.value - g.min) / (g.max - g.min)));
+    const pct100 = pct * 100;
+    const targetPct = Math.max(0, Math.min(1, (g.target - g.min) / (g.max - g.min)));
+
+    // Threshold bands
+    const dangerEnd = startRad + totalAngle * (dangerBelow / 100);
+    const warningEnd = startRad + totalAngle * (warningBelow / 100);
+
+    // Danger band
+    const db = document.createElementNS(svgNS, 'path');
+    db.setAttribute('d', describeArc(radius, startRad, dangerEnd));
+    db.setAttribute('fill', 'none');
+    db.setAttribute('stroke', colors.danger);
+    db.setAttribute('stroke-width', String(thickness));
+    db.setAttribute('stroke-linecap', 'round');
+    db.setAttribute('opacity', '0.18');
+    svg.appendChild(db);
+
+    // Warning band
+    const wb = document.createElementNS(svgNS, 'path');
+    wb.setAttribute('d', describeArc(radius, dangerEnd, warningEnd));
+    wb.setAttribute('fill', 'none');
+    wb.setAttribute('stroke', colors.warning);
+    wb.setAttribute('stroke-width', String(thickness));
+    wb.setAttribute('stroke-linecap', 'round');
+    wb.setAttribute('opacity', '0.18');
+    svg.appendChild(wb);
+
+    // Good band
+    const gb = document.createElementNS(svgNS, 'path');
+    gb.setAttribute('d', describeArc(radius, warningEnd, endRad));
+    gb.setAttribute('fill', 'none');
+    gb.setAttribute('stroke', colors.arc);
+    gb.setAttribute('stroke-width', String(thickness));
+    gb.setAttribute('stroke-linecap', 'round');
+    gb.setAttribute('opacity', '0.08');
+    svg.appendChild(gb);
+
+    // Fill arc
+    let fillColor = colors.arc;
+    if (pct100 < dangerBelow) fillColor = colors.danger;
+    else if (pct100 < warningBelow) fillColor = colors.warning;
+
+    const fillEndRad = startRad + totalAngle * pct;
+    const fillPath = document.createElementNS(svgNS, 'path');
+    fillPath.setAttribute('d', describeArc(radius, startRad, fillEndRad));
+    fillPath.setAttribute('fill', 'none');
+    fillPath.setAttribute('stroke', fillColor);
+    fillPath.setAttribute('stroke-width', String(thickness));
+    fillPath.setAttribute('stroke-linecap', 'round');
+    const len = arcLength(radius, startRad, fillEndRad);
+    fillPath.style.setProperty('--arc-len', len.toFixed(1));
+    fillPath.classList.add('gauge-arc-fill');
+    svg.appendChild(fillPath);
+
+    // Target needle
+    const tAngle = startRad + totalAngle * targetPct;
+    const ni = radius - thickness / 2 - 4;
+    const no = radius + thickness / 2 + 4;
+    const needle = document.createElementNS(svgNS, 'line');
+    needle.setAttribute('x1', (cx + ni * Math.cos(tAngle)).toFixed(2));
+    needle.setAttribute('y1', (cy + ni * Math.sin(tAngle)).toFixed(2));
+    needle.setAttribute('x2', (cx + no * Math.cos(tAngle)).toFixed(2));
+    needle.setAttribute('y2', (cy + no * Math.sin(tAngle)).toFixed(2));
+    needle.setAttribute('stroke', colors.navy);
+    needle.setAttribute('stroke-width', '3');
+    needle.setAttribute('stroke-linecap', 'round');
+    needle.classList.add('gauge-needle');
+    svg.appendChild(needle);
+
+    // Center value text
+    const valText = document.createElementNS(svgNS, 'text');
+    valText.setAttribute('x', String(cx));
+    valText.setAttribute('y', String(cy - 2));
+    valText.setAttribute('class', 'gauge-card__value-text');
+    const displayVal = (g.value / g.divisor).toFixed(g.decimals);
+    valText.textContent = g.prefix + displayVal + g.suffix;
+    svg.appendChild(valText);
+
+    // Percentage text
+    const pctText = document.createElementNS(svgNS, 'text');
+    pctText.setAttribute('x', String(cx));
+    pctText.setAttribute('y', String(cy + 16));
+    pctText.setAttribute('class', 'gauge-card__pct-text');
+    pctText.textContent = (pct * 100).toFixed(1) + '%';
+    svg.appendChild(pctText);
+
+    // Min / Max labels
+    const labelR = radius + thickness / 2 + 14;
+    const minLabel = document.createElementNS(svgNS, 'text');
+    minLabel.setAttribute('x', (cx + labelR * Math.cos(startRad)).toFixed(2));
+    minLabel.setAttribute('y', (cy + labelR * Math.sin(startRad)).toFixed(2));
+    minLabel.setAttribute('class', 'gauge-card__label-text');
+    minLabel.textContent = g.prefix + (g.min / g.divisor).toFixed(0) + (g.divisor > 1 ? g.suffix : '');
+    svg.appendChild(minLabel);
+
+    const maxLabel = document.createElementNS(svgNS, 'text');
+    maxLabel.setAttribute('x', (cx + labelR * Math.cos(endRad)).toFixed(2));
+    maxLabel.setAttribute('y', (cy + labelR * Math.sin(endRad)).toFixed(2));
+    maxLabel.setAttribute('class', 'gauge-card__label-text');
+    maxLabel.textContent = g.prefix + (g.max / g.divisor).toFixed(g.decimals > 0 ? 1 : 0) + g.suffix;
+    svg.appendChild(maxLabel);
+
+    card.appendChild(svg);
+
+    // Variance
+    const delta = g.value - g.target;
+    const varPct = g.target !== 0 ? (delta / Math.abs(g.target)) * 100 : 0;
+    const isPos = delta >= 0;
+    const varDiv = document.createElement('div');
+    varDiv.className = 'gauge-card__variance ' + (isPos ? 'pos' : 'neg');
+
+    const arrow = document.createElement('span');
+    arrow.className = 'arrow';
+    arrow.innerHTML = isPos ? '&#9650;' : '&#9660;';
+
+    const varLabel = document.createElement('span');
+    varLabel.textContent = (isPos ? '+' : '') + varPct.toFixed(1) + '%';
+
+    const tgtLabel = document.createElement('span');
+    tgtLabel.className = 'target';
+    const tgtDisplay = (g.target / g.divisor).toFixed(g.decimals);
+    tgtLabel.textContent = 'vs ' + g.prefix + tgtDisplay + g.suffix;
+
+    varDiv.append(arrow, varLabel, tgtLabel);
+    card.appendChild(varDiv);
+
+    row.appendChild(card);
   });
 })();
 
