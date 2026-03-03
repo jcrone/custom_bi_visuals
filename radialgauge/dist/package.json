@@ -1,0 +1,17 @@
+{
+		"version": "1.0.0.0",
+		"author": {"name":"Jamie Crone","email":"jamie@example.com"},
+		"resources": [
+			{
+				"resourceId": "rId0",
+				"sourceType": 5,
+				"file": "resources/radialgaugeA1B2C3D4E5F647A8B9C0D1E2F3A4B5C6.pbiviz.json"
+			}
+		],
+		"visual": {"name":"radialgauge","displayName":"Radial Gauge","guid":"radialgaugeA1B2C3D4E5F647A8B9C0D1E2F3A4B5C6","visualClassName":"Visual","version":"1.0.0.0","description":"A modern radial gauge showing progress toward a target with animated arc, threshold bands, and optional variance display","supportUrl":"https://github.com/jamie-crone/powerbi-visuals","gitHubUrl":""},
+		"metadata": {
+			"pbivizjson": {
+				"resourceId": "rId0"
+			}
+		}
+	}

@@ -1,0 +1,123 @@
+{
+    "dataRoles": [
+        {
+            "displayName": "Value",
+            "name": "value",
+            "kind": "Measure",
+            "description": "The current value to display on the gauge"
+        },
+        {
+            "displayName": "Target",
+            "name": "target",
+            "kind": "Measure",
+            "description": "Target/goal value (optional — used for variance display)"
+        },
+        {
+            "displayName": "Max Value",
+            "name": "maxValue",
+            "kind": "Measure",
+            "description": "Maximum value for the gauge scale (optional — defaults to 100)"
+        },
+        {
+            "displayName": "Min Value",
+            "name": "minValue",
+            "kind": "Measure",
+            "description": "Minimum value for the gauge scale (optional — defaults to 0)"
+        }
+    ],
+    "objects": {
+        "gauge": {
+            "properties": {
+                "title": {
+                    "type": { "text": true }
+                },
+                "showTitle": {
+                    "type": { "bool": true }
+                },
+                "arcColor": {
+                    "type": { "fill": { "solid": { "color": true } } }
+                },
+                "trackColor": {
+                    "type": { "fill": { "solid": { "color": true } } }
+                },
+                "thickness": {
+                    "type": { "numeric": true }
+                },
+                "startAngle": {
+                    "type": { "numeric": true }
+                },
+                "endAngle": {
+                    "type": { "numeric": true }
+                },
+                "decimalPlaces": {
+                    "type": { "numeric": true }
+                },
+                "displayUnits": {
+                    "type": {
+                        "enumeration": [
+                            { "value": "1", "displayName": "None" },
+                            { "value": "1000", "displayName": "Thousands" },
+                            { "value": "1000000", "displayName": "Millions" },
+                            { "value": "0", "displayName": "Auto" }
+                        ]
+                    }
+                }
+            }
+        },
+        "thresholds": {
+            "properties": {
+                "showThresholds": {
+                    "type": { "bool": true }
+                },
+                "warningPercent": {
+                    "type": { "numeric": true }
+                },
+                "warningColor": {
+                    "type": { "fill": { "solid": { "color": true } } }
+                },
+                "dangerPercent": {
+                    "type": { "numeric": true }
+                },
+                "dangerColor": {
+                    "type": { "fill": { "solid": { "color": true } } }
+                }
+            }
+        },
+        "variance": {
+            "properties": {
+                "showVariance": {
+                    "type": { "bool": true }
+                },
+                "positiveColor": {
+                    "type": { "fill": { "solid": { "color": true } } }
+                },
+                "negativeColor": {
+                    "type": { "fill": { "solid": { "color": true } } }
+                }
+            }
+        }
+    },
+    "dataViewMappings": [
+        {
+            "conditions": [
+                {
+                    "value": { "max": 1 },
+                    "target": { "max": 1 },
+                    "maxValue": { "max": 1 },
+                    "minValue": { "max": 1 }
+                }
+            ],
+            "categorical": {
+                "values": {
+                    "select": [
+                        { "bind": { "to": "value" } },
+                        { "bind": { "to": "target" } },
+                        { "bind": { "to": "maxValue" } },
+                        { "bind": { "to": "minValue" } }
+                    ]
+                }
+            }
+        }
+    ],
+    "privileges": []
+}
