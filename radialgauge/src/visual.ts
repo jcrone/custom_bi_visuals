@@ -19,6 +19,7 @@ export class Visual implements IVisual {
     private formattingSettings: VisualFormattingSettingsModel;
     private formattingSettingsService: FormattingSettingsService;
     private animationFrame: number = 0;
+    private arcAnimationFrame: number = 0;
 
     constructor(options: VisualConstructorOptions) {
         this.formattingSettingsService = new FormattingSettingsService();
@@ -29,6 +30,10 @@ export class Visual implements IVisual {
     }
 
     public update(options: VisualUpdateOptions) {
+        // Cancel any in-flight animations from previous update
+        if (this.animationFrame) { cancelAnimationFrame(this.animationFrame); this.animationFrame = 0; }
+        if (this.arcAnimationFrame) { cancelAnimationFrame(this.arcAnimationFrame); this.arcAnimationFrame = 0; }
+
         this.formattingSettings = this.formattingSettingsService.populateFormattingSettingsModel(
             VisualFormattingSettingsModel,
             options.dataViews?.[0]
@@ -76,8 +81,9 @@ export class Visual implements IVisual {
         const threshS = this.formattingSettings.thresholdSettings;
         const varS = this.formattingSettings.varianceSettings;
 
-        const gaugeMin = minVal ?? 0;
-        const gaugeMax = maxVal ?? 100;
+        let gaugeMin = minVal ?? 0;
+        let gaugeMax = maxVal ?? 100;
+        if (gaugeMax < gaugeMin) { [gaugeMin, gaugeMax] = [gaugeMax, gaugeMin]; }
         const range = gaugeMax - gaugeMin || 1;
         const pct = Math.max(0, Math.min(1, (mainValue - gaugeMin) / range));
 
@@ -86,7 +92,7 @@ export class Visual implements IVisual {
         const displayUnits = Number(gaugeS.displayUnits.value?.value ?? 1);
         const thickness = gaugeS.thickness.value;
         const startAngleDeg = gaugeS.startAngle.value;
-        const endAngleDeg = gaugeS.endAngle.value;
+        const endAngleDeg = gaugeS.endAngle.value <= startAngleDeg ? startAngleDeg + 1 : gaugeS.endAngle.value;
         const arcColor = gaugeS.arcColor.value.value;
         const trackColor = gaugeS.trackColor.value.value;
 
@@ -302,11 +308,13 @@ export class Visual implements IVisual {
             path.setAttribute("d", this.describeArc(cx, cy, r, startRad, currentEnd));
 
             if (progress < 1) {
-                requestAnimationFrame(step);
+                this.arcAnimationFrame = requestAnimationFrame(step);
+            } else {
+                this.arcAnimationFrame = 0;
             }
         };
 
-        requestAnimationFrame(step);
+        this.arcAnimationFrame = requestAnimationFrame(step);
     }
 
     private animateCountUp(
@@ -405,7 +413,15 @@ export class Visual implements IVisual {
         this.container.replaceChildren(messageEl);
     }
 
+    public destroy(): void {
+        if (this.animationFrame) cancelAnimationFrame(this.animationFrame);
+        if (this.arcAnimationFrame) cancelAnimationFrame(this.arcAnimationFrame);
+    }
+
     public getFormattingModel(): powerbi.visuals.FormattingModel {
+        if (!this.formattingSettings) {
+            this.formattingSettings = new VisualFormattingSettingsModel();
+        }
         return this.formattingSettingsService.buildFormattingModel(this.formattingSettings);
     }
 }
