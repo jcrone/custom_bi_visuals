@@ -10,7 +10,6 @@ Ask me if I want to pump the version after updates are complete
 After visual change ask user if they would like the preview file updated. 
 
 
-
 ## Project
 Power BI Visuals
 

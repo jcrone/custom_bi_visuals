@@ -176,6 +176,45 @@ export class Visual implements IVisual {
         return sum;
     }
 
+    /* ── Group small segments into "Other" (20% tail rule) ── */
+    private applyOtherGrouping(children: HierNode[]): HierNode[] {
+        // Exception: 6 or fewer categories → show all, no grouping
+        if (children.length <= 6) return children;
+
+        const total = children.reduce((s, c) => s + c.value, 0);
+        if (total <= 0) return children;
+
+        const threshold = total * 0.20;
+
+        // Sort ascending by value (smallest first)
+        const sorted = [...children].sort((a, b) => a.value - b.value);
+
+        // Accumulate smallest items while cumulative stays below threshold
+        const smallItems: HierNode[] = [];
+        let cumulative = 0;
+        for (const item of sorted) {
+            if (cumulative + item.value >= threshold) break;
+            smallItems.push(item);
+            cumulative += item.value;
+        }
+
+        // Need at least 2 items to form a meaningful "Other" group
+        if (smallItems.length < 2) return children;
+
+        const smallSet = new Set(smallItems);
+        const bigItems = children.filter(c => !smallSet.has(c));
+
+        const otherNode: HierNode = {
+            name: "Other",
+            value: cumulative,
+            children: smallItems,
+            parent: children[0]?.parent || null,
+            color: "#A8B7C6"
+        };
+
+        return [...bigItems, otherNode];
+    }
+
     /* ── Get path from root to node ── */
     private getNodePath(node: HierNode): string[] {
         const parts: string[] = [];
@@ -237,7 +276,7 @@ export class Visual implements IVisual {
         const g = this.svg.append("g")
             .attr("transform", `translate(${width / 2},${height / 2})`);
 
-        const children = current.children;
+        const children = this.applyOtherGrouping(current.children);
         if (children.length === 0) {
             // Leaf node — show single filled donut and allow going back
             this.renderLeaf(g, current, innerR, outerR, fillOpacity, arcStrokeW, strokeColor, textColor, mutedColor, centerBg, dark);
@@ -512,14 +551,14 @@ export class Visual implements IVisual {
                             .value(d => d.value)
                             .sort(null)
                             .padAngle(0);
-                        const currentArcs = pie(node.children);
+                        const currentArcs = pie(self.applyOtherGrouping(node.children));
 
                         // Find what angle range this node occupies in parent
                         const parentPie = d3.pie<HierNode>()
                             .value(d => d.value)
                             .sort(null)
                             .padAngle(0);
-                        const parentArcs = parentPie(node.parent.children);
+                        const parentArcs = parentPie(self.applyOtherGrouping(node.parent.children));
                         const myArc = parentArcs.find(a => a.data.name === node.name);
 
                         if (myArc) {

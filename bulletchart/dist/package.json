@@ -1,0 +1,17 @@
+{
+		"version": "1.0.0.0",
+		"author": {"name":"Jamie Crone","email":"jamie@example.com"},
+		"resources": [
+			{
+				"resourceId": "rId0",
+				"sourceType": 5,
+				"file": "resources/bulletchartA1B2C3D4E5F6789A0B1C2D3E4F5A6B7C.pbiviz.json"
+			}
+		],
+		"visual": {"name":"bulletchart","displayName":"Bullet Chart","guid":"bulletchartA1B2C3D4E5F6789A0B1C2D3E4F5A6B7C","visualClassName":"Visual","version":"1.0.0.0","description":"A bullet chart for KPI dashboards showing actual values, targets, and qualitative range bands","supportUrl":"https://github.com/jamie-crone/powerbi-visuals","gitHubUrl":""},
+		"metadata": {
+			"pbivizjson": {
+				"resourceId": "rId0"
+			}
+		}
+	}

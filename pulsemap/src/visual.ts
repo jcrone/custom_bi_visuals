@@ -230,10 +230,10 @@ export class Visual implements IVisual {
             const norm = maxVal > 0 ? values[i] / maxVal : 0;
             const peak = norm * spikeH;
 
-            // Flat approach
-            d += ` L ${x - halfSpike * 1.8} ${baseY}`;
+            // Flat approach — clamp so spikes don't extend behind labels
+            d += ` L ${Math.max(0, x - halfSpike * 1.8)} ${baseY}`;
             // Q-wave dip
-            d += ` L ${x - halfSpike * 1.1} ${baseY + 3}`;
+            d += ` L ${Math.max(0, x - halfSpike * 1.1)} ${baseY + 3}`;
             // R-wave peak (main spike up)
             d += ` L ${x} ${baseY - peak}`;
             // S-wave undershoot

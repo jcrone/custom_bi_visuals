@@ -32,14 +32,12 @@ export class Visual implements IVisual {
             options.dataViews?.[0]
         );
 
-        const dataView: DataView | undefined = options.dataViews?.[0];
-        if (!dataView?.categorical?.values) {
+        const dataViews: DataView[] = options.dataViews || [];
+        if (dataViews.length === 0) {
             this.renderMessage("No data");
             return;
         }
 
-        const categorical = dataView.categorical;
-        const values = categorical.values;
         let mainValue: number | null = null;
         let targetValue: number | null = null;
         let trendValues: number[] = [];
@@ -47,25 +45,58 @@ export class Visual implements IVisual {
         let valueFormat = "";
         let targetFormat = "";
 
-        for (const col of values) {
-            const role = col.source.roles;
-            if (role["value"]) {
-                measureName = col.source.displayName;
-                valueFormat = col.source.format || "";
-                // Sum all category-level values so the KPI shows the aggregate total,
-                // not just the last category's value.
-                mainValue = (col.values as number[]).reduce((sum, v) => sum + (Number(v) || 0), 0);
-                // Use value series for sparkline when no dedicated trend measure is provided.
-                if (col.values.length > 1) {
-                    trendValues = col.values.map(v => v as number);
+        // Primary KPI view: read Value/Target from a mapping without Category to avoid
+        // sparkline categories changing the headline KPI card value.
+        const hasSummaryRoles = (dv: DataView): boolean =>
+            !!dv?.categorical?.values?.some(col => col.source.roles?.["value"] || col.source.roles?.["target"]);
+
+        const summaryView = dataViews.find(dv =>
+            hasSummaryRoles(dv) && !(dv.categorical?.categories?.length)
+        ) || dataViews.find(hasSummaryRoles);
+
+        if (summaryView?.categorical?.values) {
+            for (const col of summaryView.categorical.values) {
+                const role = col.source.roles;
+                if (role["value"]) {
+                    measureName = col.source.displayName;
+                    valueFormat = col.source.format || "";
+                    if (col.values.length > 1) {
+                        mainValue = col.values.reduce((sum, v) => sum + (Number(v) || 0), 0);
+                    } else {
+                        mainValue = Number(col.values?.[0]) || 0;
+                    }
+                }
+                if (role["target"]) {
+                    targetFormat = col.source.format || "";
+                    if (col.values.length > 1) {
+                        targetValue = col.values.reduce((sum, v) => sum + (Number(v) || 0), 0);
+                    } else {
+                        targetValue = Number(col.values?.[0]) || 0;
+                    }
                 }
             }
-            if (role["target"]) {
-                targetFormat = col.source.format || "";
-                targetValue = (col.values as number[]).reduce((sum, v) => sum + (Number(v) || 0), 0);
+        }
+
+        // Prefer dedicated Trend measure with Category axis.
+        const trendView = dataViews.find(dv =>
+            !!dv?.categorical?.values?.some(col => col.source.roles?.["trend"])
+        );
+        if (trendView?.categorical?.values) {
+            const trendCol = trendView.categorical.values.find(col => col.source.roles?.["trend"]);
+            if (trendCol) {
+                trendValues = trendCol.values.map(v => Number(v)).filter(v => Number.isFinite(v));
             }
-            if (role["trend"]) {
-                trendValues = col.values.map(v => v as number);
+        }
+
+        // Fallback sparkline: Value by Category (when Trend not provided).
+        if (trendValues.length <= 1) {
+            const fallbackTrendView = dataViews.find(dv =>
+                !!dv?.categorical?.categories?.length &&
+                !!dv?.categorical?.values?.some(col => col.source.roles?.["value"] && col.values.length > 1)
+            );
+            const valueTrendCol = fallbackTrendView?.categorical?.values?.find(col => col.source.roles?.["value"]);
+            if (valueTrendCol) {
+                trendValues = valueTrendCol.values.map(v => Number(v)).filter(v => Number.isFinite(v));
             }
         }
 
@@ -126,7 +157,7 @@ export class Visual implements IVisual {
             this.container.appendChild(varianceEl);
         }
 
-        const validTrend = trendValues.filter(v => v !== null && !isNaN(v));
+        const validTrend = trendValues.filter(v => Number.isFinite(v));
         if (sparkS.showSparkline.value && validTrend.length > 1) {
             this.container.appendChild(this.renderSparkline(validTrend, sparkS.lineColor.value.value, sparkS.areaColor.value.value));
         }

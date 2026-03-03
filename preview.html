@@ -634,14 +634,15 @@
   <p class="info-panel__desc">
     Displays a single KPI metric with a large value, percentage variance against a target, and an optional sparkline trend line.
     Ideal for highlighting one key metric per card — drop multiple cards side-by-side to build a KPI row.
+    Use <strong>Trend + Category</strong> for the sparkline series/axis; the headline KPI is based on <strong>Value</strong> (and <strong>Target</strong>).
   </p>
   <div class="info-panel__heading">Data Fields</div>
   <table class="field-table">
     <tr><th>Field</th><th>Type</th><th>Description</th></tr>
     <tr><td class="field-name">Value</td><td class="field-type">Measure</td><td>The main KPI number (e.g. Sum of Revenue)</td></tr>
     <tr><td class="field-name">Target</td><td class="field-type">Measure</td><td>Comparison value — variance is calculated as (Value - Target) / Target</td></tr>
-    <tr><td class="field-name">Trend</td><td class="field-type">Measure</td><td>Values plotted on the sparkline (e.g. Revenue by month)</td></tr>
-    <tr><td class="field-name">Category</td><td class="field-type">Grouping</td><td>Axis for the sparkline (e.g. Month, Week)</td></tr>
+    <tr><td class="field-name">Trend</td><td class="field-type">Measure</td><td>Preferred sparkline series (e.g. Revenue by month)</td></tr>
+    <tr><td class="field-name">Category</td><td class="field-type">Grouping</td><td>Sparkline axis only (e.g. Month, Week)</td></tr>
   </table>
   <div class="info-panel__heading">Example Data</div>
   <table class="example-table">
@@ -651,7 +652,8 @@
     <tr><td>Mar 2026</td><td>$2,400,000</td><td>$2,100,000</td></tr>
   </table>
   <p style="font-size:11px; color:var(--text-muted); margin-top:8px;">
-    Category = <strong>Month</strong> &nbsp;|&nbsp; Value = <strong>SUM(Revenue)</strong> &nbsp;|&nbsp; Target = <strong>SUM(Target)</strong> &nbsp;|&nbsp; Trend = <strong>SUM(Revenue)</strong>
+    Headline KPI: Value = <strong>SUM(Revenue)</strong> &nbsp;|&nbsp; Target = <strong>SUM(Target)</strong><br>
+    Sparkline (recommended): Trend = <strong>SUM(Revenue)</strong> &nbsp;|&nbsp; Category = <strong>Month</strong>
   </p>
 </div>
 
@@ -1283,7 +1285,9 @@
   <p class="info-panel__desc">
     A ZoomCharts-style drilldown donut chart that shows one hierarchy level at a time. Click a segment
     to smoothly morph arcs and reveal its children. Click the center to navigate back up. Supports up
-    to three hierarchy levels with animated transitions and breadcrumb navigation.
+    to three hierarchy levels with animated transitions and breadcrumb navigation. Small segments are
+    automatically grouped into an "Other" slice (20% tail rule) to keep the chart clean — clicking
+    "Other" drills into those items with the same rule applied recursively.
   </p>
   <div class="info-panel__heading">Data Fields</div>
   <table class="field-table">
@@ -1318,17 +1322,88 @@
   "></div>
 </div>
 
-<!-- ── Footer ── -->
-<div class="footer">
-  Brand palette
-  <div class="swatch-row">
-    <div class="swatch" style="background:#00539A" title="#00539A Blue"></div>
-    <div class="swatch" style="background:#11284C" title="#11284C Navy"></div>
-    <div class="swatch" style="background:#004896" title="#004896 Blue2"></div>
-    <div class="swatch" style="background:#FDB945" title="#FDB945 Gold"></div>
-    <div class="swatch" style="background:#0E7C3A" title="#0E7C3A Positive"></div>
-    <div class="swatch" style="background:#B42318" title="#B42318 Negative"></div>
-  </div>
+<!-- ── BULLET CHART ── -->
+<div class="section-label" style="margin-top: 48px;">
+  <svg class="section-icon" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+    <rect x="1" y="3" width="18" height="5" rx="1" fill="#6B7F93"/>
+    <rect x="1" y="3" width="12" height="5" rx="1" fill="#A8B7C6"/>
+    <rect x="1" y="3" width="6" height="5" rx="1" fill="#D9E1EA"/>
+    <rect x="1" y="4.25" width="10" height="2.5" rx="1" fill="#00539A"/>
+    <line x1="14" y1="2.5" x2="14" y2="8.5" stroke="#11284C" stroke-width="2" stroke-linecap="round"/>
+    <rect x="1" y="12" width="18" height="5" rx="1" fill="#6B7F93"/>
+    <rect x="1" y="12" width="12" height="5" rx="1" fill="#A8B7C6"/>
+    <rect x="1" y="12" width="6" height="5" rx="1" fill="#D9E1EA"/>
+    <rect x="1" y="13.25" width="14" height="2.5" rx="1" fill="#00539A"/>
+    <line x1="16" y1="11.5" x2="16" y2="17.5" stroke="#11284C" stroke-width="2" stroke-linecap="round"/>
+  </svg>
+  Visual 10 — Bullet Chart
+</div>
+
+<div class="info-panel">
+  <p class="info-panel__desc">
+    A Stephen Few-style bullet chart for KPI dashboards — shows an actual value bar, a target marker line,
+    and qualitative range bands (poor / satisfactory / good) in a single compact row per metric.
+    Supports horizontal and vertical orientations with configurable thresholds.
+  </p>
+  <div class="info-panel__heading">Data Fields</div>
+  <table class="field-table">
+    <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+    <tr><td class="field-name">Category</td><td class="field-type">Grouping</td><td>Label for each bullet row (e.g., Revenue, Profit)</td></tr>
+    <tr><td class="field-name">Value</td><td class="field-type">Measure</td><td>The actual/current value</td></tr>
+    <tr><td class="field-name">Target</td><td class="field-type">Measure</td><td>Target/comparison value (shown as marker line)</td></tr>
+    <tr><td class="field-name">Maximum</td><td class="field-type">Measure</td><td>Optional — max scale value; auto-calculated if omitted</td></tr>
+  </table>
+  <div class="info-panel__heading">Formatting Options</div>
+  <table class="field-table">
+    <tr><th>Setting</th><th>Options</th><th>Description</th></tr>
+    <tr><td class="field-name">Orientation</td><td>Horizontal / Vertical</td><td>Layout direction for bullet rows</td></tr>
+    <tr><td class="field-name">Bar Thickness</td><td>6 – 40</td><td>Width of the actual value bar</td></tr>
+    <tr><td class="field-name">Qualitative Ranges</td><td>On / Off, thresholds</td><td>Poor/satisfactory/good background bands</td></tr>
+    <tr><td class="field-name">Labels</td><td>Category, Value, Axis</td><td>Toggle category names, value labels, and axis</td></tr>
+    <tr><td class="field-name">Dark Mode</td><td>On / Off</td><td>Dark background color scheme</td></tr>
+  </table>
+  <div class="info-panel__heading">Example Data</div>
+  <table class="example-table">
+    <tr><th>Category</th><th>Value</th><th>Target</th></tr>
+    <tr><td>Revenue</td><td>$275K</td><td>$300K</td></tr>
+    <tr><td>Profit</td><td>$42K</td><td>$50K</td></tr>
+    <tr><td>Satisfaction</td><td>4.1</td><td>4.5</td></tr>
+    <tr><td>New Customers</td><td>870</td><td>1,000</td></tr>
+  </table>
+  <p style="font-size:11px; color:var(--text-muted); margin-top:8px;">
+    Category = <strong>Metric Name</strong> &nbsp;|&nbsp; Value = <strong>Actual</strong> &nbsp;|&nbsp; Target = <strong>Goal</strong>
+  </p>
+</div>
+
+<div style="display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 48px;">
+  <div id="bullet-preview-light" style="
+    background: #FFFFFF;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 24px 20px;
+    flex: 1 1 380px;
+    max-width: 820px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    position: relative;
+    opacity: 0;
+    transform: translateY(18px);
+    animation: cardIn 0.5s ease forwards;
+    animation-delay: 0.1s;
+  "></div>
+  <div id="bullet-preview-dark" style="
+    background: #0B1220;
+    border: 1px solid #22324B;
+    border-radius: 12px;
+    padding: 24px 24px 20px;
+    flex: 1 1 380px;
+    max-width: 820px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    position: relative;
+    opacity: 0;
+    transform: translateY(18px);
+    animation: cardIn 0.5s ease forwards;
+    animation-delay: 0.2s;
+  "></div>
 </div>
 
 <script>
@@ -1938,14 +2013,14 @@ document.addEventListener('DOMContentLoaded', () => {
     lbl.textContent = name;
     svg.appendChild(lbl);
 
-    // EKG pulse path
+    // EKG pulse path — clamp left side so spikes don't overlap labels
     let d = 'M ' + labelW + ' ' + baseY;
     for (let i = 0; i < values.length; i++) {
       const x = labelW + (i / (periods.length - 1)) * plotW;
       const norm = maxVal > 0 ? values[i] / maxVal : 0;
       const peak = norm * spikeH;
-      d += ' L ' + (x - halfSpike * 1.8) + ' ' + baseY;
-      d += ' L ' + (x - halfSpike * 1.1) + ' ' + (baseY + 3);
+      d += ' L ' + Math.max(labelW, x - halfSpike * 1.8) + ' ' + baseY;
+      d += ' L ' + Math.max(labelW, x - halfSpike * 1.1) + ' ' + (baseY + 3);
       d += ' L ' + x + ' ' + (baseY - peak);
       d += ' L ' + (x + halfSpike * 0.7) + ' ' + (baseY + 4);
       d += ' L ' + (x + halfSpike * 1.3) + ' ' + (baseY - peak * 0.1);
@@ -2634,6 +2709,196 @@ document.addEventListener('DOMContentLoaded', () => {
   buildInteractiveDonut('donut-preview-dark', true);
 })();
 </script>
+
+<script>
+// ── Bullet Chart preview generation ──
+(() => {
+  function buildBulletPreview(containerId, isDark) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    const data = [
+      { category: 'Revenue',        value: 275, target: 300, max: 350 },
+      { category: 'Profit',         value: 42,  target: 50,  max: 60 },
+      { category: 'Satisfaction',   value: 4.1, target: 4.5, max: 5 },
+      { category: 'New Customers',  value: 870, target: 1000, max: 1200 }
+    ];
+
+    const ns = 'http://www.w3.org/2000/svg';
+    const width = 760;
+    const labelWidth = 110;
+    const valueWidth = 60;
+    const margin = { top: 8, right: valueWidth + 16, bottom: 12, left: labelWidth + 12 };
+    const barThickness = 14;
+    const rangeHeight = barThickness * 2.5;
+    const spacing = 14;
+    const rowHeight = rangeHeight + spacing;
+    const plotWidth = width - margin.left - margin.right;
+    const totalHeight = margin.top + data.length * rowHeight + margin.bottom;
+
+    const svg = document.createElementNS(ns, 'svg');
+    svg.setAttribute('viewBox', '0 0 ' + width + ' ' + totalHeight);
+    svg.setAttribute('width', '100%');
+    svg.setAttribute('height', totalHeight);
+    svg.style.overflow = 'visible';
+    svg.style.fontFamily = '"Segoe UI", system-ui, -apple-system, Arial, sans-serif';
+
+    // Stephen Few convention: poor=lightest (narrowest), good=darkest (widest background)
+    const colors = {
+      good: isDark ? '#3E556E' : '#6B7F93',
+      satisfactory: isDark ? '#2A3F5F' : '#A8B7C6',
+      poor: isDark ? '#22324B' : '#D9E1EA',
+      bar: '#00539A',
+      target: isDark ? '#FDB945' : '#11284C',
+      label: isDark ? '#F2F5F8' : '#11284C',
+      value: isDark ? '#C9D3DD' : '#3E556E'
+    };
+
+    data.forEach((d, i) => {
+      const y = margin.top + i * rowHeight;
+      const centerY = y + rangeHeight / 2;
+      const scale = plotWidth / d.max;
+
+      // Qualitative range bands: good (full, darkest), satisfactory (67%), poor (33%, lightest)
+      const goodW = plotWidth;
+      const satW = (d.max * 0.67) * scale;
+      const poorW = (d.max * 0.33) * scale;
+
+      // Good range (full background — darkest)
+      const goodRect = document.createElementNS(ns, 'rect');
+      goodRect.setAttribute('x', margin.left);
+      goodRect.setAttribute('y', y);
+      goodRect.setAttribute('width', goodW);
+      goodRect.setAttribute('height', rangeHeight);
+      goodRect.setAttribute('fill', colors.good);
+      goodRect.setAttribute('rx', '2');
+      svg.appendChild(goodRect);
+
+      // Satisfactory range (medium shade)
+      const satRect = document.createElementNS(ns, 'rect');
+      satRect.setAttribute('x', margin.left);
+      satRect.setAttribute('y', y);
+      satRect.setAttribute('width', satW);
+      satRect.setAttribute('height', rangeHeight);
+      satRect.setAttribute('fill', colors.satisfactory);
+      satRect.setAttribute('rx', '2');
+      svg.appendChild(satRect);
+
+      // Poor range (lightest)
+      const poorRect = document.createElementNS(ns, 'rect');
+      poorRect.setAttribute('x', margin.left);
+      poorRect.setAttribute('y', y);
+      poorRect.setAttribute('width', poorW);
+      poorRect.setAttribute('height', rangeHeight);
+      poorRect.setAttribute('fill', colors.poor);
+      poorRect.setAttribute('rx', '2');
+      svg.appendChild(poorRect);
+
+      // Actual value bar (with animation)
+      const barY = centerY - barThickness / 2;
+      const barW = d.value * scale;
+      const bar = document.createElementNS(ns, 'rect');
+      bar.setAttribute('x', margin.left);
+      bar.setAttribute('y', barY);
+      bar.setAttribute('width', '0');
+      bar.setAttribute('height', barThickness);
+      bar.setAttribute('fill', colors.bar);
+      bar.setAttribute('rx', '2');
+      svg.appendChild(bar);
+
+      const barAnim = document.createElementNS(ns, 'animate');
+      barAnim.setAttribute('attributeName', 'width');
+      barAnim.setAttribute('from', '0');
+      barAnim.setAttribute('to', String(barW));
+      barAnim.setAttribute('dur', '0.8s');
+      barAnim.setAttribute('fill', 'freeze');
+      barAnim.setAttribute('calcMode', 'spline');
+      barAnim.setAttribute('keySplines', '0.25 0.46 0.45 0.94');
+      barAnim.setAttribute('keyTimes', '0;1');
+      bar.appendChild(barAnim);
+
+      // Target marker line
+      const tx = margin.left + d.target * scale;
+      const markerH = rangeHeight * 0.8;
+      const targetLine = document.createElementNS(ns, 'line');
+      targetLine.setAttribute('x1', tx);
+      targetLine.setAttribute('x2', tx);
+      targetLine.setAttribute('y1', centerY - markerH / 2);
+      targetLine.setAttribute('y2', centerY + markerH / 2);
+      targetLine.setAttribute('stroke', colors.target);
+      targetLine.setAttribute('stroke-width', '3');
+      targetLine.setAttribute('stroke-linecap', 'round');
+      targetLine.setAttribute('opacity', '0');
+      svg.appendChild(targetLine);
+
+      const targetAnim = document.createElementNS(ns, 'animate');
+      targetAnim.setAttribute('attributeName', 'opacity');
+      targetAnim.setAttribute('from', '0');
+      targetAnim.setAttribute('to', '1');
+      targetAnim.setAttribute('begin', '0.8s');
+      targetAnim.setAttribute('dur', '0.3s');
+      targetAnim.setAttribute('fill', 'freeze');
+      targetLine.appendChild(targetAnim);
+
+      // Category label
+      const label = document.createElementNS(ns, 'text');
+      label.setAttribute('x', margin.left - 10);
+      label.setAttribute('y', centerY);
+      label.setAttribute('text-anchor', 'end');
+      label.setAttribute('dominant-baseline', 'central');
+      label.setAttribute('fill', colors.label);
+      label.setAttribute('font-size', '12');
+      label.setAttribute('font-weight', '600');
+      label.textContent = d.category;
+      svg.appendChild(label);
+
+      // Value label (appears after bar)
+      const valLabel = document.createElementNS(ns, 'text');
+      valLabel.setAttribute('x', margin.left + plotWidth + 10);
+      valLabel.setAttribute('y', centerY);
+      valLabel.setAttribute('text-anchor', 'start');
+      valLabel.setAttribute('dominant-baseline', 'central');
+      valLabel.setAttribute('fill', colors.value);
+      valLabel.setAttribute('font-size', '12');
+      valLabel.setAttribute('font-weight', '600');
+      valLabel.setAttribute('opacity', '0');
+      let valText = '';
+      if (d.value >= 1000) valText = (d.value / 1000).toFixed(0) + 'K';
+      else if (d.value < 10) valText = d.value.toFixed(1);
+      else valText = d.value.toFixed(0);
+      valLabel.textContent = valText;
+      svg.appendChild(valLabel);
+
+      const valAnim = document.createElementNS(ns, 'animate');
+      valAnim.setAttribute('attributeName', 'opacity');
+      valAnim.setAttribute('from', '0');
+      valAnim.setAttribute('to', '1');
+      valAnim.setAttribute('begin', '0.8s');
+      valAnim.setAttribute('dur', '0.3s');
+      valAnim.setAttribute('fill', 'freeze');
+      valLabel.appendChild(valAnim);
+    });
+
+    container.appendChild(svg);
+  }
+
+  buildBulletPreview('bullet-preview-light', false);
+  buildBulletPreview('bullet-preview-dark', true);
+})();
+</script>
+
+<!-- ── Footer ── -->
+<div class="footer">
+  Brand palette
+  <div class="swatch-row">
+    <div class="swatch" style="background:#00539A" title="#00539A Blue"></div>
+    <div class="swatch" style="background:#11284C" title="#11284C Navy"></div>
+    <div class="swatch" style="background:#004896" title="#004896 Blue2"></div>
+    <div class="swatch" style="background:#FDB945" title="#FDB945 Gold"></div>
+    <div class="swatch" style="background:#0E7C3A" title="#0E7C3A Positive"></div>
+    <div class="swatch" style="background:#B42318" title="#B42318 Negative"></div>
+  </div>
+</div>
 
 </body>
 </html>

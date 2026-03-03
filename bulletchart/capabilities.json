@@ -1,0 +1,141 @@
+{
+    "dataRoles": [
+        {
+            "displayName": "Category",
+            "name": "category",
+            "kind": "Grouping",
+            "description": "Label for each bullet row (e.g., Revenue, Profit)"
+        },
+        {
+            "displayName": "Value",
+            "name": "value",
+            "kind": "Measure",
+            "description": "The actual/current value"
+        },
+        {
+            "displayName": "Target",
+            "name": "target",
+            "kind": "Measure",
+            "description": "Target/comparison value (shown as marker line)"
+        },
+        {
+            "displayName": "Maximum",
+            "name": "maximum",
+            "kind": "Measure",
+            "description": "Max scale value; auto-calculated if omitted"
+        }
+    ],
+    "objects": {
+        "bullet": {
+            "properties": {
+                "orientation": {
+                    "type": {
+                        "enumeration": [
+                            { "value": "horizontal", "displayName": "Horizontal" },
+                            { "value": "vertical", "displayName": "Vertical" }
+                        ]
+                    }
+                },
+                "barThickness": {
+                    "type": { "numeric": true }
+                },
+                "barColor": {
+                    "type": { "fill": { "solid": { "color": true } } }
+                },
+                "targetColor": {
+                    "type": { "fill": { "solid": { "color": true } } }
+                },
+                "targetWidth": {
+                    "type": { "numeric": true }
+                },
+                "spacing": {
+                    "type": { "numeric": true }
+                }
+            }
+        },
+        "ranges": {
+            "properties": {
+                "showRanges": {
+                    "type": { "bool": true }
+                },
+                "poorThreshold": {
+                    "type": { "numeric": true }
+                },
+                "satisfactoryThreshold": {
+                    "type": { "numeric": true }
+                },
+                "poorColor": {
+                    "type": { "fill": { "solid": { "color": true } } }
+                },
+                "satisfactoryColor": {
+                    "type": { "fill": { "solid": { "color": true } } }
+                },
+                "goodColor": {
+                    "type": { "fill": { "solid": { "color": true } } }
+                }
+            }
+        },
+        "labels": {
+            "properties": {
+                "showLabels": {
+                    "type": { "bool": true }
+                },
+                "showValues": {
+                    "type": { "bool": true }
+                },
+                "showAxis": {
+                    "type": { "bool": true }
+                },
+                "fontSize": {
+                    "type": { "numeric": true }
+                },
+                "decimalPlaces": {
+                    "type": { "numeric": true }
+                },
+                "displayUnits": {
+                    "type": {
+                        "enumeration": [
+                            { "value": "1", "displayName": "None" },
+                            { "value": "1000", "displayName": "Thousands" },
+                            { "value": "1000000", "displayName": "Millions" },
+                            { "value": "0", "displayName": "Auto" }
+                        ]
+                    }
+                }
+            }
+        },
+        "layout": {
+            "properties": {
+                "darkMode": {
+                    "type": { "bool": true }
+                }
+            }
+        }
+    },
+    "dataViewMappings": [
+        {
+            "conditions": [
+                {
+                    "category": { "max": 1 },
+                    "value": { "max": 1 },
+                    "target": { "max": 1 },
+                    "maximum": { "max": 1 }
+                }
+            ],
+            "categorical": {
+                "categories": {
+                    "for": { "in": "category" },
+                    "dataReductionAlgorithm": { "top": { "count": 100 } }
+                },
+                "values": {
+                    "select": [
+                        { "bind": { "to": "value" } },
+                        { "bind": { "to": "target" } },
+                        { "bind": { "to": "maximum" } }
+                    ]
+                }
+            }
+        }
+    ],
+    "privileges": []
+}
