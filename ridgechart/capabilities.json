@@ -1,0 +1,59 @@
+{
+    "dataRoles": [
+        {
+            "displayName": "Series",
+            "name": "series",
+            "kind": "Grouping",
+            "description": "Each series becomes a ridge row (e.g. Year, Product, Region)"
+        },
+        {
+            "displayName": "Axis",
+            "name": "axis",
+            "kind": "Grouping",
+            "description": "X-axis within each ridge (e.g. Month, Day, Hour)"
+        },
+        {
+            "displayName": "Values",
+            "name": "values",
+            "kind": "Measure",
+            "description": "Ridge height — values plotted as the area shape"
+        }
+    ],
+    "objects": {
+        "ridges": {
+            "properties": {
+                "overlap": { "type": { "numeric": true } },
+                "fillOpacity": { "type": { "numeric": true } },
+                "strokeWidth": { "type": { "numeric": true } }
+            }
+        },
+        "layout": {
+            "properties": {
+                "showLabels": { "type": { "bool": true } },
+                "showAxis": { "type": { "bool": true } },
+                "darkMode": { "type": { "bool": true } }
+            }
+        }
+    },
+    "dataViewMappings": [
+        {
+            "conditions": [
+                { "series": { "max": 1 }, "axis": { "max": 1 }, "values": { "max": 1 } }
+            ],
+            "categorical": {
+                "categories": {
+                    "for": { "in": "axis" },
+                    "dataReductionAlgorithm": { "top": { "count": 10000 } }
+                },
+                "values": {
+                    "group": {
+                        "by": "series",
+                        "select": [ { "bind": { "to": "values" } } ],
+                        "dataReductionAlgorithm": { "top": { "count": 50 } }
+                    }
+                }
+            }
+        }
+    ],
+    "privileges": []
+}

@@ -1,0 +1,63 @@
+{
+    "dataRoles": [
+        {
+            "displayName": "Source",
+            "name": "source",
+            "kind": "Grouping",
+            "description": "Source entities on the left axis (e.g. Teams, Departments)"
+        },
+        {
+            "displayName": "Destination",
+            "name": "destination",
+            "kind": "Grouping",
+            "description": "Destination entities on the right axis (e.g. Projects, Products)"
+        },
+        {
+            "displayName": "Weight",
+            "name": "weight",
+            "kind": "Measure",
+            "description": "Connection strength — thicker arcs for larger values"
+        }
+    ],
+    "objects": {
+        "arcs": {
+            "properties": {
+                "maxThickness": { "type": { "numeric": true } },
+                "opacity": { "type": { "numeric": true } }
+            }
+        },
+        "axes": {
+            "properties": {
+                "showAxes": { "type": { "bool": true } },
+                "axisAngle": { "type": { "numeric": true } }
+            }
+        },
+        "labels": {
+            "properties": {
+                "showLabels": { "type": { "bool": true } },
+                "fontSize": { "type": { "numeric": true } }
+            }
+        }
+    },
+    "dataViewMappings": [
+        {
+            "conditions": [
+                { "source": { "max": 1 }, "destination": { "max": 1 }, "weight": { "max": 1 } }
+            ],
+            "categorical": {
+                "categories": {
+                    "for": { "in": "source" },
+                    "dataReductionAlgorithm": { "top": { "count": 1000 } }
+                },
+                "values": {
+                    "group": {
+                        "by": "destination",
+                        "select": [ { "bind": { "to": "weight" } } ],
+                        "dataReductionAlgorithm": { "top": { "count": 100 } }
+                    }
+                }
+            }
+        }
+    ],
+    "privileges": []
+}

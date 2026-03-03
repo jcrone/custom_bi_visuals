@@ -1,0 +1,17 @@
+{
+		"version": "1.0.0.0",
+		"author": {"name":"Jamie Crone","email":"jamie@example.com"},
+		"resources": [
+			{
+				"resourceId": "rId0",
+				"sourceType": 5,
+				"file": "resources/hiveplotF5A6B7C8D9E0F1A2B3C4D5E6F7A8B9C0.pbiviz.json"
+			}
+		],
+		"visual": {"name":"hiveplot","displayName":"Hive Plot","guid":"hiveplotF5A6B7C8D9E0F1A2B3C4D5E6F7A8B9C0","visualClassName":"Visual","version":"1.0.0.0","description":"A radial connection web showing weighted relationships between two sets of entities","supportUrl":"https://github.com/jamie-crone/powerbi-visuals","gitHubUrl":""},
+		"metadata": {
+			"pbivizjson": {
+				"resourceId": "rId0"
+			}
+		}
+	}

@@ -1,0 +1,66 @@
+@brand-blue: #00539A;
+@brand-navy: #11284C;
+@border-color: #D9E1EA;
+@text-secondary: #3E556E;
+@text-muted: #6B7F93;
+@font-family: "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+
+.ridge-chart {
+    width: 100%;
+    height: 100%;
+    font-family: @font-family;
+}
+
+.ridge-line {
+    transition: opacity 0.2s ease;
+}
+
+.ridge-area {
+    transition: opacity 0.2s ease;
+}
+
+.ridge-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+}
+
+.ridge-axis-label {
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.ridge-tooltip {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    background: @brand-navy;
+    color: #FFFFFF;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-family: @font-family;
+    line-height: 1.5;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    z-index: 100;
+    white-space: nowrap;
+    transition: opacity 0.15s ease;
+
+    strong { font-weight: 700; }
+}
+
+.ridge-message {
+    font-size: 13px;
+    font-weight: 600;
+    fill: @text-muted;
+    font-family: @font-family;
+}
+
+.ridge-chart {
+    animation: ridgeFadeIn 0.4s ease both;
+}
+
+@keyframes ridgeFadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}

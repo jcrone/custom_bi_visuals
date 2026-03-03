@@ -1,0 +1,58 @@
+{
+    "dataRoles": [
+        {
+            "displayName": "Entity",
+            "name": "entity",
+            "kind": "Grouping",
+            "description": "Rows — each entity gets its own heartbeat trace (e.g. Sales Rep, Server, Product)"
+        },
+        {
+            "displayName": "Axis",
+            "name": "axis",
+            "kind": "Grouping",
+            "description": "Time periods along each trace (e.g. Week, Month)"
+        },
+        {
+            "displayName": "Values",
+            "name": "values",
+            "kind": "Measure",
+            "description": "Pulse height — larger values produce taller spikes"
+        }
+    ],
+    "objects": {
+        "pulse": {
+            "properties": {
+                "lineWidth": { "type": { "numeric": true } },
+                "spikeWidth": { "type": { "numeric": true } }
+            }
+        },
+        "layout": {
+            "properties": {
+                "showLabels": { "type": { "bool": true } },
+                "showPeriods": { "type": { "bool": true } },
+                "rowSpacing": { "type": { "numeric": true } }
+            }
+        }
+    },
+    "dataViewMappings": [
+        {
+            "conditions": [
+                { "entity": { "max": 1 }, "axis": { "max": 1 }, "values": { "max": 1 } }
+            ],
+            "categorical": {
+                "categories": {
+                    "for": { "in": "axis" },
+                    "dataReductionAlgorithm": { "top": { "count": 10000 } }
+                },
+                "values": {
+                    "group": {
+                        "by": "entity",
+                        "select": [ { "bind": { "to": "values" } } ],
+                        "dataReductionAlgorithm": { "top": { "count": 50 } }
+                    }
+                }
+            }
+        }
+    ],
+    "privileges": []
+}

@@ -1,0 +1,77 @@
+@brand-blue: #00539A;
+@brand-navy: #11284C;
+@border-color: #D9E1EA;
+@text-secondary: #3E556E;
+@text-muted: #6B7F93;
+@font-family: "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+
+.hive-plot {
+    width: 100%;
+    height: 100%;
+    font-family: @font-family;
+    background: #FFFFFF;
+}
+
+.hive-axis {
+    stroke: @border-color;
+    stroke-width: 2;
+    stroke-linecap: round;
+}
+
+.hive-center {
+    fill: @brand-navy;
+}
+
+.hive-arc {
+    transition: opacity 0.15s ease;
+}
+
+.hive-node {
+    transition: opacity 0.3s ease, r 0.15s ease;
+
+    &:hover {
+        r: 6;
+    }
+}
+
+.hive-label {
+    font-size: 11px;
+    font-weight: 600;
+    fill: @text-secondary;
+    letter-spacing: 0.2px;
+}
+
+.hive-tooltip {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    background: @brand-navy;
+    color: #FFFFFF;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-family: @font-family;
+    line-height: 1.5;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    z-index: 100;
+    white-space: nowrap;
+    transition: opacity 0.15s ease;
+
+    strong { font-weight: 700; }
+}
+
+.hive-message {
+    font-size: 13px;
+    font-weight: 600;
+    fill: @text-muted;
+    font-family: @font-family;
+}
+
+.hive-plot {
+    animation: hiveFadeIn 0.4s ease both;
+}
+
+@keyframes hiveFadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}

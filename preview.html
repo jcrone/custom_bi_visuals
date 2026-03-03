@@ -1136,6 +1136,138 @@
   animation-delay: 0.1s;
 "></div>
 
+<!-- ── PULSE MAP ── -->
+<div class="section-label" style="margin-top: 48px;">
+  <svg class="section-icon" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+    <line x1="2" y1="10" x2="5" y2="10" stroke="#00539A" stroke-width="1.5" stroke-linecap="round"/>
+    <polyline points="5,10 6,10 7,12 8,3 9,14 10,10 11,10" fill="none" stroke="#00539A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <line x1="11" y1="10" x2="18" y2="10" stroke="#00539A" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="2" y1="16" x2="5" y2="16" stroke="#FDB945" stroke-width="1.5" stroke-linecap="round"/>
+    <polyline points="5,16 6.5,16 7,17 7.5,12 8,18 8.5,16 9,16" fill="none" stroke="#FDB945" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <line x1="9" y1="16" x2="18" y2="16" stroke="#FDB945" stroke-width="1.5" stroke-linecap="round"/>
+  </svg>
+  Visual 6 — Pulse Map
+</div>
+
+<div class="info-panel">
+  <p class="info-panel__desc">
+    An EKG/heartbeat-style chart where each entity gets its own horizontal trace with sharp pulse spikes
+    proportional to value. Instantly reveals who's active, who's flat, and the rhythm of activity across time.
+  </p>
+  <div class="info-panel__heading">Data Fields</div>
+  <table class="field-table">
+    <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+    <tr><td class="field-name">Entity</td><td class="field-type">Grouping</td><td>Each entity gets its own heartbeat row (e.g. Sales Rep, Server)</td></tr>
+    <tr><td class="field-name">Axis</td><td class="field-type">Grouping</td><td>Time periods along the trace (e.g. Week, Month)</td></tr>
+    <tr><td class="field-name">Values</td><td class="field-type">Measure</td><td>Pulse spike height — larger values produce taller spikes</td></tr>
+  </table>
+</div>
+
+<div id="pulse-preview" style="
+  background: #FFFFFF;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  max-width: 820px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  margin-bottom: 48px;
+  opacity: 0; transform: translateY(18px);
+  animation: cardIn 0.5s ease forwards; animation-delay: 0.1s;
+"></div>
+
+<!-- ── HIVE PLOT ── -->
+<div class="section-label" style="margin-top: 48px;">
+  <svg class="section-icon" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="10" cy="10" r="1.5" fill="#11284C"/>
+    <line x1="10" y1="10" x2="4" y2="4" stroke="#D9E1EA" stroke-width="1.5"/>
+    <line x1="10" y1="10" x2="16" y2="4" stroke="#D9E1EA" stroke-width="1.5"/>
+    <circle cx="4" cy="4" r="2" fill="#00539A"/><circle cx="4" cy="8" r="2" fill="#004896"/>
+    <circle cx="16" cy="4" r="2" fill="#FFF" stroke="#6B7F93" stroke-width="1.2"/>
+    <circle cx="16" cy="8" r="2" fill="#FFF" stroke="#6B7F93" stroke-width="1.2"/>
+    <circle cx="16" cy="12" r="2" fill="#FFF" stroke="#6B7F93" stroke-width="1.2"/>
+    <path d="M4,4 Q10,10 16,4" fill="none" stroke="#00539A" stroke-width="1.5" opacity="0.6"/>
+    <path d="M4,4 Q10,10 16,8" fill="none" stroke="#00539A" stroke-width="1" opacity="0.4"/>
+    <path d="M4,8 Q10,10 16,12" fill="none" stroke="#004896" stroke-width="1.5" opacity="0.6"/>
+  </svg>
+  Visual 7 — Hive Plot
+</div>
+
+<div class="info-panel">
+  <p class="info-panel__desc">
+    A radial connection web with two axes — source entities on the left, destinations on the right — connected
+    by curved arcs whose thickness represents weight. Reveals relationship patterns that tables completely miss.
+  </p>
+  <div class="info-panel__heading">Data Fields</div>
+  <table class="field-table">
+    <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+    <tr><td class="field-name">Source</td><td class="field-type">Grouping</td><td>Source entities on the left axis (e.g. Teams, Departments)</td></tr>
+    <tr><td class="field-name">Destination</td><td class="field-type">Grouping</td><td>Destination entities on the right axis (e.g. Projects, Products)</td></tr>
+    <tr><td class="field-name">Weight</td><td class="field-type">Measure</td><td>Connection strength — thicker arcs for larger values</td></tr>
+  </table>
+</div>
+
+<div id="hive-preview" style="
+  background: #FFFFFF;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  max-width: 600px;
+  height: 440px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  margin-bottom: 48px;
+  opacity: 0; transform: translateY(18px);
+  animation: cardIn 0.5s ease forwards; animation-delay: 0.1s;
+"></div>
+
+<!-- ── RIDGE CHART ── -->
+<div class="section-label" style="margin-top: 48px;">
+  <svg class="section-icon" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+    <rect x="1" y="1" width="18" height="18" rx="2" fill="#0B1220"/>
+    <path d="M2,16 C5,16 6,10 8,12 C10,14 12,8 14,10 C16,12 17,14 18,14" fill="none" stroke="#F2F5F8" stroke-width="1.2"/>
+    <path d="M2,13 C4,13 6,7 8,9 C10,11 12,5 14,7 C16,9 17,11 18,11" fill="none" stroke="#C9D3DD" stroke-width="1.2"/>
+    <path d="M2,10 C4,10 6,4 8,6 C10,8 12,3 14,5 C16,7 17,8 18,8" fill="none" stroke="#94A6B8" stroke-width="1.2"/>
+  </svg>
+  Visual 8 — Ridge Chart
+</div>
+
+<div class="info-panel">
+  <p class="info-panel__desc">
+    Stacked overlapping area ridges — each row is a series rendered as a smooth terrain shape, layered with
+    vertical offset like mountain ranges. Inspired by Joy Division's Unknown Pleasures album art. Includes
+    a dark mode toggle for the classic look. Great for comparing distribution shapes across categories.
+  </p>
+  <div class="info-panel__heading">Data Fields</div>
+  <table class="field-table">
+    <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+    <tr><td class="field-name">Series</td><td class="field-type">Grouping</td><td>Each series becomes a ridge row (e.g. Year, Product)</td></tr>
+    <tr><td class="field-name">Axis</td><td class="field-type">Grouping</td><td>X-axis within each ridge (e.g. Month, Day)</td></tr>
+    <tr><td class="field-name">Values</td><td class="field-type">Measure</td><td>Ridge height — plotted as the area shape</td></tr>
+  </table>
+</div>
+
+<div style="display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 48px;">
+  <div id="ridge-preview-light" style="
+    background: #FFFFFF;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    width: 400px; height: 340px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    opacity: 0; transform: translateY(18px);
+    animation: cardIn 0.5s ease forwards; animation-delay: 0.1s;
+  "></div>
+  <div id="ridge-preview-dark" style="
+    background: #0B1220;
+    border: 1px solid #22324B;
+    border-radius: 12px;
+    padding: 20px;
+    width: 400px; height: 340px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    opacity: 0; transform: translateY(18px);
+    animation: cardIn 0.5s ease forwards; animation-delay: 0.2s;
+  "></div>
+</div>
+
 <!-- ── Footer ── -->
 <div class="footer">
   Brand palette
@@ -1687,6 +1819,383 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   container.appendChild(svg);
+})();
+
+// ── Pulse Map preview generation ──
+(() => {
+  const container = document.getElementById('pulse-preview');
+  if (!container) return;
+
+  const periods = ['W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'W7', 'W8', 'W9', 'W10', 'W11', 'W12'];
+  const rawData = {
+    'Rep: Sarah':    [320, 180, 450, 0, 280, 520, 150, 0, 380, 290, 410, 350],
+    'Rep: Marcus':   [180, 0, 220, 340, 0, 180, 400, 280, 0, 150, 320, 0],
+    'Rep: Jun':      [420, 380, 310, 280, 350, 400, 320, 380, 420, 350, 310, 450],
+    'Rep: Priya':    [0, 120, 0, 0, 480, 380, 0, 200, 0, 520, 0, 280],
+    'Rep: Alex':     [280, 240, 190, 310, 260, 220, 350, 280, 320, 280, 240, 300]
+  };
+
+  const palette = ['#00539A', '#11284C', '#004896', '#FDB945', '#2F6FB3'];
+  const names = Object.keys(rawData);
+  const ns = 'http://www.w3.org/2000/svg';
+  const width = 780, height = 280;
+  const labelW = 90, topM = 24, botM = 8, rightM = 16;
+  const plotW = width - labelW - rightM;
+  const plotH = height - topM - botM;
+  const rowH = plotH / names.length;
+  const maxVal = Math.max(...Object.values(rawData).flat());
+  const spikeH = rowH * 0.42;
+  const spacing = plotW / (periods.length - 1);
+  const halfSpike = spacing * 0.12;
+
+  const svg = document.createElementNS(ns, 'svg');
+  svg.setAttribute('viewBox', '0 0 ' + width + ' ' + height);
+  svg.setAttribute('width', '100%');
+  svg.style.fontFamily = '"Segoe UI", system-ui, sans-serif';
+
+  // Period labels
+  periods.forEach((p, i) => {
+    if (i % 2 !== 0) return;
+    const txt = document.createElementNS(ns, 'text');
+    txt.setAttribute('x', String(labelW + (i / (periods.length - 1)) * plotW));
+    txt.setAttribute('y', String(topM - 6));
+    txt.setAttribute('text-anchor', 'middle');
+    txt.setAttribute('fill', '#3E556E');
+    txt.setAttribute('font-size', '10');
+    txt.setAttribute('font-weight', '600');
+    txt.textContent = p;
+    svg.appendChild(txt);
+  });
+
+  names.forEach((name, ri) => {
+    const baseY = topM + ri * rowH + rowH / 2;
+    const color = palette[ri % palette.length];
+    const values = rawData[name];
+
+    // Baseline
+    const bl = document.createElementNS(ns, 'line');
+    bl.setAttribute('x1', String(labelW)); bl.setAttribute('x2', String(labelW + plotW));
+    bl.setAttribute('y1', String(baseY)); bl.setAttribute('y2', String(baseY));
+    bl.setAttribute('stroke', '#E8EEF5'); bl.setAttribute('stroke-width', '1');
+    bl.setAttribute('stroke-dasharray', '3 2');
+    svg.appendChild(bl);
+
+    // Label
+    const lbl = document.createElementNS(ns, 'text');
+    lbl.setAttribute('x', String(labelW - 8)); lbl.setAttribute('y', String(baseY));
+    lbl.setAttribute('text-anchor', 'end'); lbl.setAttribute('dominant-baseline', 'central');
+    lbl.setAttribute('fill', color); lbl.setAttribute('font-size', '11'); lbl.setAttribute('font-weight', '600');
+    lbl.textContent = name;
+    svg.appendChild(lbl);
+
+    // EKG pulse path
+    let d = 'M ' + labelW + ' ' + baseY;
+    for (let i = 0; i < values.length; i++) {
+      const x = labelW + (i / (periods.length - 1)) * plotW;
+      const norm = maxVal > 0 ? values[i] / maxVal : 0;
+      const peak = norm * spikeH;
+      d += ' L ' + (x - halfSpike * 1.8) + ' ' + baseY;
+      d += ' L ' + (x - halfSpike * 1.1) + ' ' + (baseY + 3);
+      d += ' L ' + x + ' ' + (baseY - peak);
+      d += ' L ' + (x + halfSpike * 0.7) + ' ' + (baseY + 4);
+      d += ' L ' + (x + halfSpike * 1.3) + ' ' + (baseY - peak * 0.1);
+      d += ' L ' + (x + halfSpike * 1.8) + ' ' + baseY;
+    }
+    d += ' L ' + (labelW + plotW) + ' ' + baseY;
+
+    const path = document.createElementNS(ns, 'path');
+    path.setAttribute('d', d);
+    path.setAttribute('stroke', color);
+    path.setAttribute('stroke-width', '2');
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke-linecap', 'round');
+    path.setAttribute('stroke-linejoin', 'round');
+    svg.appendChild(path);
+
+    // Draw-on animation
+    const pathLen = path.getTotalLength();
+    path.setAttribute('stroke-dasharray', pathLen + ' ' + pathLen);
+    path.setAttribute('stroke-dashoffset', String(pathLen));
+    path.style.transition = 'stroke-dashoffset 1.8s linear';
+    setTimeout(() => { path.setAttribute('stroke-dashoffset', '0'); }, 100 + ri * 200);
+  });
+
+  container.appendChild(svg);
+})();
+
+// ── Hive Plot preview generation ──
+(() => {
+  const container = document.getElementById('hive-preview');
+  if (!container) return;
+
+  const sourceNames = ['Engineering', 'Design', 'Marketing', 'Sales'];
+  const destNames = ['Project Alpha', 'Project Beta', 'Project Gamma', 'Project Delta', 'Project Epsilon'];
+  const connections = [
+    ['Engineering', 'Project Alpha', 420], ['Engineering', 'Project Beta', 280],
+    ['Engineering', 'Project Gamma', 150], ['Engineering', 'Project Epsilon', 90],
+    ['Design', 'Project Alpha', 180], ['Design', 'Project Beta', 320],
+    ['Design', 'Project Delta', 240],
+    ['Marketing', 'Project Beta', 140], ['Marketing', 'Project Gamma', 380],
+    ['Marketing', 'Project Delta', 200], ['Marketing', 'Project Epsilon', 160],
+    ['Sales', 'Project Alpha', 300], ['Sales', 'Project Delta', 260],
+    ['Sales', 'Project Epsilon', 340]
+  ];
+
+  const palette = ['#00539A', '#11284C', '#004896', '#FDB945'];
+  const ns = 'http://www.w3.org/2000/svg';
+  const width = 560, height = 400;
+  const cx = width / 2, cy = height / 2;
+  const radius = 160;
+  const angle = 50 * Math.PI / 180;
+  const maxWeight = Math.max(...connections.map(c => c[2]));
+
+  const svg = document.createElementNS(ns, 'svg');
+  svg.setAttribute('viewBox', '0 0 ' + width + ' ' + height);
+  svg.setAttribute('width', '100%');
+  svg.style.fontFamily = '"Segoe UI", system-ui, sans-serif';
+
+  function toPoint(a, t) {
+    const r = radius * 0.15 + t * radius * 0.85;
+    return [cx + r * Math.sin(a), cy - r * Math.cos(a)];
+  }
+
+  // Axis lines
+  [[-angle, angle]].forEach(([a1, a2]) => {
+    [[a1, 0, 1], [a2, 0, 1]].forEach(([a, t0, t1]) => {
+      const [x1, y1] = toPoint(a, t0);
+      const [x2, y2] = toPoint(a, t1);
+      const line = document.createElementNS(ns, 'line');
+      line.setAttribute('x1', String(x1)); line.setAttribute('y1', String(y1));
+      line.setAttribute('x2', String(x2)); line.setAttribute('y2', String(y2));
+      line.setAttribute('stroke', '#D9E1EA'); line.setAttribute('stroke-width', '2');
+      line.setAttribute('stroke-linecap', 'round');
+      svg.appendChild(line);
+    });
+  });
+
+  // Center
+  const cDot = document.createElementNS(ns, 'circle');
+  cDot.setAttribute('cx', String(cx)); cDot.setAttribute('cy', String(cy));
+  cDot.setAttribute('r', '3'); cDot.setAttribute('fill', '#11284C');
+  svg.appendChild(cDot);
+
+  // Node positions
+  const srcNodes = sourceNames.map((name, i) => {
+    const t = sourceNames.length > 1 ? i / (sourceNames.length - 1) : 0.5;
+    const [x, y] = toPoint(-angle, t);
+    return { name, x, y, color: palette[i % palette.length] };
+  });
+
+  const dstNodes = destNames.map((name, i) => {
+    const t = destNames.length > 1 ? i / (destNames.length - 1) : 0.5;
+    const [x, y] = toPoint(angle, t);
+    return { name, x, y };
+  });
+
+  const srcMap = Object.fromEntries(srcNodes.map(n => [n.name, n]));
+  const dstMap = Object.fromEntries(dstNodes.map(n => [n.name, n]));
+
+  // Draw arcs
+  connections.forEach((conn, ci) => {
+    const src = srcMap[conn[0]];
+    const dst = dstMap[conn[1]];
+    const weight = conn[2];
+    if (!src || !dst) return;
+    const thickness = Math.max(1.5, (weight / maxWeight) * 12);
+
+    const arc = document.createElementNS(ns, 'path');
+    arc.setAttribute('d', 'M ' + src.x + ' ' + src.y + ' Q ' + cx + ' ' + cy + ' ' + dst.x + ' ' + dst.y);
+    arc.setAttribute('stroke', src.color);
+    arc.setAttribute('stroke-width', String(thickness));
+    arc.setAttribute('fill', 'none');
+    arc.setAttribute('opacity', '0.5');
+    arc.setAttribute('stroke-linecap', 'round');
+    svg.appendChild(arc);
+
+    // Draw-on animation
+    const arcLen = arc.getTotalLength();
+    arc.setAttribute('stroke-dasharray', arcLen + ' ' + arcLen);
+    arc.setAttribute('stroke-dashoffset', String(arcLen));
+    arc.style.transition = 'stroke-dashoffset 1s cubic-bezier(0.4,0,0.2,1)';
+    setTimeout(() => { arc.setAttribute('stroke-dashoffset', '0'); }, 200 + ci * 60);
+  });
+
+  // Draw source nodes + labels
+  srcNodes.forEach((node, i) => {
+    const c = document.createElementNS(ns, 'circle');
+    c.setAttribute('cx', String(node.x)); c.setAttribute('cy', String(node.y));
+    c.setAttribute('r', '5'); c.setAttribute('fill', node.color);
+    c.style.opacity = '0'; c.style.transition = 'opacity 0.3s ease';
+    setTimeout(() => { c.style.opacity = '1'; }, 800 + i * 60);
+    svg.appendChild(c);
+
+    const lbl = document.createElementNS(ns, 'text');
+    lbl.setAttribute('x', String(node.x - 10)); lbl.setAttribute('y', String(node.y));
+    lbl.setAttribute('text-anchor', 'end'); lbl.setAttribute('dominant-baseline', 'central');
+    lbl.setAttribute('fill', '#3E556E'); lbl.setAttribute('font-size', '11'); lbl.setAttribute('font-weight', '600');
+    lbl.textContent = node.name;
+    svg.appendChild(lbl);
+  });
+
+  // Draw dest nodes + labels
+  dstNodes.forEach((node, i) => {
+    const c = document.createElementNS(ns, 'circle');
+    c.setAttribute('cx', String(node.x)); c.setAttribute('cy', String(node.y));
+    c.setAttribute('r', '5'); c.setAttribute('fill', '#FFFFFF');
+    c.setAttribute('stroke', '#6B7F93'); c.setAttribute('stroke-width', '2');
+    c.style.opacity = '0'; c.style.transition = 'opacity 0.3s ease';
+    setTimeout(() => { c.style.opacity = '1'; }, 800 + i * 60);
+    svg.appendChild(c);
+
+    const lbl = document.createElementNS(ns, 'text');
+    lbl.setAttribute('x', String(node.x + 10)); lbl.setAttribute('y', String(node.y));
+    lbl.setAttribute('text-anchor', 'start'); lbl.setAttribute('dominant-baseline', 'central');
+    lbl.setAttribute('fill', '#3E556E'); lbl.setAttribute('font-size', '11'); lbl.setAttribute('font-weight', '600');
+    lbl.textContent = node.name;
+    svg.appendChild(lbl);
+  });
+
+  container.appendChild(svg);
+})();
+
+// ── Ridge Chart preview generation (light + dark) ──
+(() => {
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const ridgeData = {
+    '2023': [120, 180, 280, 350, 420, 380, 310, 280, 350, 400, 320, 200],
+    '2024': [150, 210, 320, 400, 480, 450, 380, 350, 420, 460, 380, 250],
+    '2025': [180, 250, 380, 450, 520, 490, 420, 380, 460, 510, 420, 300],
+    '2026': [200, 300, 420, 500, 580, 540, 460, 420, 510, 560, 480, 350]
+  };
+
+  const palette = ['#00539A', '#004896', '#2F6FB3', '#11284C'];
+  const ns = 'http://www.w3.org/2000/svg';
+  const names = Object.keys(ridgeData);
+  const maxVal = Math.max(...Object.values(ridgeData).flat());
+
+  function buildRidgeSVG(containerId, dark) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    const width = 360, height = 300;
+    const labelW = 50, topM = 16, botM = 24, rightM = 16;
+    const plotW = width - labelW - rightM;
+    const plotH = height - topM - botM;
+    const baseRowH = plotH / names.length;
+    const ridgeH = baseRowH * 1.2;
+    const bgColor = dark ? '#0B1220' : '#FFFFFF';
+    const strokeCol = dark ? '#F2F5F8' : null;
+    const labelCol = dark ? '#C9D3DD' : null;
+    const axisCol = dark ? '#94A6B8' : '#6B7F93';
+
+    const svg = document.createElementNS(ns, 'svg');
+    svg.setAttribute('viewBox', '0 0 ' + width + ' ' + height);
+    svg.setAttribute('width', '100%');
+    svg.style.fontFamily = '"Segoe UI", system-ui, sans-serif';
+
+    // Background
+    const bg = document.createElementNS(ns, 'rect');
+    bg.setAttribute('width', String(width)); bg.setAttribute('height', String(height));
+    bg.setAttribute('fill', bgColor); bg.setAttribute('rx', '8');
+    svg.appendChild(bg);
+
+    // X-axis labels
+    months.forEach((m, i) => {
+      if (i % 2 !== 0) return;
+      const x = labelW + (i / (months.length - 1)) * plotW;
+      const txt = document.createElementNS(ns, 'text');
+      txt.setAttribute('x', String(x)); txt.setAttribute('y', String(height - 6));
+      txt.setAttribute('text-anchor', 'middle');
+      txt.setAttribute('fill', axisCol); txt.setAttribute('font-size', '9'); txt.setAttribute('font-weight', '600');
+      txt.textContent = m;
+      svg.appendChild(txt);
+    });
+
+    // Draw ridges back-to-front
+    for (let ri = names.length - 1; ri >= 0; ri--) {
+      const name = names[ri];
+      const values = ridgeData[name];
+      const color = palette[ri % palette.length];
+      const baselineY = topM + (ri + 1) * baseRowH;
+
+      // Build smooth area path using cubic approximation
+      const pts = values.map((v, i) => {
+        const x = labelW + (i / (values.length - 1)) * plotW;
+        const y = baselineY - (v / maxVal) * ridgeH;
+        return [x, y];
+      });
+
+      // Area: line path + close to baseline
+      let areaD = 'M ' + labelW + ' ' + baselineY;
+      // Smooth curve through points
+      areaD += ' C';
+      for (let i = 0; i < pts.length; i++) {
+        if (i === 0) {
+          areaD += ' ' + pts[0][0] + ' ' + pts[0][1];
+        } else {
+          const prevX = pts[i - 1][0], prevY = pts[i - 1][1];
+          const curX = pts[i][0], curY = pts[i][1];
+          const cpx = (prevX + curX) / 2;
+          areaD += ' ' + cpx + ' ' + prevY + ' ' + cpx + ' ' + curY + ' ' + curX + ' ' + curY;
+          if (i < pts.length - 1) areaD += ' C';
+        }
+      }
+      areaD += ' L ' + (labelW + plotW) + ' ' + baselineY + ' Z';
+
+      // Opaque mask fill
+      const mask = document.createElementNS(ns, 'path');
+      mask.setAttribute('d', areaD);
+      mask.setAttribute('fill', bgColor);
+      svg.appendChild(mask);
+
+      // Color fill
+      const fill = document.createElementNS(ns, 'path');
+      fill.setAttribute('d', areaD);
+      fill.setAttribute('fill', color);
+      fill.setAttribute('opacity', dark ? '0.15' : '0.2');
+      svg.appendChild(fill);
+
+      // Stroke line (just the top curve)
+      let lineD = 'M ' + pts[0][0] + ' ' + pts[0][1];
+      for (let i = 1; i < pts.length; i++) {
+        const prevX = pts[i - 1][0], prevY = pts[i - 1][1];
+        const curX = pts[i][0], curY = pts[i][1];
+        const cpx = (prevX + curX) / 2;
+        lineD += ' C ' + cpx + ' ' + prevY + ' ' + cpx + ' ' + curY + ' ' + curX + ' ' + curY;
+      }
+
+      const line = document.createElementNS(ns, 'path');
+      line.setAttribute('d', lineD);
+      line.setAttribute('stroke', strokeCol || color);
+      line.setAttribute('stroke-width', '2');
+      line.setAttribute('fill', 'none');
+      line.setAttribute('stroke-linecap', 'round');
+      svg.appendChild(line);
+
+      // Draw-on animation
+      const lineLen = line.getTotalLength();
+      line.setAttribute('stroke-dasharray', lineLen + ' ' + lineLen);
+      line.setAttribute('stroke-dashoffset', String(lineLen));
+      line.style.transition = 'stroke-dashoffset 1.4s cubic-bezier(0.4,0,0.2,1)';
+      setTimeout(() => { line.setAttribute('stroke-dashoffset', '0'); }, 200 + (names.length - 1 - ri) * 150);
+
+      // Label
+      const lbl = document.createElementNS(ns, 'text');
+      lbl.setAttribute('x', String(labelW - 8));
+      lbl.setAttribute('y', String(baselineY - ridgeH * 0.3));
+      lbl.setAttribute('text-anchor', 'end');
+      lbl.setAttribute('dominant-baseline', 'central');
+      lbl.setAttribute('fill', labelCol || color);
+      lbl.setAttribute('font-size', '11'); lbl.setAttribute('font-weight', '600');
+      lbl.textContent = name;
+      svg.appendChild(lbl);
+    }
+
+    container.appendChild(svg);
+  }
+
+  buildRidgeSVG('ridge-preview-light', false);
+  buildRidgeSVG('ridge-preview-dark', true);
 })();
 </script>
 
