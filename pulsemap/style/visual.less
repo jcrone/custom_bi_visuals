@@ -1,6 +1,4 @@
-@brand-blue: #00539A;
 @brand-navy: #11284C;
-@border-color: #D9E1EA;
 @grid-color: #E8EEF5;
 @text-secondary: #3E556E;
 @text-muted: #6B7F93;
@@ -11,6 +9,7 @@
     height: 100%;
     font-family: @font-family;
     background: #FFFFFF;
+    animation: pulseFadeIn 0.4s ease both;
 }
 
 .pulse-baseline {
@@ -63,10 +62,6 @@
     font-weight: 600;
     fill: @text-muted;
     font-family: @font-family;
-}
-
-.pulse-map {
-    animation: pulseFadeIn 0.4s ease both;
 }
 
 @keyframes pulseFadeIn {

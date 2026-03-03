@@ -97,7 +97,8 @@ export class Visual implements IVisual {
         const plotH = Math.max(40, height - margin.top - margin.bottom);
 
         this.svg.attr("width", width).attr("height", height);
-        this.svg.selectAll("*").remove();
+        this.svg.selectAll("*").interrupt().remove();
+        this.tooltip.style("opacity", "0");
 
         // Background
         this.svg.append("rect")
@@ -108,7 +109,10 @@ export class Visual implements IVisual {
             .attr("transform", `translate(${margin.left},${margin.top})`);
 
         const overlapPct = ridgeS.overlap.value / 100;
-        const maxVal = Math.max(...rows.flatMap(r => r.values), 1);
+        let maxVal = 1;
+        for (const r of rows) {
+            for (const v of r.values) { if (v > maxVal) maxVal = v; }
+        }
         const nRows = rows.length;
         const baseRowH = plotH / nRows;
         const effectiveRowH = baseRowH * (1 + overlapPct);
@@ -140,7 +144,6 @@ export class Visual implements IVisual {
         // Draw ridges back-to-front (last row at back, first row at front)
         for (let ri = nRows - 1; ri >= 0; ri--) {
             const row = rows[ri];
-            const baselineY = margin.top + (ri + 1) * baseRowH;
             const relBaseY = (ri + 1) * baseRowH;
 
             // Build area path (line on top, flat baseline on bottom)
@@ -212,9 +215,10 @@ export class Visual implements IVisual {
                     const [mx] = d3.pointer(event, g.node());
                     const idx = Math.round(xScale.invert(mx));
                     const clampedIdx = Math.max(0, Math.min(axisLabels.length - 1, idx));
+                    const rect = this.target.getBoundingClientRect();
                     this.showTooltip(tooltipDiv, row.name,
-                        axisLabels[clampedIdx], row.values[clampedIdx],
-                        event.offsetX + 14, event.offsetY - 30);
+                        axisLabels[clampedIdx], row.values[clampedIdx] ?? 0,
+                        event.clientX - rect.left + 14, event.clientY - rect.top - 30);
                 })
                 .on("mouseleave", () => {
                     tooltipDiv.style("opacity", "0");
@@ -257,7 +261,7 @@ export class Visual implements IVisual {
     }
 
     private renderMessage(message: string): void {
-        this.svg.selectAll("*").remove();
+        this.svg.selectAll("*").interrupt().remove();
         this.svg.attr("width", "100%").attr("height", "100%");
         this.svg.append("text")
             .attr("class", "ridge-message")

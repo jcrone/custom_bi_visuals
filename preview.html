@@ -1268,6 +1268,56 @@
   "></div>
 </div>
 
+<!-- ── DRILLDOWN DONUT ── -->
+<div class="section-label" style="margin-top: 48px;">
+  <svg class="section-icon" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="10" cy="10" r="8" fill="none" stroke="#00539A" stroke-width="3"/>
+    <circle cx="10" cy="10" r="4" fill="#F6F8FB" stroke="#D9E1EA" stroke-width="1"/>
+    <path d="M10,2 A8,8 0 0,1 18,10" fill="none" stroke="#FDB945" stroke-width="3" stroke-linecap="round"/>
+    <path d="M18,10 A8,8 0 0,1 10,18" fill="none" stroke="#11284C" stroke-width="3" stroke-linecap="round"/>
+  </svg>
+  Visual 9 — Drilldown Donut
+</div>
+
+<div class="info-panel">
+  <p class="info-panel__desc">
+    A ZoomCharts-style drilldown donut chart that shows one hierarchy level at a time. Click a segment
+    to smoothly morph arcs and reveal its children. Click the center to navigate back up. Supports up
+    to three hierarchy levels with animated transitions and breadcrumb navigation.
+  </p>
+  <div class="info-panel__heading">Data Fields</div>
+  <table class="field-table">
+    <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+    <tr><td class="field-name">Level 1</td><td class="field-type">Grouping</td><td>Top-level categories shown on first view</td></tr>
+    <tr><td class="field-name">Level 2</td><td class="field-type">Grouping</td><td>Children revealed when drilling into a Level 1 segment</td></tr>
+    <tr><td class="field-name">Level 3</td><td class="field-type">Grouping</td><td>Optional third level for deeper drill-down</td></tr>
+    <tr><td class="field-name">Values</td><td class="field-type">Measure</td><td>Arc sizing — determines segment proportions</td></tr>
+  </table>
+</div>
+
+<div style="display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 48px;">
+  <div id="donut-preview-light" style="
+    background: #FFFFFF;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    width: 400px; height: 400px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    opacity: 0; transform: translateY(18px);
+    animation: cardIn 0.5s ease forwards; animation-delay: 0.1s;
+  "></div>
+  <div id="donut-preview-dark" style="
+    background: #0B1220;
+    border: 1px solid #22324B;
+    border-radius: 12px;
+    padding: 20px;
+    width: 400px; height: 400px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    opacity: 0; transform: translateY(18px);
+    animation: cardIn 0.5s ease forwards; animation-delay: 0.2s;
+  "></div>
+</div>
+
 <!-- ── Footer ── -->
 <div class="footer">
   Brand palette
@@ -2196,6 +2246,392 @@ document.addEventListener('DOMContentLoaded', () => {
 
   buildRidgeSVG('ridge-preview-light', false);
   buildRidgeSVG('ridge-preview-dark', true);
+})();
+
+// ── Drilldown Donut preview generation (light + dark) — INTERACTIVE ──
+(() => {
+  // Hierarchical data: Level 1 > Level 2
+  const treeData = {
+    name: 'Total', children: [
+      { name: 'Engineering', color: '#00539A', children: [
+        { name: 'Frontend', value: 420, color: '#2F6FB3' },
+        { name: 'Backend',  value: 380, color: '#004896' },
+        { name: 'DevOps',   value: 180, color: '#1D3A66' },
+        { name: 'QA',       value: 120, color: '#6B7F93' }
+      ]},
+      { name: 'Design', color: '#11284C', children: [
+        { name: 'UX',       value: 280, color: '#00539A' },
+        { name: 'Visual',   value: 220, color: '#2F6FB3' },
+        { name: 'Research', value: 140, color: '#004896' }
+      ]},
+      { name: 'Marketing', color: '#004896', children: [
+        { name: 'Digital', value: 310, color: '#11284C' },
+        { name: 'Content', value: 190, color: '#1D3A66' },
+        { name: 'Brand',   value: 160, color: '#FDB945' }
+      ]},
+      { name: 'Sales', color: '#FDB945', children: [
+        { name: 'Enterprise', value: 450, color: '#00539A' },
+        { name: 'SMB',        value: 280, color: '#11284C' },
+        { name: 'Inside',     value: 170, color: '#004896' }
+      ]}
+    ]
+  };
+
+  // Compute aggregated values
+  function sumNode(n) {
+    if (n.value != null) return n.value;
+    n.value = n.children.reduce((s, c) => s + sumNode(c), 0);
+    return n.value;
+  }
+  sumNode(treeData);
+
+  const ns = 'http://www.w3.org/2000/svg';
+
+  function buildInteractiveDonut(containerId, dark) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    const size = 360;
+    const cx = size / 2, cy = size / 2;
+    const outerR = size / 2 - 20;
+    const innerR = outerR * 0.55;
+    const centerR = innerR - 4;
+    const gap = 0.03;
+    const dur = 600; // ms for morph animation
+    const bgColor = dark ? '#0B1220' : '#FFFFFF';
+    const textColor = dark ? '#F2F5F8' : '#11284C';
+    const mutedColor = dark ? '#94A6B8' : '#6B7F93';
+    const centerBg = dark ? '#0F1A2E' : '#F6F8FB';
+    const hoverBg  = dark ? 'rgba(253,185,69,0.10)' : 'rgba(0,83,154,0.10)';
+    const strokeColor = dark ? '#22324B' : '#FFFFFF';
+    const accentColor = dark ? '#FDB945' : '#00539A';
+
+    const svg = document.createElementNS(ns, 'svg');
+    svg.setAttribute('viewBox', '0 0 ' + size + ' ' + size);
+    svg.setAttribute('width', '100%');
+    svg.style.fontFamily = '"Segoe UI", system-ui, sans-serif';
+
+    // Background
+    const bg = document.createElementNS(ns, 'rect');
+    bg.setAttribute('width', String(size)); bg.setAttribute('height', String(size));
+    bg.setAttribute('fill', bgColor); bg.setAttribute('rx', '8');
+    svg.appendChild(bg);
+
+    // Arc layer group, label layer group, center group
+    const arcLayer = document.createElementNS(ns, 'g');
+    const lblLayer = document.createElementNS(ns, 'g');
+    const ctrGroup = document.createElementNS(ns, 'g');
+    svg.appendChild(arcLayer);
+    svg.appendChild(lblLayer);
+    svg.appendChild(ctrGroup);
+    container.appendChild(svg);
+
+    let currentNode = treeData;
+    let animating = false;
+
+    // ── Arc path builder ──
+    function arcPath(sa, ea) {
+      if (Math.abs(ea - sa) < 0.001) {
+        // Degenerate — return invisible point
+        const px = cx + outerR * Math.cos(sa);
+        const py = cy + outerR * Math.sin(sa);
+        return 'M ' + px + ' ' + py + ' L ' + px + ' ' + py;
+      }
+      const full = (ea - sa) >= 2 * Math.PI - 0.001;
+      const eAdj = full ? sa + 2 * Math.PI - 0.0001 : ea;
+      const large = (eAdj - sa) > Math.PI ? 1 : 0;
+      const x1o = cx + outerR * Math.cos(sa);
+      const y1o = cy + outerR * Math.sin(sa);
+      const x2o = cx + outerR * Math.cos(eAdj);
+      const y2o = cy + outerR * Math.sin(eAdj);
+      const x1i = cx + innerR * Math.cos(eAdj);
+      const y1i = cy + innerR * Math.sin(eAdj);
+      const x2i = cx + innerR * Math.cos(sa);
+      const y2i = cy + innerR * Math.sin(sa);
+      let d = 'M ' + x1o + ' ' + y1o +
+              ' A ' + outerR + ' ' + outerR + ' 0 ' + large + ' 1 ' + x2o + ' ' + y2o +
+              ' L ' + x1i + ' ' + y1i +
+              ' A ' + innerR + ' ' + innerR + ' 0 ' + large + ' 0 ' + x2i + ' ' + y2i + ' Z';
+      return d;
+    }
+
+    // ── Compute arc angles for a list of children ──
+    function computeArcs(children) {
+      const total = children.reduce((s, c) => s + c.value, 0);
+      const arcs = [];
+      let angle = -Math.PI / 2;
+      children.forEach(c => {
+        const sweep = (c.value / total) * (2 * Math.PI - gap * children.length);
+        arcs.push({ start: angle + gap / 2, end: angle + sweep + gap / 2, node: c });
+        angle += sweep + gap;
+      });
+      return arcs;
+    }
+
+    // ── Format number ──
+    function fmt(v) {
+      if (v >= 1e6) return (v / 1e6).toFixed(1) + 'M';
+      if (v >= 1e3) return (v / 1e3).toFixed(1) + 'K';
+      return String(v);
+    }
+
+    // ── Interpolate between two arc sets with requestAnimationFrame ──
+    function morphArcs(fromArcs, toArcs, paths, onDone) {
+      // fromArcs/toArcs: arrays of {start, end, color}
+      // Pad arrays to same length
+      const count = Math.max(fromArcs.length, toArcs.length);
+      const froms = [], tos = [];
+      for (let i = 0; i < count; i++) {
+        froms.push(fromArcs[i] || { start: fromArcs[fromArcs.length - 1].end, end: fromArcs[fromArcs.length - 1].end, color: toArcs[i] ? toArcs[i].color : '#ccc' });
+        tos.push(toArcs[i]   || { start: toArcs[toArcs.length - 1].end,   end: toArcs[toArcs.length - 1].end,   color: froms[i].color });
+      }
+
+      // Ensure we have enough path elements
+      while (paths.length < count) {
+        const p = document.createElementNS(ns, 'path');
+        p.setAttribute('fill-opacity', '0.9');
+        p.setAttribute('stroke', strokeColor);
+        p.setAttribute('stroke-width', '1');
+        p.style.cursor = 'pointer';
+        arcLayer.appendChild(p);
+        paths.push(p);
+      }
+      // Hide extras
+      for (let i = count; i < paths.length; i++) {
+        paths[i].setAttribute('d', '');
+        paths[i].style.display = 'none';
+      }
+
+      const startTime = performance.now();
+      function step(now) {
+        const elapsed = now - startTime;
+        const t = Math.min(elapsed / dur, 1);
+        // Cubic ease in-out
+        const ease = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+        for (let i = 0; i < count; i++) {
+          const sa = froms[i].start + (tos[i].start - froms[i].start) * ease;
+          const ea = froms[i].end   + (tos[i].end   - froms[i].end)   * ease;
+          paths[i].setAttribute('d', arcPath(sa, ea));
+          paths[i].setAttribute('fill', tos[i].color);
+          paths[i].style.display = '';
+        }
+
+        if (t < 1) {
+          requestAnimationFrame(step);
+        } else {
+          onDone();
+        }
+      }
+      requestAnimationFrame(step);
+    }
+
+    // ── Draw center ──
+    function drawCenter(node) {
+      while (ctrGroup.firstChild) ctrGroup.removeChild(ctrGroup.firstChild);
+
+      const circle = document.createElementNS(ns, 'circle');
+      circle.setAttribute('cx', String(cx)); circle.setAttribute('cy', String(cy));
+      circle.setAttribute('r', String(centerR));
+      circle.setAttribute('fill', centerBg);
+      ctrGroup.appendChild(circle);
+
+      const isRoot = !node.children || node === treeData;
+      const nameEl = document.createElementNS(ns, 'text');
+      nameEl.setAttribute('x', String(cx)); nameEl.setAttribute('y', String(cy - (isRoot ? 8 : 12)));
+      nameEl.setAttribute('text-anchor', 'middle'); nameEl.setAttribute('dominant-baseline', 'central');
+      nameEl.setAttribute('fill', mutedColor); nameEl.setAttribute('font-size', '12');
+      nameEl.setAttribute('font-weight', '600'); nameEl.setAttribute('pointer-events', 'none');
+      nameEl.textContent = node.name;
+      ctrGroup.appendChild(nameEl);
+
+      const valEl = document.createElementNS(ns, 'text');
+      valEl.setAttribute('x', String(cx)); valEl.setAttribute('y', String(cy + 10));
+      valEl.setAttribute('text-anchor', 'middle'); valEl.setAttribute('dominant-baseline', 'central');
+      valEl.setAttribute('fill', textColor); valEl.setAttribute('font-size', '18');
+      valEl.setAttribute('font-weight', '700'); valEl.setAttribute('pointer-events', 'none');
+      valEl.textContent = fmt(node.value);
+      ctrGroup.appendChild(valEl);
+
+      if (node !== treeData) {
+        // Breadcrumb
+        const trail = document.createElementNS(ns, 'text');
+        trail.setAttribute('x', String(cx)); trail.setAttribute('y', String(cy + 30));
+        trail.setAttribute('text-anchor', 'middle'); trail.setAttribute('dominant-baseline', 'central');
+        trail.setAttribute('fill', mutedColor); trail.setAttribute('font-size', '9');
+        trail.setAttribute('font-weight', '600'); trail.setAttribute('pointer-events', 'none');
+        trail.textContent = 'Total > ' + node.name;
+        ctrGroup.appendChild(trail);
+
+        // Back hint
+        const back = document.createElementNS(ns, 'text');
+        back.setAttribute('x', String(cx)); back.setAttribute('y', String(cy - 28));
+        back.setAttribute('text-anchor', 'middle'); back.setAttribute('dominant-baseline', 'central');
+        back.setAttribute('fill', accentColor); back.setAttribute('font-size', '10');
+        back.setAttribute('font-weight', '600'); back.setAttribute('pointer-events', 'none');
+        back.textContent = '\u25C0 Back';
+        ctrGroup.appendChild(back);
+
+        // Click to go back
+        ctrGroup.style.cursor = 'pointer';
+        circle.addEventListener('mouseenter', () => { circle.setAttribute('fill', hoverBg); });
+        circle.addEventListener('mouseleave', () => { circle.setAttribute('fill', centerBg); });
+        circle.addEventListener('click', () => { drillUp(); });
+      } else {
+        ctrGroup.style.cursor = 'default';
+        // Hint
+        const hint = document.createElementNS(ns, 'text');
+        hint.setAttribute('x', String(cx)); hint.setAttribute('y', String(cy + 28));
+        hint.setAttribute('text-anchor', 'middle'); hint.setAttribute('dominant-baseline', 'central');
+        hint.setAttribute('fill', mutedColor); hint.setAttribute('font-size', '9');
+        hint.setAttribute('font-weight', '600'); hint.setAttribute('pointer-events', 'none');
+        hint.textContent = 'Click segment to drill';
+        ctrGroup.appendChild(hint);
+      }
+    }
+
+    // ── Draw labels ──
+    function drawLabels(arcs) {
+      while (lblLayer.firstChild) lblLayer.removeChild(lblLayer.firstChild);
+      const total = arcs.reduce((s, a) => s + a.node.value, 0);
+      arcs.forEach(a => {
+        const angleDiff = a.end - a.start;
+        if (angleDiff < 0.3) return;
+        const midAngle = (a.start + a.end) / 2;
+        const lr = (innerR + outerR) / 2;
+        const lx = cx + lr * Math.cos(midAngle);
+        const ly = cy + lr * Math.sin(midAngle);
+        const pct = ((a.node.value / total) * 100).toFixed(0) + '%';
+        let text = a.node.name;
+        if (text.length > 10 && angleDiff < 0.7) text = text.substring(0, 8) + '..';
+        text += ' ' + pct;
+
+        const lbl = document.createElementNS(ns, 'text');
+        lbl.setAttribute('x', String(lx)); lbl.setAttribute('y', String(ly));
+        lbl.setAttribute('text-anchor', 'middle'); lbl.setAttribute('dominant-baseline', 'central');
+        lbl.setAttribute('fill', textColor); lbl.setAttribute('font-size', '11');
+        lbl.setAttribute('font-weight', '600'); lbl.setAttribute('pointer-events', 'none');
+        lbl.textContent = text;
+        lbl.style.opacity = '0'; lbl.style.transition = 'opacity 0.3s ease';
+        setTimeout(() => { lbl.style.opacity = '1'; }, dur + 50);
+        lblLayer.appendChild(lbl);
+      });
+    }
+
+    // ── State ──
+    let arcPaths = []; // reusable SVG path elements
+    let currentArcs = []; // {start, end, node, color}
+
+    // ── Render a level ──
+    function renderLevel(node, prevArcData, entrance) {
+      if (animating) return;
+      currentNode = node;
+      const children = node.children || [];
+      if (children.length === 0) return;
+
+      const newArcs = computeArcs(children);
+      const toData = newArcs.map(a => ({ start: a.start, end: a.end, color: a.node.color }));
+
+      // Hide labels during animation
+      while (lblLayer.firstChild) lblLayer.removeChild(lblLayer.firstChild);
+
+      if (prevArcData && prevArcData.length > 0) {
+        animating = true;
+        morphArcs(prevArcData, toData, arcPaths, () => {
+          animating = false;
+          currentArcs = toData;
+          drawLabels(newArcs);
+          attachClickHandlers(newArcs);
+        });
+      } else if (entrance) {
+        // Sweep-in from zero
+        const zeroData = toData.map(() => ({ start: -Math.PI / 2, end: -Math.PI / 2, color: '#ccc' }));
+        animating = true;
+        morphArcs(zeroData, toData, arcPaths, () => {
+          animating = false;
+          currentArcs = toData;
+          drawLabels(newArcs);
+          attachClickHandlers(newArcs);
+        });
+      }
+
+      drawCenter(node);
+    }
+
+    // ── Attach click + hover to arc paths ──
+    function attachClickHandlers(arcs) {
+      arcs.forEach((a, i) => {
+        if (i >= arcPaths.length) return;
+        const p = arcPaths[i];
+        // Clone to remove old listeners
+        const newP = p.cloneNode(true);
+        arcLayer.replaceChild(newP, p);
+        arcPaths[i] = newP;
+
+        const hasChildren = a.node.children && a.node.children.length > 0;
+        newP.style.cursor = hasChildren ? 'pointer' : 'default';
+
+        // Hover
+        newP.addEventListener('mouseenter', () => {
+          if (animating) return;
+          const midAngle = (a.start + a.end) / 2;
+          newP.style.transform = 'translate(' + (Math.cos(midAngle) * 4) + 'px,' + (Math.sin(midAngle) * 4) + 'px)';
+          newP.style.transformOrigin = cx + 'px ' + cy + 'px';
+          newP.setAttribute('fill-opacity', '1');
+          // Dim siblings
+          arcPaths.forEach((sp, si) => { if (si !== i && si < arcs.length) sp.setAttribute('fill-opacity', '0.45'); });
+        });
+        newP.addEventListener('mouseleave', () => {
+          newP.style.transform = '';
+          newP.setAttribute('fill-opacity', '0.9');
+          arcPaths.forEach((sp, si) => { if (si < arcs.length) sp.setAttribute('fill-opacity', '0.9'); });
+        });
+
+        // Click to drill down
+        if (hasChildren) {
+          newP.addEventListener('click', () => {
+            if (animating) return;
+            // Collapse all arcs into the clicked arc's range
+            const collapsed = currentArcs.map(() => ({
+              start: a.start, end: a.end, color: a.node.color
+            }));
+            renderLevel(a.node, collapsed, false);
+          });
+        }
+      });
+    }
+
+    // ── Drill up ──
+    function drillUp() {
+      if (animating || currentNode === treeData) return;
+      const parent = treeData; // only 2 levels in preview data
+      // Find where current node sits in parent
+      const parentArcs = computeArcs(parent.children);
+      const myArc = parentArcs.find(a => a.node.name === currentNode.name);
+      if (!myArc) { renderLevel(parent, [], true); return; }
+
+      // Current children should collapse into myArc's range
+      const totalRange = myArc.end - myArc.start;
+      const childArcs = computeArcs(currentNode.children);
+      const collapsedFrom = childArcs.map(a => {
+        const normStart = (a.start - childArcs[0].start) / (2 * Math.PI - gap * childArcs.length + gap);
+        const normEnd   = (a.end   - childArcs[0].start) / (2 * Math.PI - gap * childArcs.length + gap);
+        return {
+          start: myArc.start + normStart * totalRange,
+          end:   myArc.start + normEnd   * totalRange,
+          color: a.node.color
+        };
+      });
+
+      renderLevel(parent, collapsedFrom, false);
+    }
+
+    // ── Initial render ──
+    renderLevel(treeData, null, true);
+  }
+
+  buildInteractiveDonut('donut-preview-light', false);
+  buildInteractiveDonut('donut-preview-dark', true);
 })();
 </script>
 

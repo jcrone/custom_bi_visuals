@@ -1,5 +1,5 @@
 {
-		"version": "1.0.0.0",
+		"version": "1.0.1.0",
 		"author": {"name":"Jamie Crone","email":"jamie@example.com"},
 		"resources": [
 			{
@@ -8,7 +8,7 @@
 				"file": "resources/ridgechartA6B7C8D9E0F1A2B3C4D5E6F7A8B9C0D1.pbiviz.json"
 			}
 		],
-		"visual": {"name":"ridgechart","displayName":"Ridge Chart","guid":"ridgechartA6B7C8D9E0F1A2B3C4D5E6F7A8B9C0D1","visualClassName":"Visual","version":"1.0.0.0","description":"A terrain-style stacked ridge chart showing overlapping area distributions across categories","supportUrl":"https://github.com/jamie-crone/powerbi-visuals","gitHubUrl":""},
+		"visual": {"name":"ridgechart","displayName":"Ridge Chart","guid":"ridgechartA6B7C8D9E0F1A2B3C4D5E6F7A8B9C0D1","visualClassName":"Visual","version":"1.0.1.0","description":"A terrain-style stacked ridge chart showing overlapping area distributions across categories","supportUrl":"https://github.com/jamie-crone/powerbi-visuals","gitHubUrl":""},
 		"metadata": {
 			"pbivizjson": {
 				"resourceId": "rId0"

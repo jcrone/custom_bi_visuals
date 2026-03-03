@@ -1,11 +1,11 @@
 {
     "visual": {
-        "name": "pulsemap",
-        "displayName": "Pulse Map",
-        "guid": "pulsemapE4F5A6B7C8D9E0F1A2B3C4D5E6F7A8B9",
+        "name": "drilldowndonut",
+        "displayName": "Drilldown Donut",
+        "guid": "drilldowndonutB1C2D3E4F5A6B7C8D9E0F1A2B3C4D5E6",
         "visualClassName": "Visual",
         "version": "1.0.1.0",
-        "description": "An EKG-style heartbeat chart showing activity pulses per entity across time periods",
+        "description": "A ZoomCharts-style drilldown donut chart that shows one hierarchy level at a time with animated arc transitions",
         "supportUrl": "https://github.com/jamie-crone/powerbi-visuals",
         "gitHubUrl": ""
     },

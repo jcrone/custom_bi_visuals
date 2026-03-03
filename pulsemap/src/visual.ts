@@ -94,14 +94,18 @@ export class Visual implements IVisual {
         const plotH = Math.max(40, height - margin.top - margin.bottom);
 
         this.svg.attr("width", width).attr("height", height);
-        this.svg.selectAll("*").remove();
+        this.svg.selectAll("*").interrupt().remove();
+        this.tooltip.style("opacity", "0");
 
         const g = this.svg.append("g")
             .attr("transform", `translate(${margin.left},${margin.top})`);
 
         const rowSpacing = layoutS.rowSpacing.value;
         const rowHeight = Math.max(20, (plotH - rowSpacing * (rows.length - 1)) / rows.length);
-        const maxValue = Math.max(...rows.flatMap(r => r.values), 1);
+        let maxValue = 1;
+        for (const r of rows) {
+            for (const v of r.values) { if (v > maxValue) maxValue = v; }
+        }
         const spikeH = rowHeight * 0.42;
         const periodSpacing = periods.length > 1 ? plotW / (periods.length - 1) : plotW;
         const spikeWidthPct = pulseS.spikeWidth.value / 100;
@@ -202,9 +206,10 @@ export class Visual implements IVisual {
                         const dist = Math.abs(mx - px);
                         if (dist < nearestDist) { nearestDist = dist; nearestIdx = i; }
                     }
+                    const rect = this.target.getBoundingClientRect();
                     this.showTooltip(
-                        tooltipDiv, row.name, periods[nearestIdx], row.values[nearestIdx],
-                        event.offsetX + 14, event.offsetY - 30
+                        tooltipDiv, row.name, periods[nearestIdx], row.values[nearestIdx] ?? 0,
+                        event.clientX - rect.left + 14, event.clientY - rect.top - 30
                     );
                 });
 
@@ -279,7 +284,7 @@ export class Visual implements IVisual {
     }
 
     private renderMessage(message: string): void {
-        this.svg.selectAll("*").remove();
+        this.svg.selectAll("*").interrupt().remove();
         this.svg.attr("width", "100%").attr("height", "100%");
         this.svg.append("text")
             .attr("class", "pulse-message")

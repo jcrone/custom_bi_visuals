@@ -1,0 +1,17 @@
+{
+		"version": "1.0.1.0",
+		"author": {"name":"Jamie Crone","email":"jamie@example.com"},
+		"resources": [
+			{
+				"resourceId": "rId0",
+				"sourceType": 5,
+				"file": "resources/drilldowndonutB1C2D3E4F5A6B7C8D9E0F1A2B3C4D5E6.pbiviz.json"
+			}
+		],
+		"visual": {"name":"drilldowndonut","displayName":"Drilldown Donut","guid":"drilldowndonutB1C2D3E4F5A6B7C8D9E0F1A2B3C4D5E6","visualClassName":"Visual","version":"1.0.1.0","description":"A ZoomCharts-style drilldown donut chart that shows one hierarchy level at a time with animated arc transitions","supportUrl":"https://github.com/jamie-crone/powerbi-visuals","gitHubUrl":""},
+		"metadata": {
+			"pbivizjson": {
+				"resourceId": "rId0"
+			}
+		}
+	}

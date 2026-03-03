@@ -1,0 +1,73 @@
+{
+    "dataRoles": [
+        {
+            "displayName": "Level 1",
+            "name": "level1",
+            "kind": "Grouping",
+            "description": "Top-level categories shown on first view"
+        },
+        {
+            "displayName": "Level 2",
+            "name": "level2",
+            "kind": "Grouping",
+            "description": "Children revealed when drilling into a Level 1 segment"
+        },
+        {
+            "displayName": "Level 3",
+            "name": "level3",
+            "kind": "Grouping",
+            "description": "Optional third level for deeper drill-down"
+        },
+        {
+            "displayName": "Values",
+            "name": "values",
+            "kind": "Measure",
+            "description": "Arc sizing — the measure that determines segment size"
+        }
+    ],
+    "objects": {
+        "donut": {
+            "properties": {
+                "innerRadius": { "type": { "numeric": true } },
+                "arcGap": { "type": { "numeric": true } },
+                "fillOpacity": { "type": { "numeric": true } },
+                "strokeWidth": { "type": { "numeric": true } }
+            }
+        },
+        "labels": {
+            "properties": {
+                "show": { "type": { "bool": true } },
+                "fontSize": { "type": { "numeric": true } },
+                "showPercentages": { "type": { "bool": true } }
+            }
+        },
+        "layout": {
+            "properties": {
+                "darkMode": { "type": { "bool": true } }
+            }
+        }
+    },
+    "dataViewMappings": [
+        {
+            "conditions": [
+                { "level1": { "max": 1 }, "level2": { "max": 1 }, "level3": { "max": 1 }, "values": { "max": 1 } }
+            ],
+            "categorical": {
+                "categories": {
+                    "select": [
+                        { "for": { "in": "level1" } },
+                        { "for": { "in": "level2" } },
+                        { "for": { "in": "level3" } }
+                    ],
+                    "dataReductionAlgorithm": { "top": { "count": 10000 } }
+                },
+                "values": {
+                    "select": [
+                        { "bind": { "to": "values" } }
+                    ]
+                }
+            }
+        }
+    ],
+    "privileges": []
+}

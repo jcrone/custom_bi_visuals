@@ -111,7 +111,8 @@ export class Visual implements IVisual {
         const labelS = this.formattingSettings.labelSettings;
 
         this.svg.attr("width", width).attr("height", height);
-        this.svg.selectAll("*").remove();
+        this.svg.selectAll("*").interrupt().remove();
+        this.tooltip.style("opacity", "0");
 
         const cx = width / 2;
         const cy = height / 2;
@@ -224,7 +225,6 @@ export class Visual implements IVisual {
         });
 
         // Draw nodes and labels
-        const allNodeEls: d3.Selection<SVGCircleElement, unknown, null, undefined>[] = [];
         const drawNodes = (nodes: HiveNode[], labelSide: number) => {
             nodes.forEach(node => {
                 const circle = g.append("circle")
@@ -238,8 +238,7 @@ export class Visual implements IVisual {
                     .attr("stroke-width", 2)
                     .attr("opacity", 0);
 
-                circle.transition().delay(800 + node.index * 60).duration(300).attr("opacity", 1);
-                allNodeEls.push(circle);
+                circle.transition("entrance").delay(800 + node.index * 60).duration(300).attr("opacity", 1);
 
                 if (labelS.showLabels.value) {
                     g.append("text")
@@ -252,28 +251,34 @@ export class Visual implements IVisual {
                         .text(node.name);
                 }
 
-                // Node hover
+                // Node hover — hit target with tooltip on enter + move
                 g.append("circle")
                     .attr("cx", node.x).attr("cy", node.y)
                     .attr("r", 14).attr("fill", "transparent")
                     .style("cursor", "pointer")
-                    .on("mouseenter", () => {
+                    .on("mouseenter", (event: MouseEvent) => {
                         arcEls.forEach(a => {
                             const connected = a.link.source.name === node.name
                                 || a.link.dest.name === node.name;
-                            a.el.transition().duration(150)
+                            a.el.transition("hover").duration(150)
                                 .attr("opacity", connected ? Math.min(opacity + 0.3, 1) : 0.05);
                         });
+                        circle.transition("hover").duration(150).attr("r", nodeRadius + 2);
+                        const rect = this.target.getBoundingClientRect();
+                        this.showTooltip(tooltipDiv, node.name, node.total,
+                            event.clientX - rect.left + 14, event.clientY - rect.top - 30);
                     })
                     .on("mouseleave", () => {
                         arcEls.forEach(a => {
-                            a.el.transition().duration(150).attr("opacity", opacity);
+                            a.el.transition("hover").duration(150).attr("opacity", opacity);
                         });
+                        circle.transition("hover").duration(150).attr("r", nodeRadius);
                         tooltipDiv.style("opacity", "0");
                     })
                     .on("mousemove", (event: MouseEvent) => {
+                        const rect = this.target.getBoundingClientRect();
                         this.showTooltip(tooltipDiv, node.name, node.total,
-                            event.offsetX + 14, event.offsetY - 30);
+                            event.clientX - rect.left + 14, event.clientY - rect.top - 30);
                     });
             });
         };
@@ -314,7 +319,7 @@ export class Visual implements IVisual {
     }
 
     private renderMessage(message: string): void {
-        this.svg.selectAll("*").remove();
+        this.svg.selectAll("*").interrupt().remove();
         this.svg.attr("width", "100%").attr("height", "100%");
         this.svg.append("text")
             .attr("class", "hive-message")
