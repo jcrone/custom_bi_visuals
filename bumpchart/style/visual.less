@@ -1,0 +1,107 @@
+@brand-blue: #00539A;
+@brand-blue2: #004896;
+@brand-gold: #FDB945;
+@brand-navy: #11284C;
+@border-color: #D9E1EA;
+@grid-color: #E8EEF5;
+@text-secondary: #3E556E;
+@text-muted: #6B7F93;
+@font-family: "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+
+.bump-chart {
+    width: 100%;
+    height: 100%;
+    font-family: @font-family;
+    overflow: visible;
+}
+
+/* ── Grid lines ── */
+.bump-grid {
+    stroke: @grid-color;
+    stroke-width: 1;
+    stroke-dasharray: 4 3;
+}
+
+/* ── Period labels (x-axis) ── */
+.bump-period {
+    font-size: 11px;
+    font-weight: 600;
+    fill: @text-secondary;
+    letter-spacing: 0.3px;
+}
+
+/* ── Rank numbers ── */
+.bump-rank-num {
+    font-size: 10px;
+    font-weight: 700;
+    fill: @text-muted;
+}
+
+/* ── Series lines ── */
+.bump-line {
+    transition: opacity 0.2s ease;
+}
+
+/* ── Data points ── */
+.bump-dot {
+    transition: opacity 0.2s ease, r 0.15s ease;
+
+    &:hover {
+        r: 7;
+    }
+}
+
+/* ── Series labels ── */
+.bump-label {
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    transition: opacity 0.2s ease;
+}
+
+.bump-label--start {
+    font-size: 11px;
+}
+
+.bump-label--end {
+    font-size: 11px;
+}
+
+/* ── Tooltip ── */
+.bump-tooltip {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    background: @brand-navy;
+    color: #FFFFFF;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-family: @font-family;
+    line-height: 1.5;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    z-index: 100;
+    white-space: nowrap;
+    transition: opacity 0.15s ease;
+
+    strong {
+        font-weight: 700;
+    }
+}
+
+/* ── Empty state message ── */
+.bump-message {
+    font-size: 13px;
+    font-weight: 600;
+    fill: @text-muted;
+    font-family: @font-family;
+}
+
+/* ── Entrance animation ── */
+.bump-chart {
+    animation: bumpFadeIn 0.4s ease both;
+}
+
+@keyframes bumpFadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}

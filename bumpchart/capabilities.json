@@ -1,0 +1,97 @@
+{
+    "dataRoles": [
+        {
+            "displayName": "Axis",
+            "name": "axis",
+            "kind": "Grouping",
+            "description": "Time periods or categories for the x-axis (e.g. months, quarters)"
+        },
+        {
+            "displayName": "Legend",
+            "name": "legend",
+            "kind": "Grouping",
+            "description": "Entities to rank (e.g. products, regions, people)"
+        },
+        {
+            "displayName": "Values",
+            "name": "values",
+            "kind": "Measure",
+            "description": "Measure used to compute rankings per period"
+        }
+    ],
+    "objects": {
+        "lines": {
+            "properties": {
+                "lineWidth": {
+                    "type": { "numeric": true }
+                },
+                "smoothCurve": {
+                    "type": { "bool": true }
+                },
+                "dimOpacity": {
+                    "type": { "numeric": true }
+                }
+            }
+        },
+        "labels": {
+            "properties": {
+                "showStartLabels": {
+                    "type": { "bool": true }
+                },
+                "showEndLabels": {
+                    "type": { "bool": true }
+                },
+                "fontSize": {
+                    "type": { "numeric": true }
+                }
+            }
+        },
+        "dataPoints": {
+            "properties": {
+                "showDots": {
+                    "type": { "bool": true }
+                },
+                "dotSize": {
+                    "type": { "numeric": true }
+                }
+            }
+        },
+        "rankAxis": {
+            "properties": {
+                "showRankNumbers": {
+                    "type": { "bool": true }
+                },
+                "showGridLines": {
+                    "type": { "bool": true }
+                }
+            }
+        }
+    },
+    "dataViewMappings": [
+        {
+            "conditions": [
+                {
+                    "axis": { "max": 1 },
+                    "legend": { "max": 1 },
+                    "values": { "max": 1 }
+                }
+            ],
+            "categorical": {
+                "categories": {
+                    "for": { "in": "axis" },
+                    "dataReductionAlgorithm": { "top": { "count": 10000 } }
+                },
+                "values": {
+                    "group": {
+                        "by": "legend",
+                        "select": [
+                            { "bind": { "to": "values" } }
+                        ],
+                        "dataReductionAlgorithm": { "top": { "count": 100 } }
+                    }
+                }
+            }
+        }
+    ],
+    "privileges": []
+}
