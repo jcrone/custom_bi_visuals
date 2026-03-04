@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280,height=720">
+<title>Custom Power BI Visuals — Promo Reel</title>
+<style>
+/* ── Reset + Base ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --blue: #00539A;
+  --blue2: #004896;
+  --gold: #FDB945;
+  --navy: #11284C;
+  --bg-dark: #0B1220;
+  --panel-dark: #0F1A2E;
+  --text-light: #F2F5F8;
+  --text-muted: #94A6B8;
+  --border-dark: #22324B;
+}
+
+body {
+  width: 1280px;
+  height: 720px;
+  overflow: hidden;
+  background: var(--bg-dark);
+  font-family: "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+  color: var(--text-light);
+}
+
+/* ── Scene system ── */
+.scene {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.8s ease;
+}
+.scene.active { opacity: 1; pointer-events: auto; }
+.scene.fade-out { opacity: 0; }
+
+/* ── Scene 1: Title card ── */
+.title-card {
+  text-align: center;
+}
+.title-card__badge {
+  display: inline-block;
+  background: rgba(253,185,69,0.12);
+  color: var(--gold);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  padding: 6px 20px;
+  border-radius: 20px;
+  border: 1px solid rgba(253,185,69,0.25);
+  margin-bottom: 28px;
+  opacity: 0; transform: translateY(14px);
+  animation: slideUp 0.6s 0.4s ease forwards;
+}
+.title-card__heading {
+  font-size: 56px;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -1.5px;
+  margin-bottom: 20px;
+  opacity: 0; transform: translateY(20px);
+  animation: slideUp 0.7s 0.7s ease forwards;
+}
+.title-card__heading span { color: var(--gold); }
+.title-card__sub {
+  font-size: 20px;
+  font-weight: 400;
+  color: var(--text-muted);
+  max-width: 540px;
+  margin: 0 auto;
+  line-height: 1.5;
+  opacity: 0; transform: translateY(14px);
+  animation: slideUp 0.6s 1.0s ease forwards;
+}
+.title-card__line {
+  width: 80px; height: 3px;
+  background: var(--gold);
+  border-radius: 2px;
+  margin: 28px auto 0;
+  opacity: 0; transform: scaleX(0);
+  animation: lineGrow 0.6s 1.3s ease forwards;
+}
+.title-card__count {
+  margin-top: 32px;
+  display: flex;
+  gap: 48px;
+  justify-content: center;
+  opacity: 0;
+  animation: fadeIn 0.6s 1.6s ease forwards;
+}
+.title-card__count-item {
+  text-align: center;
+}
+.title-card__count-num {
+  font-size: 42px;
+  font-weight: 700;
+  color: var(--gold);
+}
+.title-card__count-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* ── Visual showcase scenes ── */
+.showcase {
+  width: 100%; height: 100%;
+  display: flex;
+}
+.showcase__info {
+  width: 380px;
+  padding: 60px 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: var(--panel-dark);
+  border-right: 1px solid var(--border-dark);
+  flex-shrink: 0;
+}
+.showcase__num {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 16px;
+  opacity: 0; transform: translateX(-20px);
+}
+.showcase__name {
+  font-size: 38px;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.8px;
+  margin-bottom: 18px;
+  opacity: 0; transform: translateX(-20px);
+}
+.showcase__desc {
+  font-size: 15px;
+  color: var(--text-muted);
+  line-height: 1.65;
+  margin-bottom: 28px;
+  opacity: 0; transform: translateX(-20px);
+}
+.showcase__fields {
+  list-style: none;
+}
+.showcase__fields li {
+  font-size: 13px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--border-dark);
+  color: var(--text-muted);
+  opacity: 0; transform: translateX(-14px);
+}
+.showcase__fields li:last-child { border-bottom: none; }
+.showcase__fields strong {
+  color: var(--text-light);
+  font-weight: 600;
+  margin-right: 8px;
+}
+
+.showcase__visual {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  position: relative;
+  overflow: hidden;
+}
+.showcase__visual svg {
+  opacity: 0;
+  transform: scale(0.92);
+}
+
+/* Active scene text animations */
+.scene.active .showcase__num   { animation: slideRight 0.5s 0.2s ease forwards; }
+.scene.active .showcase__name  { animation: slideRight 0.6s 0.4s ease forwards; }
+.scene.active .showcase__desc  { animation: slideRight 0.6s 0.6s ease forwards; }
+.scene.active .showcase__fields li:nth-child(1) { animation: slideRight 0.4s 0.8s ease forwards; }
+.scene.active .showcase__fields li:nth-child(2) { animation: slideRight 0.4s 0.9s ease forwards; }
+.scene.active .showcase__fields li:nth-child(3) { animation: slideRight 0.4s 1.0s ease forwards; }
+.scene.active .showcase__visual svg { animation: zoomIn 0.8s 0.5s ease forwards; }
+
+/* ── Scene 5: Outro ── */
+.outro {
+  text-align: center;
+}
+.outro__heading {
+  font-size: 44px;
+  font-weight: 700;
+  letter-spacing: -1px;
+  margin-bottom: 16px;
+  opacity: 0; transform: scale(0.9);
+}
+.outro__heading span { color: var(--gold); }
+.outro__sub {
+  font-size: 18px;
+  color: var(--text-muted);
+  margin-bottom: 36px;
+  opacity: 0; transform: translateY(12px);
+}
+.outro__cards {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+  margin-bottom: 40px;
+}
+.outro__card {
+  background: var(--panel-dark);
+  border: 1px solid var(--border-dark);
+  border-radius: 12px;
+  padding: 24px 28px;
+  text-align: center;
+  width: 200px;
+  opacity: 0; transform: translateY(20px);
+}
+.outro__card-icon {
+  width: 40px; height: 40px;
+  margin: 0 auto 12px;
+}
+.outro__card-name {
+  font-size: 15px;
+  font-weight: 700;
+}
+.outro__cta {
+  display: inline-block;
+  background: var(--gold);
+  color: var(--navy);
+  font-size: 14px;
+  font-weight: 700;
+  padding: 12px 32px;
+  border-radius: 8px;
+  letter-spacing: 0.5px;
+  opacity: 0; transform: translateY(12px);
+}
+
+.scene.active .outro__heading { animation: zoomIn 0.7s 0.2s ease forwards; }
+.scene.active .outro__sub     { animation: slideUp 0.5s 0.5s ease forwards; }
+.scene.active .outro__card:nth-child(1) { animation: slideUp 0.5s 0.7s ease forwards; }
+.scene.active .outro__card:nth-child(2) { animation: slideUp 0.5s 0.85s ease forwards; }
+.scene.active .outro__card:nth-child(3) { animation: slideUp 0.5s 1.0s ease forwards; }
+.scene.active .outro__cta { animation: slideUp 0.5s 1.3s ease forwards; }
+
+/* ── Progress bar ── */
+.progress-bar {
+  position: fixed;
+  bottom: 0; left: 0;
+  height: 4px;
+  background: var(--gold);
+  width: 0;
+  z-index: 100;
+  transition: width 0.3s linear;
+}
+
+/* ── Keyframes ── */
+@keyframes slideUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideRight {
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+@keyframes lineGrow {
+  to { opacity: 1; transform: scaleX(1); }
+}
+@keyframes zoomIn {
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* ── Decorative glow ── */
+.glow {
+  position: absolute;
+  width: 300px; height: 300px;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.08;
+  pointer-events: none;
+}
+.glow--blue { background: var(--blue); top: -100px; right: -60px; }
+.glow--gold { background: var(--gold); bottom: -80px; left: -60px; }
+</style>
+</head>
+<body>
+
+<!-- Progress bar -->
+<div class="progress-bar" id="progress"></div>
+
+<!-- ═══ SCENE 1: TITLE CARD ═══ -->
+<div class="scene active" id="scene-0">
+  <div class="glow glow--blue"></div>
+  <div class="glow glow--gold"></div>
+  <div class="title-card">
+    <div class="title-card__badge">New Release</div>
+    <h1 class="title-card__heading">
+      Custom Power BI<br><span>Visuals</span>
+    </h1>
+    <p class="title-card__sub">
+      Three bold, original chart types that go far beyond standard visuals — built for clarity, storytelling, and impact.
+    </p>
+    <div class="title-card__line"></div>
+    <div class="title-card__count">
+      <div class="title-card__count-item">
+        <div class="title-card__count-num">3</div>
+        <div class="title-card__count-label">New Visuals</div>
+      </div>
+      <div class="title-card__count-item">
+        <div class="title-card__count-num">D3</div>
+        <div class="title-card__count-label">Animated</div>
+      </div>
+      <div class="title-card__count-item">
+        <div class="title-card__count-num">.pbiviz</div>
+        <div class="title-card__count-label">Ready to Import</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCENE 2: PULSE MAP ═══ -->
+<div class="scene" id="scene-1">
+  <div class="showcase">
+    <div class="showcase__info">
+      <div class="showcase__num">Visual 01</div>
+      <h2 class="showcase__name">Pulse Map</h2>
+      <p class="showcase__desc">
+        EKG-style heartbeat traces where each entity pulses with activity.
+        Big spikes mean big values. Flatlines mean silence. Instantly spot
+        who's performing and the rhythm of their output.
+      </p>
+      <ul class="showcase__fields">
+        <li><strong>Entity</strong> Each row is an entity trace</li>
+        <li><strong>Axis</strong> Time periods along the pulse</li>
+        <li><strong>Values</strong> Spike height = value magnitude</li>
+      </ul>
+    </div>
+    <div class="showcase__visual" id="pulse-vis">
+      <div class="glow glow--blue"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCENE 3: HIVE PLOT ═══ -->
+<div class="scene" id="scene-2">
+  <div class="showcase">
+    <div class="showcase__info">
+      <div class="showcase__num">Visual 02</div>
+      <h2 class="showcase__name">Hive Plot</h2>
+      <p class="showcase__desc">
+        A radial connection web with two axes — sources on the left,
+        destinations on the right. Curved arcs reveal weighted relationships
+        that tables and bar charts completely miss.
+      </p>
+      <ul class="showcase__fields">
+        <li><strong>Source</strong> Origin entities on left axis</li>
+        <li><strong>Destination</strong> Target entities on right axis</li>
+        <li><strong>Weight</strong> Arc thickness = connection strength</li>
+      </ul>
+    </div>
+    <div class="showcase__visual" id="hive-vis">
+      <div class="glow glow--gold"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCENE 4: RIDGE CHART ═══ -->
+<div class="scene" id="scene-3">
+  <div class="showcase">
+    <div class="showcase__info">
+      <div class="showcase__num">Visual 03</div>
+      <h2 class="showcase__name">Ridge Chart</h2>
+      <p class="showcase__desc">
+        Overlapping terrain ridges inspired by Joy Division's iconic album art.
+        Each series becomes a smooth mountain shape layered front-to-back.
+        Includes dark mode for the classic look.
+      </p>
+      <ul class="showcase__fields">
+        <li><strong>Series</strong> Each ridge is a category row</li>
+        <li><strong>Axis</strong> X-axis points within each ridge</li>
+        <li><strong>Values</strong> Ridge height = area shape</li>
+      </ul>
+    </div>
+    <div class="showcase__visual" id="ridge-vis">
+      <div class="glow glow--blue"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCENE 5: OUTRO ═══ -->
+<div class="scene" id="scene-4">
+  <div class="glow glow--blue"></div>
+  <div class="glow glow--gold"></div>
+  <div class="outro">
+    <h2 class="outro__heading">Ready to <span>Import</span></h2>
+    <p class="outro__sub">Drop the .pbiviz files into your Power BI reports and start visualizing.</p>
+    <div class="outro__cards">
+      <div class="outro__card">
+        <svg class="outro__card-icon" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+          <line x1="4" y1="20" x2="12" y2="20" stroke="#00539A" stroke-width="2" stroke-linecap="round"/>
+          <polyline points="12,20 14,20 16,26 18,8 20,28 22,20 24,20" fill="none" stroke="#00539A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <line x1="24" y1="20" x2="36" y2="20" stroke="#00539A" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <div class="outro__card-name">Pulse Map</div>
+      </div>
+      <div class="outro__card">
+        <svg class="outro__card-icon" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="20" cy="20" r="2" fill="#FDB945"/>
+          <circle cx="10" cy="10" r="3" fill="#00539A"/>
+          <circle cx="30" cy="10" r="3" fill="#FFF" stroke="#6B7F93" stroke-width="1.5"/>
+          <path d="M10,10 Q20,20 30,10" fill="none" stroke="#00539A" stroke-width="2" opacity="0.6"/>
+          <circle cx="10" cy="18" r="3" fill="#004896"/>
+          <circle cx="30" cy="18" r="3" fill="#FFF" stroke="#6B7F93" stroke-width="1.5"/>
+          <path d="M10,18 Q20,20 30,18" fill="none" stroke="#004896" stroke-width="2" opacity="0.6"/>
+        </svg>
+        <div class="outro__card-name">Hive Plot</div>
+      </div>
+      <div class="outro__card">
+        <svg class="outro__card-icon" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="2" width="36" height="36" rx="4" fill="#0B1220"/>
+          <path d="M4,32 C10,32 14,20 20,24 C26,28 30,22 36,22" fill="none" stroke="#F2F5F8" stroke-width="1.8"/>
+          <path d="M4,26 C10,26 14,14 20,18 C26,22 30,16 36,16" fill="none" stroke="#C9D3DD" stroke-width="1.8"/>
+          <path d="M4,20 C10,20 14,8 20,12 C26,16 30,10 36,10" fill="none" stroke="#94A6B8" stroke-width="1.8"/>
+        </svg>
+        <div class="outro__card-name">Ridge Chart</div>
+      </div>
+    </div>
+    <div class="outro__cta">Import into Power BI</div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════
+//  SVG BUILDERS (inline for the promo)
+// ════════════════════════════════════════
+const NS = 'http://www.w3.org/2000/svg';
+
+function buildPulseMap(container) {
+  const periods = ['W1','W2','W3','W4','W5','W6','W7','W8','W9','W10','W11','W12'];
+  const data = {
+    'Sarah':  [320,180,450,0,280,520,150,0,380,290,410,350],
+    'Marcus': [180,0,220,340,0,180,400,280,0,150,320,0],
+    'Jun':    [420,380,310,280,350,400,320,380,420,350,310,450],
+    'Priya':  [0,120,0,0,480,380,0,200,0,520,0,280],
+    'Alex':   [280,240,190,310,260,220,350,280,320,280,240,300]
+  };
+  const pal = ['#00539A','#2F6FB3','#004896','#FDB945','#11284C'];
+  const names = Object.keys(data);
+  const w = 820, h = 420;
+  const lw = 70, tm = 30, rm = 20;
+  const pw = w - lw - rm, ph = h - tm - 10;
+  const rh = ph / names.length;
+  const maxV = Math.max(...Object.values(data).flat());
+  const sH = rh * 0.42;
+  const sp = pw / (periods.length - 1);
+  const hs = sp * 0.12;
+
+  const svg = document.createElementNS(NS,'svg');
+  svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+  svg.setAttribute('width','100%');
+  svg.style.fontFamily = '"Segoe UI", system-ui, sans-serif';
+
+  // Period labels
+  periods.forEach((p,i) => {
+    if (i % 2 !== 0) return;
+    const t = document.createElementNS(NS,'text');
+    t.setAttribute('x', String(lw + (i/(periods.length-1))*pw));
+    t.setAttribute('y', String(tm - 8));
+    t.setAttribute('text-anchor','middle');
+    t.setAttribute('fill','#94A6B8');
+    t.setAttribute('font-size','11');
+    t.setAttribute('font-weight','600');
+    t.textContent = p;
+    svg.appendChild(t);
+  });
+
+  names.forEach((name,ri) => {
+    const by = tm + ri * rh + rh / 2;
+    const c = pal[ri % pal.length];
+    const vals = data[name];
+
+    // baseline
+    const bl = document.createElementNS(NS,'line');
+    bl.setAttribute('x1',String(lw)); bl.setAttribute('x2',String(lw+pw));
+    bl.setAttribute('y1',String(by)); bl.setAttribute('y2',String(by));
+    bl.setAttribute('stroke','#1A2942'); bl.setAttribute('stroke-width','1');
+    bl.setAttribute('stroke-dasharray','3 2');
+    svg.appendChild(bl);
+
+    // label
+    const lb = document.createElementNS(NS,'text');
+    lb.setAttribute('x',String(lw-10)); lb.setAttribute('y',String(by));
+    lb.setAttribute('text-anchor','end'); lb.setAttribute('dominant-baseline','central');
+    lb.setAttribute('fill',c); lb.setAttribute('font-size','13'); lb.setAttribute('font-weight','600');
+    lb.textContent = name;
+    svg.appendChild(lb);
+
+    // EKG path
+    let d = `M ${lw} ${by}`;
+    for (let i = 0; i < vals.length; i++) {
+      const x = lw + (i/(periods.length-1))*pw;
+      const n = maxV > 0 ? vals[i]/maxV : 0;
+      const pk = n * sH;
+      d += ` L ${x-hs*1.8} ${by}`;
+      d += ` L ${x-hs*1.1} ${by+3}`;
+      d += ` L ${x} ${by-pk}`;
+      d += ` L ${x+hs*0.7} ${by+4}`;
+      d += ` L ${x+hs*1.3} ${by-pk*0.1}`;
+      d += ` L ${x+hs*1.8} ${by}`;
+    }
+    d += ` L ${lw+pw} ${by}`;
+
+    const path = document.createElementNS(NS,'path');
+    path.setAttribute('d',d);
+    path.setAttribute('stroke',c);
+    path.setAttribute('stroke-width','2.5');
+    path.setAttribute('fill','none');
+    path.setAttribute('stroke-linecap','round');
+    path.setAttribute('stroke-linejoin','round');
+    svg.appendChild(path);
+
+    // animate
+    const len = path.getTotalLength();
+    path.setAttribute('stroke-dasharray', `${len} ${len}`);
+    path.setAttribute('stroke-dashoffset', String(len));
+    path.style.transition = 'stroke-dashoffset 2s linear';
+    setTimeout(() => path.setAttribute('stroke-dashoffset','0'), 800 + ri * 250);
+  });
+
+  container.appendChild(svg);
+}
+
+function buildHivePlot(container) {
+  const srcNames = ['Engineering','Design','Marketing','Sales'];
+  const dstNames = ['Alpha','Beta','Gamma','Delta','Epsilon'];
+  const conns = [
+    ['Engineering','Alpha',420],['Engineering','Beta',280],['Engineering','Gamma',150],['Engineering','Epsilon',90],
+    ['Design','Alpha',180],['Design','Beta',320],['Design','Delta',240],
+    ['Marketing','Beta',140],['Marketing','Gamma',380],['Marketing','Delta',200],['Marketing','Epsilon',160],
+    ['Sales','Alpha',300],['Sales','Delta',260],['Sales','Epsilon',340]
+  ];
+  const pal = ['#00539A','#11284C','#004896','#FDB945'];
+  const w = 780, h = 420;
+  const cx = w/2, cy = h/2, radius = 170;
+  const angle = 50 * Math.PI / 180;
+  const maxW = Math.max(...conns.map(c=>c[2]));
+
+  const svg = document.createElementNS(NS,'svg');
+  svg.setAttribute('viewBox',`0 0 ${w} ${h}`);
+  svg.setAttribute('width','100%');
+  svg.style.fontFamily = '"Segoe UI", system-ui, sans-serif';
+
+  function pt(a,t) {
+    const r = radius*0.15 + t*radius*0.85;
+    return [cx + r*Math.sin(a), cy - r*Math.cos(a)];
+  }
+
+  // axes
+  [[-angle,angle]].forEach(([a1,a2]) => {
+    [[a1,0,1],[a2,0,1]].forEach(([a,t0,t1]) => {
+      const [x1,y1]=pt(a,t0),[x2,y2]=pt(a,t1);
+      const l = document.createElementNS(NS,'line');
+      l.setAttribute('x1',String(x1)); l.setAttribute('y1',String(y1));
+      l.setAttribute('x2',String(x2)); l.setAttribute('y2',String(y2));
+      l.setAttribute('stroke','#22324B'); l.setAttribute('stroke-width','2');
+      l.setAttribute('stroke-linecap','round');
+      svg.appendChild(l);
+    });
+  });
+
+  // center
+  const cd = document.createElementNS(NS,'circle');
+  cd.setAttribute('cx',String(cx)); cd.setAttribute('cy',String(cy));
+  cd.setAttribute('r','4'); cd.setAttribute('fill','#FDB945');
+  svg.appendChild(cd);
+
+  const srcNodes = srcNames.map((n,i) => {
+    const t = srcNames.length>1 ? i/(srcNames.length-1) : 0.5;
+    const [x,y] = pt(-angle,t);
+    return {name:n,x,y,color:pal[i%pal.length]};
+  });
+  const dstNodes = dstNames.map((n,i) => {
+    const t = dstNames.length>1 ? i/(dstNames.length-1) : 0.5;
+    const [x,y] = pt(angle,t);
+    return {name:n,x,y};
+  });
+  const sMap = Object.fromEntries(srcNodes.map(n=>[n.name,n]));
+  const dMap = Object.fromEntries(dstNodes.map(n=>[n.name,n]));
+
+  // arcs
+  conns.forEach((conn,ci) => {
+    const src = sMap[conn[0]], dst = dMap[conn[1]];
+    if (!src||!dst) return;
+    const thick = Math.max(1.5, (conn[2]/maxW)*14);
+    const arc = document.createElementNS(NS,'path');
+    arc.setAttribute('d',`M ${src.x} ${src.y} Q ${cx} ${cy} ${dst.x} ${dst.y}`);
+    arc.setAttribute('stroke',src.color);
+    arc.setAttribute('stroke-width',String(thick));
+    arc.setAttribute('fill','none');
+    arc.setAttribute('opacity','0.45');
+    arc.setAttribute('stroke-linecap','round');
+    svg.appendChild(arc);
+    const al = arc.getTotalLength();
+    arc.setAttribute('stroke-dasharray',`${al} ${al}`);
+    arc.setAttribute('stroke-dashoffset',String(al));
+    arc.style.transition = 'stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1)';
+    setTimeout(() => arc.setAttribute('stroke-dashoffset','0'), 800 + ci*80);
+  });
+
+  // nodes + labels
+  srcNodes.forEach((n,i) => {
+    const c = document.createElementNS(NS,'circle');
+    c.setAttribute('cx',String(n.x)); c.setAttribute('cy',String(n.y));
+    c.setAttribute('r','6'); c.setAttribute('fill',n.color);
+    c.style.opacity='0'; c.style.transition='opacity 0.3s ease';
+    setTimeout(()=>{c.style.opacity='1';},1200+i*80);
+    svg.appendChild(c);
+    const lb = document.createElementNS(NS,'text');
+    lb.setAttribute('x',String(n.x-12)); lb.setAttribute('y',String(n.y));
+    lb.setAttribute('text-anchor','end'); lb.setAttribute('dominant-baseline','central');
+    lb.setAttribute('fill','#C9D3DD'); lb.setAttribute('font-size','13'); lb.setAttribute('font-weight','600');
+    lb.textContent = n.name;
+    lb.style.opacity='0'; lb.style.transition='opacity 0.3s ease';
+    setTimeout(()=>{lb.style.opacity='1';},1200+i*80);
+    svg.appendChild(lb);
+  });
+  dstNodes.forEach((n,i) => {
+    const c = document.createElementNS(NS,'circle');
+    c.setAttribute('cx',String(n.x)); c.setAttribute('cy',String(n.y));
+    c.setAttribute('r','6'); c.setAttribute('fill','#0F1A2E');
+    c.setAttribute('stroke','#94A6B8'); c.setAttribute('stroke-width','2');
+    c.style.opacity='0'; c.style.transition='opacity 0.3s ease';
+    setTimeout(()=>{c.style.opacity='1';},1200+i*80);
+    svg.appendChild(c);
+    const lb = document.createElementNS(NS,'text');
+    lb.setAttribute('x',String(n.x+12)); lb.setAttribute('y',String(n.y));
+    lb.setAttribute('text-anchor','start'); lb.setAttribute('dominant-baseline','central');
+    lb.setAttribute('fill','#C9D3DD'); lb.setAttribute('font-size','13'); lb.setAttribute('font-weight','600');
+    lb.textContent = n.name;
+    lb.style.opacity='0'; lb.style.transition='opacity 0.3s ease';
+    setTimeout(()=>{lb.style.opacity='1';},1200+i*80);
+    svg.appendChild(lb);
+  });
+
+  container.appendChild(svg);
+}
+
+function buildRidgeChart(container) {
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const data = {
+    '2023': [120,180,280,350,420,380,310,280,350,400,320,200],
+    '2024': [150,210,320,400,480,450,380,350,420,460,380,250],
+    '2025': [180,250,380,450,520,490,420,380,460,510,420,300],
+    '2026': [200,300,420,500,580,540,460,420,510,560,480,350]
+  };
+  const names = Object.keys(data);
+  const maxV = Math.max(...Object.values(data).flat());
+  const w = 780, h = 420;
+  const lw = 55, tm = 20, bm = 28, rm = 20;
+  const pw = w - lw - rm, ph = h - tm - bm;
+  const brh = ph / names.length;
+  const ridgeH = brh * 1.3;
+
+  const svg = document.createElementNS(NS,'svg');
+  svg.setAttribute('viewBox',`0 0 ${w} ${h}`);
+  svg.setAttribute('width','100%');
+  svg.style.fontFamily = '"Segoe UI", system-ui, sans-serif';
+
+  // bg
+  const bg = document.createElementNS(NS,'rect');
+  bg.setAttribute('width',String(w)); bg.setAttribute('height',String(h));
+  bg.setAttribute('fill','#0B1220'); bg.setAttribute('rx','8');
+  svg.appendChild(bg);
+
+  // x-axis
+  months.forEach((m,i) => {
+    if (i%2!==0) return;
+    const x = lw + (i/(months.length-1))*pw;
+    const t = document.createElementNS(NS,'text');
+    t.setAttribute('x',String(x)); t.setAttribute('y',String(h-8));
+    t.setAttribute('text-anchor','middle');
+    t.setAttribute('fill','#94A6B8'); t.setAttribute('font-size','10'); t.setAttribute('font-weight','600');
+    t.textContent = m;
+    svg.appendChild(t);
+  });
+
+  for (let ri = names.length-1; ri >= 0; ri--) {
+    const name = names[ri];
+    const vals = data[name];
+    const baseY = tm + (ri+1)*brh;
+
+    const pts = vals.map((v,i) => {
+      const x = lw + (i/(vals.length-1))*pw;
+      const y = baseY - (v/maxV)*ridgeH;
+      return [x,y];
+    });
+
+    // area path
+    let ad = `M ${lw} ${baseY}`;
+    ad += ` C ${pts[0][0]} ${pts[0][1]}`;
+    for (let i = 1; i < pts.length; i++) {
+      const cpx = (pts[i-1][0]+pts[i][0])/2;
+      ad += ` ${cpx} ${pts[i-1][1]} ${cpx} ${pts[i][1]} ${pts[i][0]} ${pts[i][1]}`;
+      if (i < pts.length-1) ad += ' C';
+    }
+    ad += ` L ${lw+pw} ${baseY} Z`;
+
+    // opaque mask
+    const mask = document.createElementNS(NS,'path');
+    mask.setAttribute('d',ad); mask.setAttribute('fill','#0B1220');
+    svg.appendChild(mask);
+
+    // color fill
+    const fill = document.createElementNS(NS,'path');
+    fill.setAttribute('d',ad); fill.setAttribute('fill','#00539A');
+    fill.setAttribute('opacity','0.12');
+    svg.appendChild(fill);
+
+    // stroke
+    let ld = `M ${pts[0][0]} ${pts[0][1]}`;
+    for (let i = 1; i < pts.length; i++) {
+      const cpx = (pts[i-1][0]+pts[i][0])/2;
+      ld += ` C ${cpx} ${pts[i-1][1]} ${cpx} ${pts[i][1]} ${pts[i][0]} ${pts[i][1]}`;
+    }
+    const line = document.createElementNS(NS,'path');
+    line.setAttribute('d',ld);
+    line.setAttribute('stroke','#F2F5F8');
+    line.setAttribute('stroke-width','2.5');
+    line.setAttribute('fill','none');
+    line.setAttribute('stroke-linecap','round');
+    svg.appendChild(line);
+
+    // animate
+    const len = line.getTotalLength();
+    line.setAttribute('stroke-dasharray',`${len} ${len}`);
+    line.setAttribute('stroke-dashoffset',String(len));
+    line.style.transition = 'stroke-dashoffset 1.6s cubic-bezier(0.4,0,0.2,1)';
+    setTimeout(() => line.setAttribute('stroke-dashoffset','0'), 800 + (names.length-1-ri)*200);
+
+    // label
+    const lb = document.createElementNS(NS,'text');
+    lb.setAttribute('x',String(lw-10));
+    lb.setAttribute('y',String(baseY - ridgeH*0.3));
+    lb.setAttribute('text-anchor','end'); lb.setAttribute('dominant-baseline','central');
+    lb.setAttribute('fill','#C9D3DD'); lb.setAttribute('font-size','13'); lb.setAttribute('font-weight','600');
+    lb.textContent = name;
+    svg.appendChild(lb);
+  }
+
+  container.appendChild(svg);
+}
+
+// ════════════════════════════════════════
+//  SCENE CONTROLLER
+// ════════════════════════════════════════
+const SCENE_DURATIONS = [4500, 6000, 6000, 6000, 5000]; // ms per scene
+const totalDuration = SCENE_DURATIONS.reduce((a,b)=>a+b,0);
+const scenes = document.querySelectorAll('.scene');
+const progress = document.getElementById('progress');
+let currentScene = 0;
+let startTime = Date.now();
+
+// Pre-build visuals (they auto-animate when scene becomes active)
+const visualBuilders = [null, buildPulseMap, buildHivePlot, buildRidgeChart, null];
+const visualContainers = [null, 'pulse-vis', 'hive-vis', 'ridge-vis', null];
+let built = {};
+
+function goToScene(idx) {
+  // Deactivate current
+  scenes[currentScene].classList.remove('active');
+  scenes[currentScene].classList.add('fade-out');
+
+  currentScene = idx;
+
+  // Build visual if needed
+  if (visualBuilders[idx] && !built[idx]) {
+    const cont = document.getElementById(visualContainers[idx]);
+    visualBuilders[idx](cont);
+    built[idx] = true;
+  }
+
+  // Activate new scene
+  setTimeout(() => {
+    scenes.forEach(s => s.classList.remove('fade-out'));
+    scenes[currentScene].classList.add('active');
+  }, 800);
+}
+
+function tick() {
+  const elapsed = Date.now() - startTime;
+  const pct = Math.min(100, (elapsed / totalDuration) * 100);
+  progress.style.width = pct + '%';
+
+  // Determine which scene we should be on
+  let cumulative = 0;
+  for (let i = 0; i < SCENE_DURATIONS.length; i++) {
+    cumulative += SCENE_DURATIONS[i];
+    if (elapsed < cumulative) {
+      if (i !== currentScene) goToScene(i);
+      break;
+    }
+  }
+
+  if (elapsed < totalDuration) {
+    requestAnimationFrame(tick);
+  }
+}
+
+requestAnimationFrame(tick);
+</script>
+</body>
+</html>
